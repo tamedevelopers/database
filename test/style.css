@@ -1,0 +1,46 @@
+/* Container for the wallet */
+.wallet-container {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Wallet card */
+.wallet-card {
+    width: 30%;
+    background-color: #f8f9fa;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+/* User name section */
+.wallet-card .user-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Amount section */
+.wallet-card .amount {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Other sections */
+.wallet-card .section {
+    margin-bottom: 10px;
+}
+
+/* Footer section */
+.wallet-card .footer {
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
+}
+
+
