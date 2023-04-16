@@ -79,21 +79,23 @@ abstract class Model extends ModelQuery{
     }
 
     /**
+     * Get result data as an array of arrays
+     *
+     * @return object|array\getArr
+     */
+    public function getArr()
+    {
+        return $this->fetchCollector(false);
+    }
+
+    /**
      * Get result data as an arrays of objects
      *
      * @return object|array\get
      */
     public function get()
     {
-        try {
-            // query builder
-            $this->compileQuery()->execute();
-
-            return $this->getQueryResult( $this->tryFetchAll() );
-        } catch (\Throwable $th) {
-            $this->dump_final = false;
-            $this->dump( $this->errorTemp($th)['message'] );
-        }
+        return $this->fetchCollector();
     }
 
     /**
@@ -210,6 +212,24 @@ abstract class Model extends ModelQuery{
     public function close()
     {
         $this->closeQuery();
+    }
+
+    /**
+     * Same logic for Get and GetArr
+     *
+     * @return object|array\fetchCollector
+     */
+    private function fetchCollector($type = true)
+    {
+        try {
+            // query builder
+            $this->compileQuery()->execute();
+
+            return $this->getQueryResult( $this->tryFetchAll($type) );
+        } catch (\Throwable $th) {
+            $this->dump_final = false;
+            $this->dump( $this->errorTemp($th)['message'] );
+        }
     }
 
 }

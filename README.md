@@ -21,6 +21,7 @@ Ultimate ORM Database
   * [Raw](#raw)
 * [Fetching Data](#fetching-data)
     * [Get](#get)
+    * [Get Arr](#getarr)
     * [First](#first)
     * [First or Fail](#first-or-fail)
     * [Count](#count)
@@ -338,6 +339,15 @@ SELECT * FROM users
 ### GET
 ```
 $db->table('users')->get();
+
+-- Query
+SELECT * 
+    FROM `users`
+```
+
+### GetArr
+```
+$db->table('users')->getArr();
 
 -- Query
 SELECT * 

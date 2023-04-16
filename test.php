@@ -13,15 +13,11 @@ AutoloadEnv::start([
 ]);
 
 $db = new DB();
-
-
 $user = $db->table('tb_user')
-            ->get();
-
-
+            ->getArr();
 
 $db->dump(
-    $db->toObject($user),
+    $user,
     // ORM_ENV_CLASS,
     'ss'
 );
