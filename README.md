@@ -143,7 +143,7 @@ OrmDotEnv::load();
 ```
 use UltimateOrmDatabase\AutoloadEnv;
 
-- This will auto create .env file with dummy data and auto-start environment model
+- This will auto create .env file with dummy data (if doesn't exist) and auto-start environment model
 
 AutoloadEnv::start();
 
