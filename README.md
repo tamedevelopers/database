@@ -157,6 +157,7 @@ $db = new DB();
 
 | key               |  Type     |  Default Value        |
 |-------------------|-----------|-----------------------|
+| DB_CONNECTION     |  string   |  mysql                |
 | APP_DEBUG         |  boolean  |  true                 |
 | DB_HOST           |  string   |  `localhost`          |
 | DB_USERNAME       |  string   |                       |
@@ -168,6 +169,7 @@ $db = new DB();
 
 ```
 new DB([
+    'DB_CONNECTION'=> '', 
     'APP_DEBUG'    => '', 
     'DB_HOST'      => '', 
     'DB_USERNAME'  => '', 
@@ -177,6 +179,9 @@ new DB([
     'DB_CHARSET'   => '', 
     'DB_COLLATION' => '', 
 ]);
+
+The DB_CONNECTION uses only `mysql`
+No other connection type is supported for now.
 ```
 
 ## Usage 
@@ -227,9 +232,7 @@ $db->table('users')
 ```
 $db->table('users')
     ->where('user_id', 10000001)
-    ->update([
-        'first_name' => 'Alfred C.',
-    ]);
+    ->delete();
 ```
 
 ### Increment
@@ -312,11 +315,12 @@ SELECT count(*) FROM users
 ```
 $db->raw('SELECT * FROM users')
     ->where('is_active', 1)
-    ->get();
+    ->first();
 
 -- Query
 SELECT * FROM users
     WHERE is_active=:is_active
+    LIMIT 1
 ```
 
 
@@ -332,7 +336,6 @@ SELECT * FROM users
 | tableExist()  |  array             |
 
 ### GET
-- Get all data, using Query Schema
 ```
 $db->table('users')->get();
 
@@ -342,7 +345,6 @@ SELECT *
 ```
 
 ### First
-- Get first data, using Query Schema
 ```
 $db->table('users')->first();
 
@@ -352,7 +354,7 @@ SELECT *
 ```
 
 ### First or Fail
-- Same as first() method but exit with error code 404, if data not found
+- Same as `first()` method but exit with error code 404, if data not found
 ```
 $db->table('users')->firstOrFail();
 
@@ -372,7 +374,7 @@ SELECT count(*)
 
 ### Paginate
 - Takes param as `int` `$per_page`
-- By default if no param is given, then it displays 10 per page
+    - By default if no param is given, then it displays 10 per page
 ```
 $users = $db->table('users')->paginate(40);
 
@@ -420,7 +422,7 @@ SELECT first_name, email
 
 ### orderBy
 - Takes two param `$column` and `$direction`
-- By default  `$direction` param is set to `ASC`
+    - By default  `$direction` param is set to `ASC`
 ```
 $db->table('wallet')
     ->orderBy('date', 'DESC')
@@ -562,7 +564,7 @@ SELECT *
 
 ### where
 - Takes three parameter
-- Only the first param is required
+    - Only the first param is required
 
 | param     | Data types |
 |-----------|------------|
@@ -645,7 +647,7 @@ SELECT *
 
 ### whereBetween
 - Takes two parameter `column` as string `param` as array
-- Doesn't support float value
+    - Doesn't support float value
 
 | param  | Data types |     Value    |
 |--------|------------|--------------|
@@ -681,7 +683,7 @@ SELECT *
 
 ### whereIn
 - Takes two parameter `column` as string `param` as array
-- Doesn't support float value
+    - Doesn't support float value
 
 | param  | Data types |     Value    |
 |--------|------------|--------------|
@@ -857,7 +859,7 @@ true|false
 
 ## Extend DB Class
 - You can as well extends the DB class and use along 
-- If inherited class must use a __construct, Then you must use `parent::__construct();`
+    - If inherited class must use a __construct, Then you must use `parent::__construct();`
 
 ```
 use UltimateOrmDatabase\DB;
