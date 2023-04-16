@@ -53,7 +53,7 @@ trait ReusableTrait{
                 'maxStringLength'   => 500, // Set maximum string length to display
                 'expand'            => 'toggle', // Enable toggling arrays and objects
             ]);
-            echo "<style>pre.sf-dump, pre.sf-dump .sf-dump-default{{$this->getBgColor($this->bg)}}</style>";
+            echo "<style>pre.sf-dump, pre.sf-dump .sf-dump-default{{$this->getBgColor( $this->bg )}}</style>";
             if($this->dump_final)
                 die(1);
         }

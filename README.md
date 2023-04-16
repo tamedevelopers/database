@@ -9,6 +9,7 @@ Ultimate ORM Database
 * [Installation](#installation)
 * [Instantiate](#instantiate)
 * [Database Connection](#database-connection)
+* [Env Auto Loader](#env-auto-loader)
 * [More Database Connection Keys](#more-database-connection-keys)
 * [Usage](#usage)
   * [Table](#table)
@@ -47,6 +48,8 @@ Ultimate ORM Database
   * [whereIn](#wherein)
   * [whereNotIn](#wherenotin)
   * [groupBy](#groupby)
+* [toArray](#toarray)
+* [toObject](#toobject)
 * [Pagination](#pagination)
 * [Get Database Query](#get-database-query)
 * [Get Database Config Data](#get-database-config-data)
@@ -98,9 +101,9 @@ $db = new DB();
 
 ## Database Connection
 
-**Direct Connection** — When initializing the class
-- Pass and array to the DB class on initialization
-
+### Direct DB Connection
+- When initializing the class
+    - Pass and array to the DB class on initialization
 ```
 $db = new DB([
     'DB_USERNAME' => '',
@@ -109,38 +112,50 @@ $db = new DB([
 ]);
 ```
 
-**.ENV Connection** — Most preferred
-- Create a file and save as (.env) in any folder
-- Prefered location is always at the ROOT dir[directory].
-- By default you don't need to provide any path, since the Model auto get the root path to your project [dir]
-
+### ENV Connection - `Most preferred`
+- If you intend using .env, Make sure it's being setup before calling the database class
+    - Create a file and save as (.env) in any folder
+        - Prefered location is always at the ROOT dir[directory].
+            - By default you don't need to provide any path, since the Model auto get the root path to your project [dir]
 ```
-    use UltimateOrmDatabase\Methods\OrmDotEnv;
+use UltimateOrmDatabase\Methods\OrmDotEnv;
 
-    $dotenv = new OrmDotEnv('PATH_TO_ENV_FOLDER');
-    $dotenv->load();
+$dotenv = new OrmDotEnv('PATH_TO_ENV_FOLDER');
+$dotenv->load();
 
-    or 
-    $dotenv = new OrmDotEnv('PATH_TO_ENV_FOLDER');
-    $dotenv->loadOrFail();
-
-    or shorter way
-    (new OrmDotEnv('PATH_TO_ENV_FOLDER'))->load();
+or 
+$dotenv = new OrmDotEnv();
+$dotenv->loadOrFail();
 ```
+
 **Static method**
-- The `->loadOrFail()` method is useful in development stage
+- The `->loadOrFail()` method is useful on development stage only
 
 ```
-    OrmDotEnv::loadOrFail('PATH_TO_ENV_FOLDER');
+OrmDotEnv::loadOrFail();
+or
+OrmDotEnv::load();
+```
 
-    or
-    OrmDotEnv::load('PATH_TO_ENV_FOLDER');
+## Env Auto Loader
+- Just call class and see it's magic `.env auto setup`
+
+```
+use UltimateOrmDatabase\AutoloadEnv;
+
+- This will auto create .env file with dummy data and auto-start environment model
+
+AutoloadEnv::start();
+
+- As seen (Must be called before you start using the database instance)
+
+$db = new DB();
 ```
 
 ## More Database Connection Keys
 - All available connection keys
 
-| key_name          |  Type     |  Default Value        |
+| key               |  Type     |  Default Value        |
 |-------------------|-----------|-----------------------|
 | APP_DEBUG         |  boolean  |  true                 |
 | DB_HOST           |  string   |  `localhost`          |
@@ -285,22 +300,22 @@ $db->table('users')
 - Allows you to use direct raw `SQL query syntax`
 
 ```
-$db->raw('SELECT * FROM tb_user')
+$db->raw('SELECT * FROM users')
     ->where('is_active', 1)
     ->count();
 
 -- Query
-SELECT count(*) FROM tb_user
+SELECT count(*) FROM users
     WHERE is_active=:is_active
 ```
 
 ```
-$db->raw('SELECT * FROM tb_user')
+$db->raw('SELECT * FROM users')
     ->where('is_active', 1)
     ->get();
 
 -- Query
-SELECT * FROM tb_user
+SELECT * FROM users
     WHERE is_active=:is_active
 ```
 
@@ -381,7 +396,7 @@ $db->tableExist('users');
 -- Either 404|200
 array [
     "status" => 200
-    "message" => "Table name `tb_user` exist."
+    "message" => "Table name `users` exist."
 ]
 ```
 
@@ -524,25 +539,25 @@ SELECT *
 | localColumn   | local_table.column |
 ```
 $db->table('wallet')
-    ->join('tb_user', 'tb_user.user_id', '=', 'wallet.user_id')
+    ->join('users', 'users.user_id', '=', 'wallet.user_id')
     ->get();
 
 -- Query
 SELECT * 
     FROM `wallet`
-    INNER JOIN `tb_user` ON tb_user.user_id = wallet.user_id
+    INNER JOIN `users` ON users.user_id = wallet.user_id
 ```
 
 ### leftJoin
 - Same as `join`
 ```
 $db->table('wallet')
-    ->leftJoin('tb_user', 'tb_user.user_id', '=', 'wallet.user_id')
+    ->leftJoin('users', 'users.user_id', '=', 'wallet.user_id')
     ->get();
 
 SELECT * 
     FROM `wallet`
-    LEFT JOIN `tb_user` ON tb_user.user_id = wallet.user_id
+    LEFT JOIN `users` ON users.user_id = wallet.user_id
 ```
 
 ### where
@@ -711,6 +726,22 @@ $db->table('wallet')
 SELECT * 
     FROM `wallet`
     WHERE user_id=:user_id GROUP BY amount
+```
+
+## toArray
+- Takes one param as `array or object` `$data`
+```
+$db->toArray([]);
+
+- This will convert all data into an array or arrays
+```
+
+## toObject
+- Same as `toArray()` method
+```
+$db->toObject([]);
+
+- This will convert all data into an array or objects
 ```
 
 ## Pagination

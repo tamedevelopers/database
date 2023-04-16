@@ -57,6 +57,28 @@ abstract class Model extends ModelQuery{
     }
 
     /**
+     * Convert data to array
+     * 
+     * @param array|object|null $data
+     * @return array\toArray
+     */ 
+    public function toArray($data = [])
+    {
+        return json_decode( json_encode($data), TRUE);
+    }
+    
+    /**
+     * Convert data to object
+     * 
+     * @param array|object|null $data
+     * @return array|object\toObject
+     */ 
+    public function toObject($data = [])
+    {
+        return json_decode( json_encode($data), FALSE);
+    }
+
+    /**
      * Get result data as an arrays of objects
      *
      * @return object|array\get

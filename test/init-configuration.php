@@ -1,7 +1,5 @@
 <?php
 
-use UltimateOrmDatabase\Methods\OrmDotEnv;
-
 /*
  * This file is part of ultimate-orm-database.
  *
@@ -10,8 +8,31 @@ use UltimateOrmDatabase\Methods\OrmDotEnv;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+use UltimateOrmDatabase\Methods\OrmDotEnv;
 
-$ormDotEnv = OrmDotEnv::load();
+/*
+|--------------------------------------------------------------------------
+| Instance of class
+|--------------------------------------------------------------------------
+*/
+$ormDotEnv = new OrmDotEnv();
+
+/*
+|--------------------------------------------------------------------------
+| Create a sample .env file if not exist in project
+|--------------------------------------------------------------------------
+*/
+$ormDotEnv::createOrIgnore();
+
+
+/*
+|--------------------------------------------------------------------------
+| Load environment file (associated to database)
+|--------------------------------------------------------------------------
+| This will automatically6 setup our database configuration if found 
+|
+*/
+$loader = $ormDotEnv::load();
 
 
 /*
@@ -20,8 +41,7 @@ $ormDotEnv = OrmDotEnv::load();
 |--------------------------------------------------------------------------
 | default | main | dark | red | blue
 */
-
-$ormDotEnv->bg = "default";
+$ormDotEnv->bg = 'default';
 
 
 /*
@@ -33,7 +53,6 @@ $ormDotEnv->bg = "default";
 | Error on using the Database model
 |
 */
-
 if($ormDotEnv['response'] != 200){
     /**
      * Setting application to use the dump error handling
@@ -43,7 +62,7 @@ if($ormDotEnv['response'] != 200){
     /**
      * Dump error message
      */
-    $ormDotEnv->dump($ormDotEnv['message']);
+    $ormDotEnv->dump( $loader['message'] );
     die(1);
 }
 
@@ -57,6 +76,7 @@ if($ormDotEnv['response'] != 200){
 |
 | ENV_CLASS['path'] -> return .env root Path
 */
-
-define('ENV_CLASS', $ormDotEnv);
+if ( ! defined('ORM_ENV_CLASS') ) {
+    define('ORM_ENV_CLASS', $ormDotEnv);
+}
 

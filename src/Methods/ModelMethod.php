@@ -76,6 +76,7 @@ class ModelMethod extends Constants{
     {
         $defaultOption = [
             'APP_DEBUG'     => $options['APP_DEBUG']    ?? true,
+            'DB_CONNECTION' => $options['DB_CONNECTION']?? 'mysql',
             'DB_HOST'       => $options['DB_HOST']      ?? 'localhost',
             'DB_DATABASE'   => $options['DB_DATABASE']  ?? '',
             'DB_USERNAME'   => $options['DB_USERNAME']  ?? '',
@@ -93,6 +94,11 @@ class ModelMethod extends Constants{
         // APP_DEBUG
         if ( ! defined('APP_DEBUG') ) {
             define('APP_DEBUG', self::setEnvBool($_ENV['APP_DEBUG'] ?? $defaultOption['APP_DEBUG']));
+        }
+
+        // DB_CONNECTION
+        if ( ! defined('DB_CONNECTION') ) {
+            define('DB_CONNECTION', self::setEnvBool($_ENV['DB_CONNECTION'] ?? $defaultOption['DB_CONNECTION']));
         }
 
         // DB_HOST
@@ -142,6 +148,7 @@ class ModelMethod extends Constants{
     {
         $data =  [
             'APP_DEBUG'     => defined('APP_DEBUG')     ? APP_DEBUG     : true,
+            'DB_CONNECTION' => defined('DB_CONNECTION') ? DB_CONNECTION : 'mysql',
             'DB_HOST'       => defined('DB_HOST')       ? DB_HOST       : 'localhost',
             'DB_DATABASE'   => defined('DB_DATABASE')   ? DB_DATABASE   : null,
             'DB_USERNAME'   => defined('DB_USERNAME')   ? DB_USERNAME   : null,
@@ -151,7 +158,7 @@ class ModelMethod extends Constants{
             'DB_CHARSET'    => defined('DB_CHARSET')    ? DB_CHARSET    : 'utf8mb4',
         ];
 
-        return $data[$key] ?? $data;
+        return $data[$key] ?? array_merge($data, $_ENV);
     }
 
     /**
@@ -202,28 +209,6 @@ class ModelMethod extends Constants{
         }
 
         return $charset; 
-    }
-
-    /**
-     * Convert data to array
-     * 
-     * @param array|object|null $data
-     * @return array\toArray
-     */ 
-    static public function toArray($data = [])
-    {
-        return (array) $data;
-    }
-    
-    /**
-     * Convert data to object
-     * 
-     * @param array|object|null $data
-     * @return array\toObject
-     */ 
-    static public function toObject($data = [])
-    {
-        return (object) $data;
     }
 
     /**
