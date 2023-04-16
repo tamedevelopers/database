@@ -13,6 +13,17 @@ use UltimateOrmDatabase\Methods\OrmDotEnv;
 
 $ormDotEnv = OrmDotEnv::load();
 
+
+/*
+|--------------------------------------------------------------------------
+| Defining background color for var dump
+|--------------------------------------------------------------------------
+| default | main | dark | red | blue
+*/
+
+$ormDotEnv->bg = "default";
+
+
 /*
 |--------------------------------------------------------------------------
 | Check If There was an error getting the environment file
@@ -36,6 +47,7 @@ if($ormDotEnv['response'] != 200){
     die(1);
 }
 
+
 /*
 |--------------------------------------------------------------------------
 | Storing data into a Constant once everything is successful
@@ -47,3 +59,4 @@ if($ormDotEnv['response'] != 200){
 */
 
 define('ENV_CLASS', $ormDotEnv);
+

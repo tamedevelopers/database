@@ -14,6 +14,12 @@ trait ReusableTrait{
      * @var bool
     */
     public $dump_final = true;
+    
+    /**
+     * Define var_dump background color
+     * @var string
+    */
+    public $bg = 'default';
 
     /**
      * Background colors
@@ -42,13 +48,12 @@ trait ReusableTrait{
         // if DEBUG MODE IS ON
         if($App){
             VarDumper::dump($data, 20, true, [
-                'bg'                => 'dark', // Set dark background
                 'highlight'         => true, // Enable syntax highlighting
                 'maxDepth'          => 3, // Set maximum depth for arrays and objects
                 'maxStringLength'   => 500, // Set maximum string length to display
                 'expand'            => 'toggle', // Enable toggling arrays and objects
             ]);
-            echo "<style>pre.sf-dump, pre.sf-dump .sf-dump-default{{$this->getBgColor('default')}}</style>";
+            echo "<style>pre.sf-dump, pre.sf-dump .sf-dump-default{{$this->getBgColor($this->bg)}}</style>";
             if($this->dump_final)
                 die(1);
         }
@@ -64,7 +69,7 @@ trait ReusableTrait{
     {
         return isset($this->backgroundColors[$color]) 
                 ? $this->backgroundColors[$color] 
-                : $this->backgroundColors['dark'];
+                : $this->backgroundColors['default'];
     }
 
 }
