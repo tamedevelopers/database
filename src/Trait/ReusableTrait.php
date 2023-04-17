@@ -40,9 +40,18 @@ trait ReusableTrait{
      */
     public function dump($data)
     {
+        // get App Config
+        $appConfig = $this->AppConfig();
+
+        // get bg
+        $bg =   isset($_ENV['APP_DEBUG_BG']) 
+                ? $_ENV['APP_DEBUG_BG'] 
+                : isset($appConfig['APP_DEBUG_BG']) 
+                ?? $this->bg;
+
         // app data
-        $App =  is_array($this->AppConfig()) 
-                ? $this->AppConfig()['APP_DEBUG'] 
+        $App =  is_array($appConfig) 
+                ? $appConfig['APP_DEBUG'] 
                 : true;
 
         // if DEBUG MODE IS ON
@@ -53,7 +62,7 @@ trait ReusableTrait{
                 'maxStringLength'   => 500, // Set maximum string length to display
                 'expand'            => 'toggle', // Enable toggling arrays and objects
             ]);
-            echo "<style>pre.sf-dump, pre.sf-dump .sf-dump-default{{$this->getBgColor( $this->bg )}}</style>";
+            echo "<style>pre.sf-dump, pre.sf-dump .sf-dump-default{{$this->getBgColor( $bg )}}</style>";
             if($this->dump_final)
                 die(1);
         }

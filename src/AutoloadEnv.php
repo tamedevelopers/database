@@ -64,7 +64,15 @@ class AutoloadEnv{
         */
         $ormDotEnv->bg = $default['bg'];
 
-        
+        /*
+        |--------------------------------------------------------------------------
+        | Update ENV variable
+        |--------------------------------------------------------------------------
+        | 
+        */
+        $ormDotEnv::updateENV('APP_DEBUG_BG', $ormDotEnv->bg, false);
+
+
         /*
         |--------------------------------------------------------------------------
         | Check If There was an error getting the environment file
@@ -78,7 +86,7 @@ class AutoloadEnv{
             /**
              * Setting application to use the dump error handling
              */
-            $ormDotEnv->dump_final = true;
+            $ormDotEnv->dump_final = false;
 
             /**
              * Dump error message
@@ -95,10 +103,10 @@ class AutoloadEnv{
         | We can now use on anywhere on our application 
         | Mostly to get our defined .env root Path
         |
-        | ENV_CLASS['path'] -> return .env root Path
+        | ORM_ENV_CLASS['path'] -> return .env root Path
         */
         if ( ! defined('ORM_ENV_CLASS') ) {
-            define('ORM_ENV_CLASS', $ormDotEnv);
+            define('ORM_ENV_CLASS', $loader);
         }
     }
     

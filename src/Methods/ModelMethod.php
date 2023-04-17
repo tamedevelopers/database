@@ -76,6 +76,7 @@ class ModelMethod extends Constants{
     {
         $defaultOption = [
             'APP_DEBUG'     => $options['APP_DEBUG']    ?? true,
+            'APP_DEBUG_BG'  => $options['APP_DEBUG_BG'] ?? 'default',
             'DB_CONNECTION' => $options['DB_CONNECTION']?? 'mysql',
             'DB_HOST'       => $options['DB_HOST']      ?? 'localhost',
             'DB_DATABASE'   => $options['DB_DATABASE']  ?? '',
@@ -94,6 +95,11 @@ class ModelMethod extends Constants{
         // APP_DEBUG
         if ( ! defined('APP_DEBUG') ) {
             define('APP_DEBUG', self::setEnvBool($_ENV['APP_DEBUG'] ?? $defaultOption['APP_DEBUG']));
+        }
+
+        // APP_DEBUG_BG
+        if ( ! defined('APP_DEBUG_BG') ) {
+            define('APP_DEBUG_BG', self::setEnvBool($_ENV['APP_DEBUG_BG'] ?? $defaultOption['APP_DEBUG_BG']));
         }
 
         // DB_CONNECTION
@@ -148,6 +154,7 @@ class ModelMethod extends Constants{
     {
         $data =  [
             'APP_DEBUG'     => defined('APP_DEBUG')     ? APP_DEBUG     : true,
+            'APP_DEBUG_BG'  => defined('APP_DEBUG_BG')  ? APP_DEBUG_BG  : 'default',
             'DB_CONNECTION' => defined('DB_CONNECTION') ? DB_CONNECTION : 'mysql',
             'DB_HOST'       => defined('DB_HOST')       ? DB_HOST       : 'localhost',
             'DB_DATABASE'   => defined('DB_DATABASE')   ? DB_DATABASE   : null,

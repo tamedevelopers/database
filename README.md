@@ -160,6 +160,7 @@ $db = new DB();
 |-------------------|-----------|-----------------------|
 | DB_CONNECTION     |  string   |  mysql                |
 | APP_DEBUG         |  boolean  |  true                 |
+| APP_DEBUG_BG      |  string   |  Default value is `default` and other color \| `main`  \| `dark` \| `red` \| `blue` |
 | DB_HOST           |  string   |  `localhost`          |
 | DB_USERNAME       |  string   |                       |
 | DB_PASSWORD       |  string   |                       |
@@ -170,9 +171,6 @@ $db = new DB();
 
 ```
 new DB([
-    'DB_CONNECTION'=> '', 
-    'APP_DEBUG'    => '', 
-    'DB_HOST'      => '', 
     'DB_USERNAME'  => '', 
     'DB_PASSWORD'  => '', 
     'DB_DATABASE'  => '', 

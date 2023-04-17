@@ -211,6 +211,7 @@ class OrmDotEnv extends Constants{
             APP_ENV=local
             APP_KEY='.self::generateAppKey() .'
             APP_DEBUG=true
+            APP_DEBUG_BG=default
             SITE_EMAIL=
             
             DB_CONNECTION=mysql
