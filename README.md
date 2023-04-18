@@ -816,12 +816,6 @@ $users->data
 ```
 $users->pagination->links();
 // This will return the view of pagination links
-
--- or direct on every pagination links()
-$users->paginate->links([
-    'first' => 'First Page',
-    'last'  => 'Last Page',
-])
 ```
 
 ### Pagination Links Configuration
