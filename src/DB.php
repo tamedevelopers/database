@@ -18,5 +18,8 @@ class DB extends Model{
     
     public function __construct(?array $options = []) {
         parent::__construct($options);
+
+        // configure pagination settings 
+        $this->configurePagination($options);
     }
 }

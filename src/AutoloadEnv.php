@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 namespace UltimateOrmDatabase;
-
+    
 use UltimateOrmDatabase\Methods\OrmDotEnv;
 
 
@@ -30,6 +30,7 @@ class AutoloadEnv{
             'bg'    => $option['bg']    ?? 'default',
         ];
         
+
         /*
         |--------------------------------------------------------------------------
         | Instance of class
@@ -37,7 +38,7 @@ class AutoloadEnv{
         */
         $ormDotEnv = new OrmDotEnv($default['path']);
         
-        
+
         /*
         |--------------------------------------------------------------------------
         | Create a sample .env file if not exist in project
@@ -45,7 +46,7 @@ class AutoloadEnv{
         */
         $ormDotEnv::createOrIgnore();
         
-        
+
         /*
         |--------------------------------------------------------------------------
         | Load environment file (associated to database)
@@ -53,8 +54,8 @@ class AutoloadEnv{
         | This will automatically6 setup our database configuration if found 
         |
         */
-        $loader = $ormDotEnv::load();
-        
+        $loader = $ormDotEnv::loadOrFail();
+
         
         /*
         |--------------------------------------------------------------------------
@@ -62,16 +63,24 @@ class AutoloadEnv{
         |--------------------------------------------------------------------------
         | default | main | dark | red | blue
         */
-        $ormDotEnv->bg = $default['bg'];
+        $ormDotEnv->{'bg'} = $default['bg'];
+
 
         /*
         |--------------------------------------------------------------------------
         | Update ENV variable
         |--------------------------------------------------------------------------
-        | 
+        | Here we do not want to temper with the environment file always
+        | - Since this path will always run at every application call
+        | - We only will update APP_DEBUG_BG if env path is set and 
+        | - If the APP_DEBUG_BG is empty
+        |
         */
-        $ormDotEnv::updateENV('APP_DEBUG_BG', $ormDotEnv->bg, false);
-
+        if(isset($_ENV['APP_DEBUG_BG'])){
+            if(empty($_ENV['APP_DEBUG_BG'])){
+                $ormDotEnv::updateENV('APP_DEBUG_BG', $ormDotEnv->{'bg'}, false);
+            }
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -94,7 +103,6 @@ class AutoloadEnv{
             $ormDotEnv->dump( $loader['message'] );
             die(1);
         }
-        
         
         /*
         |--------------------------------------------------------------------------

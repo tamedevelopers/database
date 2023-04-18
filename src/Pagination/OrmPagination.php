@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace UltimateOrmDatabase\Pagination;
 
-
 class OrmPagination{
-    
 
     /**
      * Return boostrap pagination css style

@@ -75,7 +75,7 @@ Prior to installing `ultimate-orm-database` get the [Composer](https://getcompos
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^1.0.8" 
+    "peterson/ultimate-orm-database": "^1.0.1" 
 }
 ```
 
@@ -760,36 +760,112 @@ $db->toObject([]);
 | key   | Data Type |  Description    |
 |-------|-----------|-----------------|
 | allow | `true` \| `false` |  Default is `false` Setting to true will allow the system use this setting allover the system app |
-| class | string    | Css `class_name` here will be appended to the pagination ul tag in the browser |
+| class | string    | Css `selector` For pagination ul tag in the browser |
+| span  | string    | Css `selector` For pagination Showing Span tags in the browser |
 | view  | `bootstrap` \| `simple`   | Default is `bootstrap` - Supports either `boostrap` view or `simple` pagination design |
 | first | string    | Change the letter of `First`
 | last  | string    | Change the letter of `Last`
 | next  | string    | Change the letter of `Next`
 | prev  | string    | Change the letter of `Prev`
+| showing | string    | Change the letter of `Prev`
+| of    | string    | Change the letter `of`
+| to    | string    | Change the letter `to`
+| results | string    | Change the letter `results`
 
-- 1 -- Global Configuraton
+### Global Configuraton
+- 1 Can be called using the `configurePagination` method
 ```
 $db->configurePagination([
     'allow' => true, 
     'view'  => 'bootstrap',
-    'class' => 'Custom-Class', //can add a custom css and style
+    'class' => 'Custom-Class-Css-Selector', 
 ]);
 ```
-- 2  -- or direct on every pagination links()
+
+- 2 Can be called same time initializing the DB 
 ```
-$users = $db->table('users')->paginate(40);
+$db = new DB([
+    'allow'         => true, 
+    'prev'          => 'Prev Page', 
+    'last'          => 'Last Page', 
+    'next'          => 'Next Page', 
+    'DB_USERNAME'   => 'root', 
+    'DB_PASSWORD'   => '', 
+    'DB_DATABASE'   => 'dbquery', 
+]);
+```
+
+### Paginate Query
+```
+$users = $db->table('users')
+            ->paginate(40);
 
 -- Query
 SELECT * 
     FROM `users` 
     LIMIT 0, 40
+```
 
-$users->data // this will return the data objects
+### Get Pagination Data
+```
+$users->data
+// This will return the pagination data objects
+```
 
+### Get Pagination Links
+```
+$users->pagination->links();
+// This will return the view of pagination links
+
+-- or direct on every pagination links()
 $users->paginate->links([
     'first' => 'First Page',
     'last'  => 'Last Page',
 ])
+```
+
+### Pagination Links Configuration
+- You can directly configure pagination links directly
+    - If `configurePagination()` `allow` is set to `true`
+        - It'll override every other settings
+```
+$users->paginate->links([
+    'first' => 'First Page',
+    'last'  => 'Last Page',
+    'prev'  => 'Previous Page',
+    'next'  => 'Next Page',
+])
+```
+
+### Get Pagination Showing of
+```
+$users->pagination->showing();
+
+// This will create a span html element with text
+<div>
+    <span class='pagination-highlight'>
+        Showing 0 to 40 of 500 results
+    </span>
+</div>
+```
+
+### Pagination Showing Configuration
+- You can directly configure showing text directly
+```
+$users->paginate->showing([
+    'showing'   => 'Showing',
+    'to'        => 'To',
+    'of'        => 'out of',
+    'results'   => 'Results',
+    'span'      => 'css-selector',
+])
+
+// This will change the span text to
+<div>
+    <span class='css-selector'>
+        Showing 0 To 40 out of 500 Results
+    </span>
+</div>
 ```
 
 ## Get Database Query

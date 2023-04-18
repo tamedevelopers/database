@@ -145,39 +145,6 @@ abstract class Model extends ModelQuery{
     }
 
     /**
-     * Get Pagination Links
-     * @param array $options
-     *
-     * @return object|array\links
-     */
-    public function links(?array $options = [])
-    {
-        // If global is not allowed, 
-        // Then use each settings for each view
-        if(!$this->use_global){
-            $this->pagination_settings = [
-                'allow' => $options['allow'] ?? false,
-                'class' => $options['class'] ?? null,
-                'view'  => in_array($options['view'] ?? null, $this->pagination_view) ? $options['view'] : 'bootstrap',
-                'first' => $options['first'] ?? 'First',
-                'last'  => $options['last'] ?? 'Last',
-                'next'  => $options['next'] ?? 'Next',
-                'prev'  => $options['prev'] ?? 'Prev',
-            ];
-        }
-
-        echo \yidas\widgets\Pagination::widget([
-            'pagination'        => $this->pagination,
-            'ulCssClass'        => $this->pagination_settings['class'],
-            'view'              => $this->pagination_settings['view'],
-            'firstPageLabel'    => $this->pagination_settings['first'],
-            'lastPageLabel'     => $this->pagination_settings['last'],
-            'nextPageLabel'     => $this->pagination_settings['next'],
-            'prevPageLabel'     => $this->pagination_settings['prev']
-        ]) . "{$this->pagination_css}";
-    }
-
-    /**
      * Count results
      *
      * @return int\count

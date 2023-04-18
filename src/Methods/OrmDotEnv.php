@@ -39,6 +39,15 @@ class OrmDotEnv extends Constants{
     }
 
     /**
+     * Initialization of self class
+     * @return void
+     */
+    static private function init() 
+    {
+        self::$object = new OrmDotEnv;
+    }
+
+    /**
      * Define custom Directory path to .env file
      * By default we use your server root folder
      * @param string $path Path to .env Folder\Not needed exept called statically
@@ -172,15 +181,6 @@ class OrmDotEnv extends Constants{
         }
 
         return false;
-    }
-
-    /**
-     * Initialization of self class
-     * @return void
-     */
-    static private function init() 
-    {
-        self::$object = new OrmDotEnv;
     }
 
     /**
