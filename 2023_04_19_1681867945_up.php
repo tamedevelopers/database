@@ -5,7 +5,6 @@ use UltimateOrmDatabase\Migration\Blueprint;
 use UltimateOrmDatabase\Migration\Migration;
 
 
-
 return new class extends Migration
 {
     /**
@@ -15,7 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('ads_data', function (Blueprint $table) {
+        Schema::create('up', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->index();
             $table->foreign('user_id')
@@ -44,17 +43,18 @@ return new class extends Migration
      */
     public function drop()
     {
-        Schema::dropTable('ads_data');
+        Schema::dropTable('up');
     }
 
     /**
      * drop database column
+     * @param string $column 
      *
      * @return void
      */
-    public function column()
+    public function column(?string $column)
     {
-        Schema::dropColumn('ads_data', 'mare');
+        Schema::dropColumn('up', $column);
     }
 
 };
