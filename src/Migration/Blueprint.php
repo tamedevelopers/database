@@ -104,6 +104,17 @@ class Blueprint extends Constants{
 
         // Creating table queries
         $Query = "
+
+            SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
+            START TRANSACTION;
+            SET time_zone = '+00:00';
+
+            --
+            -- Database: `{$this->tableName}`
+            --
+
+            -- --------------------------------------------------------
+
             --
             -- Table structure for table `{$this->tableName}`
             --
@@ -142,19 +153,6 @@ class Blueprint extends Constants{
             ";
         }
 
-        // add constriants
-        if(count($this->queryConstraints) > 0){
-            // implode constraints with comma
-            $this->queryConstraints = implode(', ', $this->queryConstraints);
-            $Query .= "
-                --
-                -- Constraints for table `{$this->tableName}`
-                --
-                ALTER TABLE `{$this->tableName}`
-                {$this->queryConstraints};
-            ";
-        }
-
         // Add triggers
         if(count($this->queryTimeStamps) > 0){
             foreach($this->queryTimeStamps as $triggers){
@@ -167,7 +165,7 @@ class Blueprint extends Constants{
                         BEFORE INSERT ON {$this->tableName}
                         FOR EACH ROW
                         SET NEW.created_at = IFNULL(NEW.created_at, NOW()),
-                            NEW.updated_at = NOW();
+                        NEW.updated_at = NOW();
                     ";
                 }else{
                     $Query .= "
@@ -183,6 +181,19 @@ class Blueprint extends Constants{
             }
         }
 
+        // add constriants
+        if(count($this->queryConstraints) > 0){
+            // implode constraints with comma
+            $this->queryConstraints = implode(', ', $this->queryConstraints);
+            $Query .= "
+                --
+                -- Constraints for table `{$this->tableName}`
+                --
+                ALTER TABLE `{$this->tableName}`
+                {$this->queryConstraints};
+            ";
+        }
+
         // end commit
         $Query .= "COMMIT;";
 
@@ -192,7 +203,10 @@ class Blueprint extends Constants{
         // clean string from begining and ending
         $Query = preg_replace("/^[ \t]+|[ \t]+$/m", "", $Query);
 
-        return str_replace('\\', '', $Query);
+        // clean forward slash
+        $Query = str_replace('\\', '', $Query);
+
+        return $Query;
     }
 
     /**

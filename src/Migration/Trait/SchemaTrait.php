@@ -226,7 +226,7 @@ trait SchemaTrait{
      */
     public function timestamp($name)
     {
-        return $this->addColumn($name, 'timestamp');
+        return $this->addColumn($name, 'timestamp', ['nullable' => true, 'default' => null]);
     }
 
     /**
