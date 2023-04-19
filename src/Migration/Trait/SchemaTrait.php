@@ -236,8 +236,14 @@ trait SchemaTrait{
      */
     public function timestamps()
     {
-        return $this->addColumn('created_at', 'timestamps', ['nullable' => true])
-                    ->addColumn('updated_at', 'timestamps', ['nullable' => true]);
+        return $this->addColumn('created_at', 'timestamps', [
+                        'nullable'  => true,
+                        'index'     => $this->generix_name('created_at_index')
+                    ])
+                    ->addColumn('updated_at', 'timestamps', [
+                        'nullable'  => true,
+                        'index'     => $this->generix_name('updated_at_index')
+                    ]);
     }
 
     /**

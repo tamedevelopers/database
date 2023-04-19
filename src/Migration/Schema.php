@@ -95,6 +95,16 @@ class Schema extends Constants{
                     ->compileQuery()
                     ->execute();
 
+            // DROP COLUMN TRIGGERS 
+            self::$db->raw( "DROP TRIGGER IF EXISTS {$columnName}_created_at;" )
+                    ->compileQuery()
+                    ->execute();
+
+            // DROP COLUMN TRIGGERS 
+            self::$db->raw( "DROP TRIGGER IF EXISTS {$columnName}_updated_at;" )
+                    ->compileQuery()
+                    ->execute();
+
             echo "Column `{$columnName}` on `{$tableName}` dropped successfully <br> \n";
         } catch (PDOException $e){
             echo preg_replace(
