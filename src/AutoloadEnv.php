@@ -3,22 +3,21 @@
 declare(strict_types=1);
 
 namespace UltimateOrmDatabase;
-    
-use UltimateOrmDatabase\Methods\OrmDotEnv;
 
+use UltimateOrmDatabase\Methods\OrmDotEnv;
 
 class AutoloadEnv{
 
     /**
      * Star env configuration
      * 
-     * @param array $option 
+     * @param array $options 
      * path \Path to .env file
      * bg \dump background color (default | main | dark | red | blue)
      * 
      * @return void\start
      */
-    static public function start(?array $option = [])
+    static public function start(?array $options = [])
     {
         /*
         |--------------------------------------------------------------------------
@@ -26,8 +25,20 @@ class AutoloadEnv{
         |--------------------------------------------------------------------------
         */
         $default = [
-            'path'  => $option['path']  ?? null,
-            'bg'    => $option['bg']    ?? 'default',
+            'path'      => $options['path']             ?? null,
+            'bg'        => $options['bg']               ?? 'default',
+            'allow'     => $options['allow']            ?? 'disallow',
+            'class'     => $options['class']            ?? null,
+            'view'      => in_array($options['view']    ?? null, ['bootstrap' => 'bootstrap', 'simple' => 'simple']) ? $options['view'] : 'bootstrap',
+            'first'     => $options['first']            ?? 'First',
+            'last'      => $options['last']             ?? 'Last',
+            'next'      => $options['next']             ?? 'Next',
+            'prev'      => $options['prev']             ?? 'Prev',
+            'span'      => $options['span']             ?? 'pagination-highlight',
+            'showing'   => $options['showing']          ?? 'Showing',
+            'to'        => $options['to']               ?? 'to',
+            'of'        => $options['of']               ?? 'of',
+            'results'   => $options['results']          ?? 'results',
         ];
         
 
@@ -37,7 +48,6 @@ class AutoloadEnv{
         |--------------------------------------------------------------------------
         */
         $ormDotEnv = new OrmDotEnv($default['path']);
-        
 
         /*
         |--------------------------------------------------------------------------
@@ -103,6 +113,14 @@ class AutoloadEnv{
             $ormDotEnv->dump( $loader['message'] );
             die(1);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Saving any configuration passed to the env handler into a global varriable
+        |--------------------------------------------------------------------------
+        */
+        $paginationDefault          = $default;
+        $paginationDefault['path']  = $loader;
         
         /*
         |--------------------------------------------------------------------------
@@ -111,10 +129,11 @@ class AutoloadEnv{
         | We can now use on anywhere on our application 
         | Mostly to get our defined .env root Path
         |
-        | ORM_ENV_CLASS['path'] -> return .env root Path
+        | APP_ORM_DOT_ENV['path'] -> return array of data containing .env path
         */
-        if ( ! defined('ORM_ENV_CLASS') ) {
-            define('ORM_ENV_CLASS', $loader);
+
+        if ( ! defined('APP_ORM_DOT_ENV') ) {
+            define('APP_ORM_DOT_ENV', $paginationDefault);
         }
     }
     

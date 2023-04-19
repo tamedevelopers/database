@@ -1,9 +1,14 @@
 <?php
     
 use UltimateOrmDatabase\DBImport;
+use UltimateOrmDatabase\AutoloadEnv;
 
 include_once __DIR__ . "/../vendor/autoload.php";
-include_once __DIR__ . "/init-configuration.php";
+
+// start env configuration
+AutoloadEnv::start();
+
+
 
 
 $import = new DBImport();

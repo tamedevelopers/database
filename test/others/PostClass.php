@@ -20,11 +20,11 @@ class PostClass extends DB{
     public function getUsers()
     {
         $users = $this->table('tb_user')
-                ->random()
-                ->join('tb_orders_payment', 'tb_orders_payment.user_id', '=', 'tb_user.user_id')
-                ->join('tb_wallet', 'tb_wallet.user_id', '=', 'tb_user.user_id')
-                // ->join('tb_user_address', 'tb_user_address.user_id', '=', 'tb_user.user_id')
-                ->paginate(2);
+                        ->random()
+                        ->join('tb_orders_payment', 'tb_orders_payment.user_id', '=', 'tb_user.user_id')
+                        ->join('tb_wallet', 'tb_wallet.user_id', '=', 'tb_user.user_id')
+                        // ->join('tb_user_address', 'tb_user_address.user_id', '=', 'tb_user.user_id')
+                        ->paginate(2);
 
         $this->dump(
             $users
@@ -34,10 +34,10 @@ class PostClass extends DB{
     public function getWallets()
     {
         $wallets = $this->table('tb_wallet')
-                ->where('amount', '>', 0)
-                ->join('tb_user', 'tb_user.user_id', '=', 'tb_wallet.user_id')
-                ->latest('date')
-                ->paginate(2);
+                        ->where('amount', '>', 0)
+                        ->join('tb_user', 'tb_user.user_id', '=', 'tb_wallet.user_id')
+                        ->latest('date')
+                        ->paginate(2);
 
         $this->dump(
             $wallets

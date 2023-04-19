@@ -1,13 +1,15 @@
 <?php
 
 use UltimateOrmDatabase\DB;
-use UltimateOrmDatabase\Methods\OrmDotEnv;
 
 include_once __DIR__ . "/../vendor/autoload.php";
-include_once __DIR__ . "/init-configuration.php";
 
 
-$model = new DB();
+$model = new DB([
+    'DB_USERNAME' => 'root',
+    'DB_PASSWORD' => '',
+    'DB_DATABASE' => '',
+]);
 
 // configure pagination settings for entire application
 $model->configurePagination([
@@ -35,6 +37,11 @@ $wallets = $model->table('tb_wallet')
     </head>
 <body>
 
+        <!-- showing 2 of total results -->
+        <?= 
+            $languages->pagination->showing(); 
+        ?>
+
         <div class="wallet-container">
             <?php foreach($wallets->data as $wallet) {?>
                 <div class="wallet-card">
@@ -57,7 +64,7 @@ $wallets = $model->table('tb_wallet')
             <?php }?>
         </div>
 
-        <!-- pagination -->
+        <!-- pagination links -->
         <?= 
             $wallets->pagination->links();
         ?>

@@ -19,7 +19,17 @@ class DB extends Model{
     public function __construct(?array $options = []) {
         parent::__construct($options);
 
-        // configure pagination settings 
-        $this->configurePagination($options);
+        // configuring pagination settings 
+        if ( ! defined('APP_ORM_DOT_ENV') ) {
+            $this->configurePagination($options);
+        } else{
+            // if set to allow global use of ENV Autoloader Settings
+            if(is_bool(APP_ORM_DOT_ENV['allow'])){
+                $this->configurePagination(APP_ORM_DOT_ENV);
+            }else{
+                $this->configurePagination($options);
+            }
+        }
+        
     }
 }

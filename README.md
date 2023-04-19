@@ -9,7 +9,6 @@ Ultimate ORM Database
 * [Installation](#installation)
 * [Instantiate](#instantiate)
 * [Database Connection](#database-connection)
-* [Env Auto Loader](#env-auto-loader)
 * [More Database Connection Keys](#more-database-connection-keys)
 * [Usage](#usage)
   * [Table](#table)
@@ -49,6 +48,12 @@ Ultimate ORM Database
   * [whereIn](#wherein)
   * [whereNotIn](#wherenotin)
   * [groupBy](#groupby)
+* [Database Migration](#database-migration)
+  * [Migration Table](#migration-table)
+  * [Run Migration](#run-migration)
+  * [Create Database Schema](#create-database-schema)
+  * [Drop Table](#drop-table)
+  * [Drop Column](#drop-column)
 * [toArray](#toarray)
 * [toObject](#toobject)
 * [Pagination](#pagination)
@@ -75,7 +80,7 @@ Prior to installing `ultimate-orm-database` get the [Composer](https://getcompos
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^1.0.1" 
+    "peterson/ultimate-orm-database": "^2.0.1" 
 }
 ```
 
@@ -102,59 +107,59 @@ $db = new DB();
 
 ## Database Connection
 
-### Direct DB Connection
+### Env Auto Loader  - `Most preferred`
+- Just call class and see it's magic `.env auto setup`
+    - By default you don't need to provide any path, since the Model use your project root [dir]
+        - Have `removed support` for direct db config
+
+```
+use UltimateOrmDatabase\AutoloadEnv;
+
+// call the autoLoader
+AutoloadEnv::start([
+    'path' => 'define root path or ignore'
+]);
+
+This is all you need to do, before using the DB Class
+```
+
+### Direct DB Connection - `Supported but ![Recommended]`
 - When initializing the class
-    - Pass and array to the DB class on initialization
+    - Pass an array as a param to the class
+        - Why not recommended? Because you must use thesame varaible name `$db` everywhere in your app
 ```
 $db = new DB([
     'DB_USERNAME' => '',
     'DB_PASSWORD' => '',
     'DB_DATABASE' => '',
 ]);
+
+Still working but not supported, use `ENV autoloader` recommended
 ```
 
-### ENV Connection - `Most preferred`
-- If you intend using .env, Make sure it's being setup before calling the database class
-    - Create a file and save as (.env) in any folder
-        - Prefered location is always at the ROOT dir[directory].
-            - By default you don't need to provide any path, since the Model auto get the root path to your project [dir]
+-1 Or Better still `If you consider using it that way`
 ```
-use UltimateOrmDatabase\Methods\OrmDotEnv;
+define("DATABASE_CONNECT", new DB([
+    'DB_USERNAME' => 'root',
+    'DB_PASSWORD' => '',
+    'DB_DATABASE' => '',
+]));
 
-$dotenv = new OrmDotEnv('PATH_TO_ENV_FOLDER');
-$dotenv->load();
+Now you have access to the CONSTANT andywhere in your app.
 
-or 
-$dotenv = new OrmDotEnv();
-$dotenv->loadOrFail();
-```
+$db = DATABASE_CONNECT;
 
-**Static method**
-- The `->loadOrFail()` method is useful on development stage only
-
-```
-OrmDotEnv::loadOrFail();
-or
-OrmDotEnv::load();
+$db->table('users')
+    ->limit(10),
+    ->get();
 ```
 
-## Env Auto Loader
-- Just call class and see it's magic `.env auto setup`
 
-```
-use UltimateOrmDatabase\AutoloadEnv;
-
-- This will auto create .env file with dummy data (if doesn't exist) and auto-start environment model
-
-AutoloadEnv::start();
-
-- As seen (Must be called before you start using the database instance)
-
-$db = new DB();
-```
 
 ## More Database Connection Keys
 - All available connection keys
+    - The DB_CONNECTION uses only `mysql`
+        - No other connection type is supported for now.
 
 | key               |  Type     |  Default Value        |
 |-------------------|-----------|-----------------------|
@@ -169,19 +174,6 @@ $db = new DB();
 | DB_CHARSET        |  string   |  `utf8mb4_unicode_ci` |
 | DB_COLLATION      |  string   |  `utf8mb4`            |
 
-```
-new DB([
-    'DB_USERNAME'  => '', 
-    'DB_PASSWORD'  => '', 
-    'DB_DATABASE'  => '', 
-    'DB_PORT'      => '', 
-    'DB_CHARSET'   => '', 
-    'DB_COLLATION' => '', 
-]);
-
-The DB_CONNECTION uses only `mysql`
-No other connection type is supported for now.
-```
 
 ## Usage 
 - All Methods of usage 
@@ -301,6 +293,7 @@ $db->table('users')
 ### Raw
 - Allows you to use direct raw `SQL query syntax`
 
+- 1 usage
 ```
 $db->raw('SELECT * FROM users')
     ->where('is_active', 1)
@@ -311,6 +304,7 @@ SELECT count(*) FROM users
     WHERE is_active=:is_active
 ```
 
+- 2 usage
 ```
 $db->raw('SELECT * FROM users')
     ->where('is_active', 1)
@@ -738,6 +732,64 @@ SELECT *
     WHERE user_id=:user_id GROUP BY amount
 ```
 
+## Database Migration
+- Similar to Laravel DB Migration `Just to make database table creation more easier`
+
+| object name   |  Returns           |
+|---------------|--------------------|
+| create()      |  Used to create database table schema  |
+| up()          |  used for commence migration `send table_schema to database` |
+| drop()        |  used to drop table   |
+| column()      |  used to drop `column` |
+
+### Migration Table
+
+- 1 Add path to migration class
+```
+use UltimateOrmDatabase\Migration\Migration;
+```
+
+### Run Migration
+
+- 1 You need to pass in the `object name` as a param
+    - This auto create folders/subfolder with read permission
+        - The code above execute all files located in [root/database/migrations]
+            - This will only create table that doesn't exist only
+
+```
+Migration::run('up');
+
+
+Migration runned successfully on `2023_04_19_1681860618_user` 
+Migration runned successfully on `2023_04_19_1681860618_user_wallet` 
+```
+
+### Create Database Schema 
+- To create a php file or database schema
+    - Takes param as `table name`
+
+```
+Migration::create('users_wallet');
+
+
+Table `2023_04_19_1681860618_user_wallet` has been created successfully
+```
+
+### Drop Table
+- Be careful as this will execute and drop all files table `located in the migration`
+
+```
+Migration::run('drop');
+```
+
+### Drop Column
+- To Drop Column `takes two param`
+    - This will drop the column available
+```
+Migration::run('column', 'column_name);
+```
+
+
 ## toArray
 - Takes one param as `array or object` `$data`
 ```
@@ -773,10 +825,13 @@ $db->toObject([]);
 | results | string    | Change the letter `results`
 
 ### Global Configuraton
-- 1 Can be called using the `configurePagination` method
+- 1 Setup global pagination on ENV autostart `most preferred` method
 ```
-$db->configurePagination([
+AutoloadEnv::start([
     'allow' => true, 
+    'prev'  => 'Prev Page', 
+    'last'  => 'Last Page', 
+    'next'  => 'Next Page', 
     'view'  => 'bootstrap',
     'class' => 'Custom-Class-Css-Selector', 
 ]);
@@ -785,13 +840,17 @@ $db->configurePagination([
 - 2 Can be called same time initializing the DB 
 ```
 $db = new DB([
-    'allow'         => true, 
-    'prev'          => 'Prev Page', 
-    'last'          => 'Last Page', 
-    'next'          => 'Next Page', 
-    'DB_USERNAME'   => 'root', 
-    'DB_PASSWORD'   => '', 
-    'DB_DATABASE'   => 'dbquery', 
+    'allow' => true, 
+    'prev'  => 'Prev Page', 
+]);
+```
+
+- 3 Can also be called using the `$db->configurePagination` method
+```
+$db->configurePagination([
+    'allow' => true, 
+    'view'  => 'bootstrap',
+    'class' => 'Custom-Class-Css-Selector', 
 ]);
 ```
 
@@ -819,7 +878,7 @@ $users->pagination->links();
 ```
 
 ### Pagination Links Configuration
-- You can directly configure pagination links directly
+- You can directly configure pagination links
     - If `configurePagination()` `allow` is set to `true`
         - It'll override every other settings
 ```
@@ -847,11 +906,11 @@ $users->pagination->showing();
 - You can directly configure showing text directly
 ```
 $users->paginate->showing([
-    'showing'   => 'Showing',
-    'to'        => 'To',
-    'of'        => 'out of',
-    'results'   => 'Results',
-    'span'      => 'css-selector',
+    'showing'  => 'Showing',
+    'to'       => 'To',
+    'of'       => 'out of',
+    'results'  => 'Results',
+    'span'     => 'css-selector',
 ])
 
 // This will change the span text to

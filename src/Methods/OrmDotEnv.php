@@ -16,6 +16,7 @@ class OrmDotEnv extends Constants{
 
     static private $immutable;
     static private $object;
+    static public $path;
 
     /**
      * Define custom Server root path
@@ -36,6 +37,9 @@ class OrmDotEnv extends Constants{
 
         // add to global property
         self::$object = $this;
+
+        // create public path
+        self::$path = self::$immutable;
     }
 
     /**
