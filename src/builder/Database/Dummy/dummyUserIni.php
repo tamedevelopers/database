@@ -1,0 +1,9 @@
+file_uploads = On
+post_max_size = 15M
+upload_max_filesize = 25M
+output_buffering = Off
+max_execution_time = 4000
+max_input_vars = 3000
+max_input_time = 5000
+memory_limit = 128M
+zlib.output_compression = On

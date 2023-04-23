@@ -2,34 +2,44 @@
     "name": "peterson/ultimate-orm-database",
     "type": "library",
     "description": "Lightweight ORM PHP Database Model.",
-    "keywords": ["php-database-orm-model", "orm database", "php orm", "php orm database", "php database query", "php database github", "orm database"],
+    "keywords": ["ultimate orm database", "php orm database", "php database", "php database github", "orm database"],
     "homepage": "https://github.com/tamedevelopers/php-database-orm-model",
     "license": "MIT",
     "authors": [
-        {"name": "Fredrick Peterson", "email": "fredi.peterson2000@gmail.com"},
-        {"name": "Tame Developers", "email": "tamedevelopers@gmail.com"}
+        {
+            "name": "Fredrick Peterson", 
+            "email": "fredi.peterson2000@gmail.com"
+        },
+        {
+            "name": "Tame Developers", 
+            "email": "tamedevelopers@gmail.com"
+        }
     ],
     "require": {
+        "php": ">=7.2",
         "vlucas/phpdotenv": "^5.3",
         "yidas/pagination": "^1.0",
-        "symfony/var-dumper": "^6.2.8",
-        "php": ">=7.0"
+        "symfony/var-dumper": "^6.2.8"
     },
     "autoload": {
+        "files": [
+            "src/builder/Database/helpers.php"
+        ],
         "psr-4": {
-            "UltimateOrmDatabase\\": "src/"
+            "builder\\Database\\": "src/"
         },
         "classmap": ["src/*"]
     },
     "autoload-dev": {
         "psr-4": {
-            "UltimateOrmDatabase\\": "test/"
+            "builder\\Database\\Tests\\": "tests/"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.0-dev"
+            "dev-main": "2.0.1-dev"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

@@ -1,4 +1,4 @@
-# Lightweight ORM PHP Database Model - UltimateOrmDatabase
+# Lightweight ORM PHP Database Model - builder\Database
 
 ### @author Fredrick Peterson (Tame Developers)
 Lightweight ORM PHP Database Model
@@ -13,10 +13,13 @@ Ultimate ORM Database
 * [Usage](#usage)
   * [Table](#table)
   * [Insert](#insert)
+  * [Insert Or Ignore](#insert-or-ignore)
   * [Update](#update)
+  * [Update Or Ignore](#update-or-ignore)
   * [Delete](#delete)
   * [Increment](#increment)
   * [Decrement](#decrement)
+  * [Allow Tags](#allow-tags)
   * [Raw](#raw)
 * [Fetching Data](#fetching-data)
     * [Get](#get)
@@ -25,7 +28,8 @@ Ultimate ORM Database
     * [First or Fail](#first-or-fail)
     * [Count](#count)
     * [Paginate](#paginate)
-    * [Table Exist](#table-exist)
+    * [Exist](#exists)
+    * [Table Exist](#table-xists)
 * [Clause](#clause)
   * [select](#select)
   * [orderBy](#orderby)
@@ -51,11 +55,12 @@ Ultimate ORM Database
 * [Database Migration](#database-migration)
   * [Migration Table](#migration-table)
   * [Run Migration](#run-migration)
-  * [Create Database Schema](#create-database-schema)
+  * [Create Database Table Schema](#create-database-table-schema)
   * [Drop Table](#drop-table)
   * [Drop Column](#drop-column)
 * [toArray](#toarray)
 * [toObject](#toobject)
+* [toJson](#toJson)
 * [Pagination](#pagination)
 * [Get Database Query](#get-database-query)
 * [Get Database Config Data](#get-database-config-data)
@@ -80,18 +85,18 @@ Prior to installing `ultimate-orm-database` get the [Composer](https://getcompos
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^2.0.2" 
+    "peterson/ultimate-orm-database": "^2.1.1" 
 }
-```
-
-**Or composer install**:
-```
-composer require peterson/ultimate-orm-database
 ```
 
 **Step 2** — run [Composer](https://getcomposer.org):
 ```update
 composer update
+```
+
+**Or composer require**:
+```
+composer require peterson/ultimate-orm-database
 ```
 
 ## Instantiate
@@ -100,7 +105,7 @@ composer update
 ```
 require_once __DIR__ . '/vendor/autoload.php';
 
-use UltimateOrmDatabase\DB;
+use builder\Database\DB;
 
 $db = new DB();
 ```
@@ -108,36 +113,32 @@ $db = new DB();
 ## Database Connection
 
 ### Env Auto Loader  - `Most preferred`
-- Just call class and see it's magic `.env auto setup`
+- This will auto setup your entire application on a go! `.env auto setup`
     - By default you don't need to provide any path, since the Model use your project root [dir]
-        - Have `removed support` for direct db config
+        - The below code should be called before using the database model
 
 ```
-use UltimateOrmDatabase\AutoloadEnv;
+use builder\Database\AutoloadEnv;
 
-// call the autoLoader
 AutoloadEnv::start([
     'path' => 'define root path or ignore'
 ]);
-
-This is all you need to do, before using the DB Class
 ```
 
 ### Direct DB Connection - `Supported but ![Recommended]`
 - When initializing the class
     - Pass an array as a param to the class
         - Why not recommended? Because you must use thesame varaible name `$db` everywhere in your app
+            - Working but not supported, use `ENV autoloader` recommended
 ```
 $db = new DB([
     'DB_USERNAME' => '',
     'DB_PASSWORD' => '',
     'DB_DATABASE' => '',
 ]);
-
-Still working but not supported, use `ENV autoloader` recommended
 ```
 
--1 Or Better still `If you consider using it that way`
+- Or Better still `If you consider using it that way`
 ```
 define("DATABASE_CONNECT", new DB([
     'DB_USERNAME' => 'root',
@@ -145,7 +146,7 @@ define("DATABASE_CONNECT", new DB([
     'DB_DATABASE' => '',
 ]));
 
-Now you have access to the CONSTANT andywhere in your app.
+Now you have access to the CONSTANT anywhere in your app.
 
 $db = DATABASE_CONNECT;
 
@@ -155,15 +156,14 @@ $db->table('users')
 ```
 
 
-
 ## More Database Connection Keys
 - All available connection keys
-    - The DB_CONNECTION uses only `mysql`
+    - The DRIVER_NAME uses only `mysql`
         - No other connection type is supported for now.
 
 | key               |  Type     |  Default Value        |
 |-------------------|-----------|-----------------------|
-| DB_CONNECTION     |  string   |  mysql                |
+| DRIVER_NAME       |  string   |  mysql                |
 | APP_DEBUG         |  boolean  |  true                 |
 | APP_DEBUG_BG      |  string   |  Default value is `default` and other color \| `main`  \| `dark` \| `red` \| `blue` |
 | DB_HOST           |  string   |  `localhost`          |
@@ -179,14 +179,14 @@ $db->table('users')
 - All Methods of usage 
 
 ### Table
-- Takes a parameter `string of table_name`
+- Takes a parameter as `string` table_name
 ```
 $db->table('users');
 ```
 
 ### Insert
 - Takes one parameter as assoc array `column_name => value`
-- It returns an array data
+    - It returns an object on success or error
 
 ```
 $db->table('users')->insert([
@@ -200,9 +200,20 @@ $db->table('users')->insert([
 -- To see data, you need to save into a variable
 ```
 
+### Insert Or Ignore
+- Same as `insert()` method
+    - It returns an object of created data or `false` on error
+
+```
+$db->table('users')->insertOrIgnore([
+    'user_id'    => 10000001,
+    'first_name' => 'Alfred',
+]);
+```
+
 ### Update
 - Takes one parameter as assoc array `column_name => value`
-- It returns an array data
+    - Returns an `int` numbers of affected rows or error
 
 ```
 $db->table('users')
@@ -212,13 +223,20 @@ $db->table('users')
     ]);
 ```
 
-### Delete
+### Update Or Ignore
+- Same as `update()` method
+    - Returns an `int` numbers of affected rows or `0` on error
 
-| errors  |  Description                                         |
-|---------|------------------------------------------------------|
-| 200     |  Data deleted successfully                           |
-| 400     |  Delete method successfully, but no data was deleted |
-| 404     |  Delete was not successfully executed                |
+```
+$db->table('users')
+    ->where('user_id', 10000001)
+    ->updateOrIgnore([
+        'first_name' => 'Alfred C.',
+    ]);
+```
+
+### Delete
+- Returns an `int`
 
 ```
 $db->table('users')
@@ -228,7 +246,7 @@ $db->table('users')
 
 ### Increment
 - Takes three parameter
-- Only the first param is required
+    - Only the first param is required
 
 | param             |  Data types     |
 |-------------------|-----------------|
@@ -316,17 +334,37 @@ SELECT * FROM users
     LIMIT 1
 ```
 
+### Allow Tags
+- Helps against `XSS attacks` 
+    - By default we prevent `XSS attacks` by adding standard method of cleaning all values
+        -> Applies to `insert` `update` `increment` `decrement` methods.
+
+- 1 usage
+```
+$db->table('post')
+    ->allowTags()
+    ->insert([
+        'description' => '<script> alert(2); console.log('Blossom');</script>',
+        'user_id' => 
+    ])
+
+-- Query
+The value will be allowed to be saved into the Database
+But by default the value should be 'empty' if found as an attack
+```
 
 ## Fetching Data
 
 | object name   |  Returns           |
 |---------------|--------------------|
 | get()         |  array of objects  |
+| getArr()      |  array of arrays   |
 | first()       |  object            |
 | firstOrFail() |  object or exit with 404 status   |
 | count()       |  int               |
 | paginate()    |  array of objects  |
-| tableExist()  |  array             |
+| exists()      |  boolean `true\|false` |
+| tableExist()  |  boolean `true\|false` |
 
 ### GET
 ```
@@ -340,10 +378,6 @@ SELECT *
 ### GetArr
 ```
 $db->table('users')->getArr();
-
--- Query
-SELECT * 
-    FROM `users`
 ```
 
 ### First
@@ -357,12 +391,9 @@ SELECT *
 
 ### First or Fail
 - Same as `first()` method but exit with error code 404, if data not found
+
 ```
 $db->table('users')->firstOrFail();
-
--- Query
-SELECT * 
-    FROM `users` LIMIT 1
 ```
 
 ### Count
@@ -385,23 +416,28 @@ SELECT * FROM `users`
 
 object {
     "data": []
-    "pagination": UltimateOrmDatabase\DB {}
+    "pagination": builder\Database\DB {}
 }
 
 $users->data // this will return the data objects
 $users->paginate->links() // this will return the paginations links view
 ```
 
+### Exists
+```
+$db->table('users')
+    ->where('email', 'email@gmail.com')
+    ->orWhere('name', 'Mandison')
+    ->exists();
+
+-- Query
+SELECT EXISTS(SELECT 1 FROM `users` WHERE email=:email OR name=:name) as `exists`
+```
+
 ### Table Exist
 - Takes param as `string` `$table_name`
 ```
 $db->tableExist('users');
-
--- Either 404|200
-array [
-    "status" => 200
-    "message" => "Table name `users` exist."
-]
 ```
 
 ## Clause
@@ -746,7 +782,7 @@ SELECT *
 
 - 1 Add path to migration class
 ```
-use UltimateOrmDatabase\Migration\Migration;
+use builder\Database\Migrations\Migration;
 ```
 
 ### Run Migration
@@ -764,14 +800,16 @@ Migration runned successfully on `2023_04_19_1681860618_user`
 Migration runned successfully on `2023_04_19_1681860618_user_wallet` 
 ```
 
-### Create Database Schema 
+### Create Database Table Schema 
 - To create a php file or database schema
     - Takes param as `table name`
 
 ```
+Migration::create('users');
 Migration::create('users_wallet');
 
 
+Table `2023_04_19_1681860618_user` has been created successfully
 Table `2023_04_19_1681860618_user_wallet` has been created successfully
 ```
 
@@ -789,45 +827,55 @@ Migration::run('drop');
 Migration::run('column', 'column_name);
 ```
 
-
 ## toArray
-- Takes one param as `array or object` `$data`
-```
-$db->toArray([]);
+- Takes one param as `mixed` data
+    - Convert data into an array or arrays
 
-- This will convert all data into an array or arrays
-```
+| object            | Helpers      |
+|-------------------|--------------|
+| $db->toArray([])  | toArray([])  |
+
 
 ## toObject
-- Same as `toArray()` method
-```
-$db->toObject([]);
+- Takes one param as `mixed` data
+    - Convert data into an array or objects
 
-- This will convert all data into an array or objects
-```
+| object             | Helpers      |
+|--------------------|--------------|
+| $db->toObject([])  | toObject([]) |
+
+
+## toJson
+- Takes one param as `mixed` data
+    - Convert data into a json object
+
+| object           | Helpers     |
+|------------------|-------------|
+| $db->toJson([])  | toJson([])  |
+
 
 ## Pagination
 - Configuring Pagination
 
-| key   | Data Type |  Description    |
-|-------|-----------|-----------------|
-| allow | `true` \| `false` |  Default is `false` Setting to true will allow the system use this setting allover the system app |
-| class | string    | Css `selector` For pagination ul tag in the browser |
-| span  | string    | Css `selector` For pagination Showing Span tags in the browser |
-| view  | `bootstrap` \| `simple`   | Default is `bootstrap` - Supports either `boostrap` view or `simple` pagination design |
-| first | string    | Change the letter of `First`
-| last  | string    | Change the letter of `Last`
-| next  | string    | Change the letter of `Next`
-| prev  | string    | Change the letter of `Prev`
-| showing | string    | Change the letter of `Prev`
-| of    | string    | Change the letter `of`
-| to    | string    | Change the letter `to`
-| results | string    | Change the letter `results`
+| key       | Data Type               |  Description    |
+|-----------|-------------------------|-----------------|
+| allow     | `true` \| `false`       | Default `false` Setting to true will allow the system use this settings across app|
+| class     | string                  | Css `selector` For pagination ul tag in the browser |
+| span      | string                  | Css `selector` For pagination Showing Span tags in the browser |
+| view      | `bootstrap` \| `simple` | Default `simple` - For pagination design |
+| first     | string                  | Change the letter of `First` |
+| last      | string                  | Change the letter of `Last` |
+| next      | string                  | Change the letter of `Next` |
+| prev      | string                  | Change the letter of `Prev` |
+| showing   | string                  | Change the letter of `Showing` |
+| of        | string                  | Change the letter `of` |
+| to        | string                  | Change the letter `to` |
+| results   | string                  | Change the letter `results` |
 
 ### Global Configuraton
 - 1 Setup global pagination on ENV autostart `most preferred` method
 ```
-AutoloadEnv::start([
+AutoloadEnv::configurePagination([
     'allow' => true, 
     'prev'  => 'Prev Page', 
     'last'  => 'Last Page', 
@@ -837,21 +885,21 @@ AutoloadEnv::start([
 ]);
 ```
 
-- 2 Can be called same time initializing the DB 
-```
-$db = new DB([
-    'allow' => true, 
-    'prev'  => 'Prev Page', 
-]);
-```
-
-- 3 Can also be called using the `$db->configurePagination` method
+- 2 Can also be called using the `$db->configurePagination` method
 ```
 $db->configurePagination([
     'allow' => true, 
     'view'  => 'bootstrap',
     'class' => 'Custom-Class-Css-Selector', 
 ]);
+
+- 3 Can be called same time initializing the DB 
+```
+$db = new DB([
+    'allow' => true, 
+    'prev'  => 'Prev Page', 
+]);
+```
 ```
 
 ### Paginate Query
@@ -879,7 +927,7 @@ $users->pagination->links();
 
 ### Pagination Links Configuration
 - You can directly configure pagination links
-    - If `configurePagination()` `allow` is set to `true`
+    - Note: If `configurePagination()` `allow` is set to `true`
         - It'll override every other settings
 ```
 $users->paginate->links([
@@ -903,7 +951,7 @@ $users->pagination->showing();
 ```
 
 ### Pagination Showing Configuration
-- You can directly configure showing text directly
+- You can configure showing text directly as well
 ```
 $users->paginate->showing([
     'showing'  => 'Showing',
@@ -943,7 +991,7 @@ $db->getConnection();
 - You can use this class to import .sql into a database programatically
 
 ```
-use UltimateOrmDatabase\DBImport;
+use builder\Database\DBImport;
 
 $import = new DBImport();
 
@@ -968,7 +1016,7 @@ $response = $import->DatabaseImport('orm.sql');
 | allow_space   | `true` /| `false`  - Default is false (Allow space between key and value)|
 
 ```
-use UltimateOrmDatabase\Methods\OrmDotEnv;
+use builder\Database\Methods\OrmDotEnv;
 
 OrmDotEnv::updateENV('DB_PASSWORD', 'newPassword');
 OrmDotEnv::updateENV('APP_DEBUG', false);
@@ -999,7 +1047,7 @@ true|false
     - If inherited class must use a __construct, Then you must use `parent::__construct();`
 
 ```
-use UltimateOrmDatabase\DB;
+use builder\Database\DB;
 
 class PostClass extends DB{
     
@@ -1021,7 +1069,6 @@ class PostClass extends DB{
 ## Error status
 
 - On error returns `404` status code 
-- On Database delete query `400` status code - `If successful - But no data was deleted`
 - On success returns `200` status code
 
 ## Useful links
