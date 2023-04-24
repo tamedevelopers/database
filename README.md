@@ -421,6 +421,7 @@ object {
 
 $users->data // this will return the data objects
 $users->paginate->links() // this will return the paginations links view
+$users->pagination->showing() // Display items of total results
 ```
 
 ### Exists
