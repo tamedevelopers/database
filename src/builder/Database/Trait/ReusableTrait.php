@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace builder\Database\Trait;
 
+use builder\Database\Capsule\Manager;
 use Symfony\Component\VarDumper\VarDumper;
 
 trait ReusableTrait{
@@ -55,8 +56,7 @@ trait ReusableTrait{
                 : true;
         
         // if DEBUG MODE IS ON
-        if($App){
-            
+        if(Manager::setEnvBool($App)){
             $bt     = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             $caller = array_shift($bt);
             $header = sprintf("#1: %s:%d ", $caller['file'], $caller['line']);
@@ -67,7 +67,7 @@ trait ReusableTrait{
             
             echo "<style>pre.sf-dump, pre.sf-dump .sf-dump-default{{$this->getBgColor( $bg )}}</style>";
             if($this->dump_final){
-                // exit(1);
+                exit(1);
             }
         }
     }
