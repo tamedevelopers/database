@@ -53,9 +53,8 @@ Ultimate ORM Database
   * [whereNotIn](#wherenotin)
   * [groupBy](#groupby)
 * [Database Migration](#database-migration)
-  * [Migration Table](#migration-table)
+  * [Create Database Tables](#create-database-tables)
   * [Run Migration](#run-migration)
-  * [Create Database Table Schema](#create-database-table-schema)
   * [Drop Table](#drop-table)
   * [Drop Column](#drop-column)
 * [toArray](#toarray)
@@ -73,7 +72,6 @@ Ultimate ORM Database
 * [Get Database Query](#get-database-query)
 * [Get Database Config Data](#get-database-config-data)
 * [Get Database Connection](#get-database-connection)
-<!-- * [Pagination](#pagination) -->
 * [Database Import](#database-import)
 * [Update Env Variable](#update-env-variable)
 * [Collation And Charset](#collation-and-charset)
@@ -786,6 +784,7 @@ SELECT *
 
 ## Database Migration
 - Similar to Laravel DB Migration `Just to make database table creation more easier`
+    - Add path to migration class
 
 | object name   |  Returns           |
 |---------------|--------------------|
@@ -794,29 +793,11 @@ SELECT *
 | drop()        |  used to drop table   |
 | column()      |  used to drop `column` |
 
-### Migration Table
-
-- 1 Add path to migration class
 ```
 use builder\Database\Migrations\Migration;
 ```
 
-### Run Migration
-
-- 1 You need to pass in the `object name` as a param
-    - This auto create folders/subfolder with read permission
-        - The code above execute all files located in [root/database/migrations]
-            - This will only create table that doesn't exist only
-
-```
-Migration::run('up');
-
-
-Migration runned successfully on `2023_04_19_1681860618_user` 
-Migration runned successfully on `2023_04_19_1681860618_user_wallet` 
-```
-
-### Create Database Table Schema 
+### Create Database Tables 
 - To create a php file or database schema
     - Takes param as `table name`
 
@@ -827,6 +808,21 @@ Migration::create('users_wallet');
 
 Table `2023_04_19_1681860618_user` has been created successfully
 Table `2023_04_19_1681860618_user_wallet` has been created successfully
+```
+
+### Run Migration
+
+- You need to pass in the `object name` as a param
+    - This auto create folders/subfolder with read permission
+        - The code above execute all files located in [root/database/migrations]
+            - This will only create table that doesn't exist only
+
+```
+Migration::run('up');
+
+
+Migration runned successfully on `2023_04_19_1681860618_user` 
+Migration runned successfully on `2023_04_19_1681860618_user_wallet` 
 ```
 
 ### Drop Table
