@@ -93,7 +93,7 @@ Prior to installing `ultimate-orm-database` get the [Composer](https://getcompos
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^2.1.6" 
+    "peterson/ultimate-orm-database": "^2.1.7" 
 }
 ```
 
@@ -1082,6 +1082,7 @@ class PostClass extends DB{
 
 | function                  | Description     |
 |---------------------------|-----------------|
+| base_dir()                | Return `server` base directory |
 | orm_db()                  | Return `new DB($options)` class |
 | orm_dot_env()             | Return `(new OrmDotEnv)` class |
 | autoload_env()            | Return `(new AutoloadEnv)` class |

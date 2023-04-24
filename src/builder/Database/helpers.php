@@ -108,6 +108,18 @@ if (! function_exists('configure_pagination')) {
     }
 }
 
+if (! function_exists('base_dir')) {
+    /**
+     * Get Base Directory
+     * 
+     * @return string
+     */
+    function base_dir()
+    {
+        return orm_dot_env()->getDirectory();
+    }
+}
+
 if (! function_exists('app_config')) {
     /**
      * Get App Configuration
