@@ -62,14 +62,24 @@ Ultimate ORM Database
 * [toObject](#toobject)
 * [toJson](#toJson)
 * [Pagination](#pagination)
+    * [Global Configuration](#global-configuration)
+    * [Pagination Query](#pagination-query)
+    * [Get Pagination Data](#get-pagination-data)
+    * [Get Pagination Links](#get-pagination-links)
+    * [Direct Pagination Links Config](#direct-pagination-links-config)
+    * [Get Pagination Showing of](#get-pagination-showing-of)
+    * [Direct Pagination Showing Config](#direct-pagination-showing-config)
+    * [Pagination Showing Configuration](#pagination-showing-configuration)
 * [Get Database Query](#get-database-query)
 * [Get Database Config Data](#get-database-config-data)
 * [Get Database Connection](#get-database-connection)
-* [Pagination](#pagination)
+<!-- * [Pagination](#pagination) -->
 * [Database Import](#database-import)
 * [Update Env Variable](#update-env-variable)
 * [Collation And Charset](#collation-and-charset)
 * [Extend DB Class](#extend-db-class)
+* [Helpers](#helpers)
+* [Error Dump](#error-dump)
 * [Error Status](#error-status)
 * [Useful links](#useful-links)
 
@@ -85,7 +95,7 @@ Prior to installing `ultimate-orm-database` get the [Composer](https://getcompos
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^2.1.1" 
+    "peterson/ultimate-orm-database": "^2.1.5" 
 }
 ```
 
@@ -121,6 +131,11 @@ $db = new DB();
 use builder\Database\AutoloadEnv;
 
 AutoloadEnv::start([
+    'path' => 'define root path or ignore'
+]);
+
+or - helpers function
+env_start([
     'path' => 'define root path or ignore'
 ]);
 ```
@@ -834,7 +849,7 @@ Migration::run('column', 'column_name);
 
 | object            | Helpers      |
 |-------------------|--------------|
-| $db->toArray([])  | toArray([])  |
+| $db->toArray([])  | to_array([])  |
 
 
 ## toObject
@@ -843,7 +858,7 @@ Migration::run('column', 'column_name);
 
 | object             | Helpers      |
 |--------------------|--------------|
-| $db->toObject([])  | toObject([]) |
+| $db->toObject([])  | to_object([]) |
 
 
 ## toJson
@@ -852,7 +867,7 @@ Migration::run('column', 'column_name);
 
 | object           | Helpers     |
 |------------------|-------------|
-| $db->toJson([])  | toJson([])  |
+| $db->toJson([])  | to_json([])  |
 
 
 ## Pagination
@@ -873,7 +888,8 @@ Migration::run('column', 'column_name);
 | to        | string                  | Change the letter `to` |
 | results   | string                  | Change the letter `results` |
 
-### Global Configuraton
+
+### Global Configuration 
 - 1 Setup global pagination on ENV autostart `most preferred` method
 ```
 AutoloadEnv::configurePagination([
@@ -883,6 +899,11 @@ AutoloadEnv::configurePagination([
     'next'  => 'Next Page', 
     'view'  => 'bootstrap',
     'class' => 'Custom-Class-Css-Selector', 
+]);
+
+or
+configure_pagination([
+
 ]);
 ```
 
@@ -903,7 +924,7 @@ $db = new DB([
 ```
 ```
 
-### Paginate Query
+### Pagination Query
 ```
 $users = $db->table('users')
             ->paginate(40);
@@ -926,7 +947,7 @@ $users->pagination->links();
 // This will return the view of pagination links
 ```
 
-### Pagination Links Configuration
+### Direct Pagination Links Config
 - You can directly configure pagination links
     - Note: If `configurePagination()` `allow` is set to `true`
         - It'll override every other settings
@@ -951,7 +972,7 @@ $users->pagination->showing();
 </div>
 ```
 
-### Pagination Showing Configuration
+### Direct Pagination Showing Config
 - You can configure showing text directly as well
 ```
 $users->paginate->showing([
@@ -961,32 +982,26 @@ $users->paginate->showing([
     'results'  => 'Results',
     'span'     => 'css-selector',
 ])
-
-// This will change the span text to
-<div>
-    <span class='css-selector'>
-        Showing 0 To 40 out of 500 Results
-    </span>
-</div>
 ```
 
 ## Get Database Query
-- Get Database Query
-```
-$db->getQuery();
-```
+
+| object            | Helpers      |
+|-------------------|--------------|
+| $db->getQuery()   | get_query()  |
+
 
 ## Get Database Config Data
-- Get Database Configuration data
-```
-$db->AppConfig();
-```
+
+| object            | Helpers      |
+|-------------------|--------------|
+| $db->AppConfig()  | app_config() |
+
 
 ## Get Database Connection
-- Get Database Connection
-```
-$db->getConnection();
-```
+| object                | Helpers      |
+|-----------------------|--------------|
+| $db->getConnection()  | get_connection() |
 
 ## Database Import
 - You can use this class to import .sql into a database programatically
@@ -1067,12 +1082,39 @@ class PostClass extends DB{
 }
 ```
 
-## Error status
+## Helpers
+
+| function                  | Description     |
+|---------------------------|-----------------|
+| orm_db()                  | Return `new DB($options)` class |
+| orm_dot_env()             | Return `(new OrmDotEnv)` class |
+| autoload_env()            | Return `(new AutoloadEnv)` class |
+| env_start()               | Same as `AutoloadEnv::start()` |
+| config_database()         | Same as `Direct DB Connection` get access to `DATABASE_CONNECTION` Constant |
+| configure_pagination()    | Same as `$db->configurePagination()` or `AutoloadEnv::configurePagination` |
+| app_config()              | Same as `$db->AppConfig()` |
+| get_connection()          | Same as `$db->getConnection()` |
+| get_app_data()            | Get `path` `database` & `pagination` info |
+| get_query()               | Same as `$db->getQuery()` |
+| to_array()                | Same as `$db->toArray()` |
+| to_object()               | Same as `$db->toObject()` |
+| to_json()                 | Same as `$db->toJson()` |
+
+## Error Dump
+
+| function  | Description     |
+|-----------|-----------------|
+| ddump     | Custom made error dump  |
+| dump      | Better error handling |
+| dd        | Dump and Die - Error handling |
+
+
+## Error Status
 
 - On error returns `404` status code 
 - On success returns `200` status code
 
-## Useful links
+## Useful Links
 
 - If you love this PHP Library, you can [Buy Tame Developers a coffee](https://www.buymeacoffee.com/tamedevelopers)
 - Link to Youtube Video Tutorial on usage will be available soon

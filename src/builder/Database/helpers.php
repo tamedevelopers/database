@@ -6,11 +6,48 @@ use builder\Database\Query\MySqlExec;
 use builder\Database\Schema\OrmDotEnv;
 
 
+if (! function_exists('orm_db')) {
+    /**
+     * Get Database 
+     * @param array $options
+     * 
+     * @return object\builder\Database\DB
+     */
+    function orm_db(?array $options = [])
+    {
+        return new DB($options);
+    }
+}
+
+if (! function_exists('orm_dot_env')) {
+    /**
+     * Get ORM Dot Env
+     * 
+     * @return object\builder\Database\Schema\OrmDotEnv
+     */
+    function orm_dot_env()
+    {
+        return (new OrmDotEnv);
+    }
+}
+
+if (! function_exists('autoload_env')) {
+    /**
+     * Get Autoload Env
+     * 
+     * @return object\builder\Database\AutoloadEnv
+     */
+    function autoload_env()
+    {
+        return (new AutoloadEnv);
+    }
+}
+
 if (! function_exists('get_orm_db_exec')) {
     /**
-     * Get Object Execution Object of MySQL
+     * Get MySqlExec
      * 
-     * @return object\builder\Database\get_orm_db_exec
+     * @return object\builder\Database\Query\MySqlExec
      */
     function get_orm_db_exec()
     {
@@ -31,103 +68,99 @@ if (! function_exists('ddump')) {
     }
 }
 
-if (! function_exists('envStart')) {
+if (! function_exists('env_start')) {
     /**
-     * Configure envStart
-     * 
-     * @return mixed
-     */
-    function envStart()
-    {
-        AutoloadEnv::start();
-    }
-}
-
-if (! function_exists('ConfigDatabase')) {
-    /**
-     * Configure ConfigDatabase
-     * 
-     * @return mixed
-     */
-    function ConfigDatabase(?array $options = [])
-    {
-        if ( ! defined('DATABASE_CONNECTION') ) {
-            define('DATABASE_CONNECTION', new DB($options));
-        }
-    }
-}
-
-if (! function_exists('configurePagination')) {
-    /**
-     * Configure configurePagination
+     * Configure Environment Start
      * @param array $options
      * 
      * @return mixed
      */
-    function configurePagination(?array $options = [])
+    function env_start(?array $options = [])
     {
-        AutoloadEnv::configurePagination($options);
+        autoload_env()->start($options);
     }
 }
 
-if (! function_exists('AppConfig')) {
+if (! function_exists('config_database')) {
+    /**
+     * Configure Database
+     * 
+     * @return mixed
+     */
+    function config_database(?array $options = [])
+    {
+        if ( ! defined('DATABASE_CONNECTION') ) {
+            define('DATABASE_CONNECTION', orm_db($options));
+        }
+    }
+}
+
+if (! function_exists('configure_pagination')) {
+    /**
+     * Configure Pagination
+     * @param array $options
+     * 
+     * @return mixed
+     */
+    function configure_pagination(?array $options = [])
+    {
+        autoload_env()->configurePagination($options);
+    }
+}
+
+if (! function_exists('app_config')) {
     /**
      * Get App Configuration
      * 
      * @return mixed
      */
-    function AppConfig()
+    function app_config()
     {
         return get_orm_db_exec()->AppConfig();
     }
 }
 
-if (! function_exists('GetConnection')) {
+if (! function_exists('get_connection')) {
     /**
      * Get Database Connection
      * @param string $type\reponse|message|driver
      * 
      * @return mixed
      */
-    function GetConnection(?string $type = null)
+    function get_connection(?string $type = null)
     {
         // get database connection
         $connection = defined('DATABASE_CONNECTION') 
                     ? DATABASE_CONNECTION->getConnection($type)
-                    : (new DB())->getConnection($type);
-            
-               
-        dump(
-            (new DB())->getConnection($type)
-        );
-        exit();
+                    : orm_db()->getConnection($type);
+
         return (object) $connection;
     }
 }
 
-if (! function_exists('getAppData')) {
+if (! function_exists('get_app_data')) {
     /**
      * Get All Application Data
      * 
      * @return array
      */
-    function getAppData()
+    function get_app_data()
     {
         // get base root path
         $getPath = defined('DOT_ENV_CONNECTION') 
                     ? DOT_ENV_CONNECTION['self_path']['path'] 
-                    : (new OrmDotEnv)->getDirectory();
+                    : orm_dot_env()->getDirectory();
 
         // get database
         $database = defined('DATABASE_CONNECTION') 
                     ? DATABASE_CONNECTION
-                    : new DB();
+                    : orm_db();
 
         // get pagination
         $pagination = defined('PAGINATION_CONFIG') 
                     && PAGINATION_CONFIG['allow'] === true
                     ? PAGINATION_CONFIG
-                    : (new DB)->pagination_settings;
+                    : orm_db()->pagination_settings;
 
         return [
             'path'          => $getPath,
@@ -137,13 +170,13 @@ if (! function_exists('getAppData')) {
     }
 }
 
-if (! function_exists('getQuery')) {
+if (! function_exists('get_query')) {
     /**
      * Get Database Query
      * 
      * @return mixed
      */
-    function getQuery()
+    function get_query()
     {
         // get query
         return defined('DATABASE_CONNECTION') 
@@ -152,40 +185,40 @@ if (! function_exists('getQuery')) {
     }
 }
 
-if (! function_exists('toArray')) {
+if (! function_exists('to_array')) {
     /**
      * Convert data to array
      * @param mixed $data
      * 
      * @return array
      */ 
-    function toArray(mixed $data)
+    function to_array(mixed $data)
     {
         return get_orm_db_exec()->toArray($data);
     }
 }
 
-if (! function_exists('toObject')) {
+if (! function_exists('to_object')) {
     /**
      * Convert data to object
      * @param mixed $data
      * 
      * @return mixed
      */ 
-    function toObject(mixed $data)
+    function to_object(mixed $data)
     {
         return get_orm_db_exec()->toObject($data);
     }
 }
 
-if (! function_exists('toJson')) {
+if (! function_exists('to_json')) {
     /**
      * Convert data to json
      * @param mixed $data
      * 
      * @return mixed
      */ 
-    function toJson(mixed $data)
+    function to_json(mixed $data)
     {
         return get_orm_db_exec()->toJson($data);
     }
