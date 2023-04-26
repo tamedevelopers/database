@@ -866,7 +866,7 @@ Migration::run('column', 'column_name);
 |-----------|-------------------------|-----------------|
 | allow     | `true` \| `false`       | Default `false` Setting to true will allow the system use this settings across app|
 | class     | string                  | Css `selector` For pagination ul tag in the browser |
-| span      | string                  | Css `selector` For pagination Showing Span tags in the browser |
+| span      | string                  | Default `.pagination-highlight` Css `selector` For pagination Showing Span tags in the browser |
 | view      | `bootstrap` \| `simple` | Default `simple` - For pagination design |
 | first     | string                  | Change the letter of `First` |
 | last      | string                  | Change the letter of `Last` |
@@ -954,11 +954,9 @@ $users->paginate->links([
 $users->pagination->showing();
 
 // This will create a span html element with text
-<div>
-    <span class='pagination-highlight'>
-        Showing 0 to 40 of 500 results
-    </span>
-</div>
+<span class='pagination-highlight'>
+    Showing 0 to 40 of 500 results
+</span>
 ```
 
 ### Direct Pagination Showing Config

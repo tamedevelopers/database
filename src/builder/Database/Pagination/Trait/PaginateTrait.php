@@ -140,20 +140,18 @@ trait PaginateTrait{
 
         // only display results when total count is more than 0
         if($data['total'] > 0){
-            echo "<div style='text-align: center;'>
-                        <span class='{$settings['span']}'>
-                            {$settings['showing']} 
-                            {$data['showing']} 
-    
-                            {$settings['to']} 
-                            {$data['to']}
-    
-                            {$settings['of']} 
-    
-                            {$data['total']}
-                            {$settings['results']}
-                        </span>
-                    </div>
+            echo "<span class='{$settings['span']}' style='display: inline-block; text-align: center; padding: 0;'>
+                    {$settings['showing']} 
+                    {$data['showing']} 
+
+                    {$settings['to']} 
+                    {$data['to']}
+
+                    {$settings['of']} 
+
+                    {$data['total']}
+                    {$settings['results']}
+                </span>
             ";
         }
     }
