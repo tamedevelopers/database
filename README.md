@@ -19,7 +19,7 @@ Ultimate ORM Database
   * [Delete](#delete)
   * [Increment](#increment)
   * [Decrement](#decrement)
-  * [Allow Tags](#allow-tags)
+  * [Remove Tags](#remove-tags)
   * [Raw](#raw)
 * [Fetching Data](#fetching-data)
     * [Get](#get)
@@ -93,7 +93,7 @@ Prior to installing `ultimate-orm-database` get the [Composer](https://getcompos
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^2.1.8" 
+    "peterson/ultimate-orm-database": "^2.2.1" 
 }
 ```
 
@@ -340,23 +340,23 @@ $db->get();
 SELECT count(*) FROM users WHERE status=:status
 ```
 
-### Allow Tags
+### Remove Tags
 - Helps against `XSS attacks` 
-    - By default we prevent `XSS attacks` by adding standard method of cleaning all values
+    - By default we remove-prevention of `XSS attacks` as this should already been handled by Forms Validation before sending into the Database
         -> Applies to `insert` `update` `increment` `decrement` methods.
 
 - 1 usage
 ```
 $db->table('post')
-    ->allowTags()
+    ->removeTags()
     ->insert([
         'description' => '<script> alert(2); console.log('Blossom');</script>',
         'user_id' => 
     ])
 
 -- Query
-The value will be allowed to be saved into the Database
-But by default the value should be 'empty' if found as an attack
+The value should be 'empty' if found as an attack
+Now the method automatically apply strict method of cleaning each values
 ```
 
 ## Fetching Data

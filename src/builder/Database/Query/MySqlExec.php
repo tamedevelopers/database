@@ -394,13 +394,13 @@ class MySqlExec  extends Constants{
     }
 
     /**
-     * Allow Raw HTML Entity
+     * Remove Tags Found as an XSS-Attack
      *
-     * @return object\builder\Database\allowTags
+     * @return object\builder\Database\removeTags
      */
-    public function allowTags()
+    public function removeTags()
     {
-        $this->allowTags = true;
+        $this->removeTags = true;
 
         return $this;
     }
@@ -586,7 +586,7 @@ class MySqlExec  extends Constants{
         $this->rawQuery             = false;
         $this->PaginateQuery        = false;
         $this->countQuery           = false;
-        $this->allowTags            = false;
+        $this->removeTags           = false;
         $this->runtime              = 0.00;
         $this->timer                = [
             'start'   => 0.00,

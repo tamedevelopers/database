@@ -156,7 +156,7 @@ trait MySqlProperties{
     /**
      * @var bool
      */
-    protected $allowTags  = false;
+    protected $removeTags  = false;
 
     /**
      * @var array

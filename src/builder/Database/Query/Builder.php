@@ -590,7 +590,7 @@ class Builder extends MySqlExec{
      */ 
     public function whitelistInput(mixed $input) 
     {
-        if(!$this->allowTags){
+        if($this->removeTags){
             if (is_array($input)) {
                 return array_map(array($this, 'whitelistInput'), $input)[0] ?? '';
             }
