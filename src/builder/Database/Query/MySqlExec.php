@@ -565,7 +565,6 @@ class MySqlExec  extends Constants{
      */
     protected function closeQuery()
     {
-        $this->table                = null;
         $this->query                = null;
         $this->stmt                 = null;
         $this->tempQuery            = null;
