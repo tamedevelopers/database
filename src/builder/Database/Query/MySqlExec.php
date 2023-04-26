@@ -95,6 +95,9 @@ class MySqlExec  extends Constants{
         if($this->rawQuery){
             $this->startTimer();
             $this->tempRawQuery = "$query";
+
+            // query builder
+            $this->compileQueryBuilder();
         }
         return $this;
     }
@@ -349,14 +352,7 @@ class MySqlExec  extends Constants{
      */ 
     public function compileQuery()
     {
-        // raw query
-        if($this->rawQuery){
-            
-            // query builder
-            $this->compileQueryBuilder();
-        }
-        // pagination
-        elseif($this->PaginateQuery){
+        if($this->PaginateQuery){
 
             // reset count
             $this->countQuery = false;
@@ -422,29 +418,8 @@ class MySqlExec  extends Constants{
         
         // if raw query
         if($this->rawQuery){
-            
-            // if query is count(*) only | perform SELECT By columns query 
-            if($this->countQuery || $this->selectQuery){
-                if(!is_null($this->table)){
-                    $query = "SELECT 
-                                {$this->formatSelectQuery()} 
-                                FROM ({$this->rawCountQueryFinder()}) 
-                                `{$this->table}`";
-                }else{
-                    $query = $this->rawCountQueryFinder();
-                }
-            }else{
-                if(!is_null($this->table)){
-                    $query = "SELECT * 
-                                FROM ({$this->rawCountQueryFinder()}) 
-                                `{$this->table}`";
-                }else{
-                    $query = $this->rawCountQueryFinder();
-                }
-            }
-
             return $this->console::replaceWhiteSpace( 
-                "{$query} 
+                "{$this->rawCountQueryFinder()} 
                 {$joins} 
                 {$this->tempQuery} 
                 {$this->groupBy} 
@@ -458,8 +433,7 @@ class MySqlExec  extends Constants{
                         {$this->formatSelectQuery()} 
                         FROM `{$this->table}`";
         }else{
-            $query = "SELECT * 
-                        FROM `{$this->table}`";
+            $query = "SELECT * FROM `{$this->table}`";
         }
 
         return $this->console::replaceWhiteSpace(
@@ -591,6 +565,7 @@ class MySqlExec  extends Constants{
      */
     protected function closeQuery()
     {
+        $this->table                = null;
         $this->query                = null;
         $this->stmt                 = null;
         $this->tempQuery            = null;

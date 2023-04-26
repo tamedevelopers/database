@@ -84,7 +84,7 @@ Ultimate ORM Database
 
 ## Requirements
 
-- `>= php7.0+`
+- `>= php7.2+`
 
 ## Installation
 
@@ -93,7 +93,7 @@ Prior to installing `ultimate-orm-database` get the [Composer](https://getcompos
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^2.1.7" 
+    "peterson/ultimate-orm-database": "^2.1.8" 
 }
 ```
 
@@ -326,25 +326,18 @@ $db->table('users')
 
 - 1 usage
 ```
-$db->raw('SELECT * FROM users')
-    ->where('is_active', 1)
-    ->count();
-
--- Query
-SELECT count(*) FROM users
-    WHERE is_active=:is_active
+$db->raw('SHOW COLUMNS FROM users')->get();
+$db->raw('DROP TABLE users;')->execute();
 ```
 
 - 2 usage
 ```
-$db->raw('SELECT * FROM users')
-    ->where('is_active', 1)
-    ->first();
+$db->raw('SELECT count(*) FROM users WHERE status=:status');
+$db->bind('status', 1);
+$db->get();
 
 -- Query
-SELECT * FROM users
-    WHERE is_active=:is_active
-    LIMIT 1
+SELECT count(*) FROM users WHERE status=:status
 ```
 
 ### Allow Tags

@@ -61,8 +61,11 @@ trait ReusableTrait{
             $caller = array_shift($bt);
             $header = sprintf("#1: %s:%d ", $caller['file'], $caller['line']);
 
-            foreach ($data[0] ?? $data as $var) {
-                VarDumper::dump($var);
+            $dataArray = $data[0] ?? $data;
+            if(is_array($dataArray)){
+                foreach ($dataArray as $var) {
+                    VarDumper::dump($var);
+                }
             }
             
             echo "<style>pre.sf-dump, pre.sf-dump .sf-dump-default{{$this->getBgColor( $bg )}}</style>";

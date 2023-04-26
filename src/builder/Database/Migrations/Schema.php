@@ -54,9 +54,7 @@ class Schema extends Constants{
         // Handle query
         try{
             // DROP TABLE IF EXISTS
-            self::$db->raw( "DROP TABLE {$tableName};" )
-                    ->compileQuery()
-                    ->execute();
+            self::$db->raw( "DROP TABLE {$tableName};" )->execute();
 
             echo "Table `{$tableName}` dropped successfully <br> \n";
         } catch (PDOException $e){
@@ -91,19 +89,13 @@ class Schema extends Constants{
         // Handle query
         try{
             // DROP COLUMN IF EXISTS
-            self::$db->raw( "ALTER TABLE {$tableName} DROP COLUMN {$columnName};" )
-                    ->compileQuery()
-                    ->execute();
+            self::$db->raw( "ALTER TABLE {$tableName} DROP COLUMN {$columnName};" )->execute();
 
             // DROP COLUMN TRIGGERS 
-            self::$db->raw( "DROP TRIGGER IF EXISTS {$columnName}_created_at;" )
-                    ->compileQuery()
-                    ->execute();
+            self::$db->raw( "DROP TRIGGER IF EXISTS {$columnName}_created_at;" )->execute();
 
             // DROP COLUMN TRIGGERS 
-            self::$db->raw( "DROP TRIGGER IF EXISTS {$columnName}_updated_at;" )
-                    ->compileQuery()
-                    ->execute();
+            self::$db->raw( "DROP TRIGGER IF EXISTS {$columnName}_updated_at;" )->execute();
 
             echo "Column `{$columnName}` on `{$tableName}` dropped successfully <br> \n";
         } catch (PDOException $e){

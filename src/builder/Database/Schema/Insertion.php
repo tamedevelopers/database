@@ -93,9 +93,7 @@ abstract class Insertion extends Builder {
     public function tableExist(?string $table_name = null)
     {
         try{
-            $this->raw("SELECT 1 FROM `{$table_name}` LIMIT 1")
-                        ->compileQuery()
-                        ->execute();
+            $this->raw("SELECT 1 FROM `{$table_name}` LIMIT 1")->execute();
             
             $this->close();
             

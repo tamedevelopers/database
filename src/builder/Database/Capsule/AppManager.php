@@ -28,8 +28,7 @@ class AppManager extends Constants{
     {
        self::initAppManager();
 
-        return preg_replace("/^[ \t]+|[ \t]+$/m", "", '
-            APP_NAME="ORM Model"
+        return preg_replace("/^[ \t]+|[ \t]+$/m", "", 'APP_NAME="ORM Model"
             APP_ENV=local
             APP_KEY='. self::generateAppKey() .'
             APP_DEBUG=true
