@@ -12,14 +12,6 @@ global $dotEnv, $db;
 
 /*
 |--------------------------------------------------------------------------
-| Include path to your autoloader
-|--------------------------------------------------------------------------
-*/
-include_once __DIR__ . "/vendor/autoload.php";
-
-
-/*
-|--------------------------------------------------------------------------
 | Start env configuration
 | You can configura your pagination text data here if you like
 |--------------------------------------------------------------------------
@@ -50,9 +42,15 @@ $db = DATABASE_CONNECTION;
 | Configure your pagination data here
 | Should incase you are implementing language model from the database
 | You can add get the text needed and add to the configuration as needed
-| When used, you'll have access to CONSTANT NAME
+| To override the Pagination settings below, use any of the Helper or Autoload methods
 |
-| -> PAGINATION_CONFIG
+|   Helpers
+|   configure_pagination([])
+|   or
+|   AutoloadEnv::configurePagination()
+|
+|   When Helper function or AutoloadEnv is used, you'll have access to CONSTANT NAME
+|   `PAGINATION_CONFIG`
 |
 | key       | Data Type          |  Description                                                                           |
 |-----------|--------------------|----------------------------------------------------------------------------------------|
@@ -70,7 +68,7 @@ $db = DATABASE_CONNECTION;
 | results   | string             | Change the letter `results`
 |--------------------------------------------------------------------------
 */
-AutoloadEnv::configurePagination([
+$db->configurePagination([
    'allow'  => false,
    'view'   => 'simple',
 ]);
