@@ -138,7 +138,7 @@ trait PaginateTrait{
         // get showing data
         $data = $this->getShowingData();
         
-        // only display clete text formatting when total count is more than 0
+        // only display full text formatting when total count is more than 0
         if($data['total'] > 0){
             // if total is greater than or equal to limit
             if($data['total'] >= $this->pagination->limit){
