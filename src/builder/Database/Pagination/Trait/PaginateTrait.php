@@ -137,10 +137,12 @@ trait PaginateTrait{
 
         // get showing data
         $data = $this->getShowingData();
-
-        // only display results when total count is more than 0
+        
+        // only display clete text formatting when total count is more than 0
         if($data['total'] > 0){
-            echo "<span class='{$settings['span']}' style='display: inline-block; text-align: center; padding: 0;'>
+            // if total is greater than or equal to limit
+            if($data['total'] >= $this->pagination->limit){
+                $formatDisplayText = "
                     {$settings['showing']} 
                     {$data['showing']} 
 
@@ -151,9 +153,31 @@ trait PaginateTrait{
 
                     {$data['total']}
                     {$settings['results']}
-                </span>
+                ";
+            }else{
+                $formatDisplayText = "
+                    {$settings['showing']} 
+                    {$data['showing']} 
+
+                    {$settings['to']} 
+                    {$data['to']}
+                    
+                    {$settings['results']}
+                ";
+            }
+        } else{
+            $formatDisplayText = "
+                {$settings['showing']} 
+                {$data['total']}
+                {$settings['results']}
             ";
         }
+
+        // only display results when total count is more than 0
+        echo "<span class='{$settings['span']}' style='display: inline-block; text-align: center; padding: 0;'>
+                {$formatDisplayText} 
+            </span>
+        ";
     }
 
     /**
