@@ -1075,6 +1075,7 @@ class PostClass extends DB{
 |---------------------------|-----------------|
 | base_dir()                | Return `server` base directory |
 | orm_db()                  | Return `new DB($options)` class |
+| orm_migration()           | Return `(new Migration)` class |
 | orm_dot_env()             | Return `(new OrmDotEnv)` class |
 | autoload_env()            | Return `(new AutoloadEnv)` class |
 | env_start()               | Same as `AutoloadEnv::start()` |

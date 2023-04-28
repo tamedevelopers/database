@@ -4,6 +4,7 @@ use builder\Database\DB;
 use builder\Database\AutoloadEnv;
 use builder\Database\Query\MySqlExec;
 use builder\Database\Schema\OrmDotEnv;
+use builder\Database\Migrations\Migration;
 
 
 if (! function_exists('orm_db')) {
@@ -28,6 +29,18 @@ if (! function_exists('orm_dot_env')) {
     function orm_dot_env()
     {
         return (new OrmDotEnv);
+    }
+}
+
+if (! function_exists('orm_migration')) {
+    /**
+     * Get Migration Helpers
+     * 
+     * @return object\builder\Database\Migration
+     */
+    function orm_migration()
+    {
+        return (new Migration);
     }
 }
 
