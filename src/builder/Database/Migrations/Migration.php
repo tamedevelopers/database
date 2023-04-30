@@ -123,12 +123,12 @@ class Migration{
     /**
      * Create migration name
      * @param string $table_name 
-     * @param bool $jobs 
+     * @param string $type
      * - optional $jobs\To create dummy Jobs table Data
      * 
      * @return void
      */
-    static public function create(?string $table_name,?bool $jobs = false)
+    static public function create(?string $table_name, ?string $type = null)
     {
         self::initStatic();
 
@@ -143,9 +143,14 @@ class Migration{
         // get directory
         $dummyPath = realpath(__DIR__) . "\..\Dummy\dummyMigration.php";
 
-        // if we're to create a jobs table
-        if($jobs){
+
+        // If type creation passed
+        if(!empty($type) && in_array(strtolower($type), ['job', 'jobs'])){
+            // create a jobs table
             $dummyPath = realpath(__DIR__) . "\..\Dummy\dummyJobsMigration.php";
+        } elseif(!empty($type) && in_array(strtolower($type), ['session', 'sessions'])){
+            // create a sessions table
+            $dummyPath = realpath(__DIR__) . "\..\Dummy\dummySessionsMigration.php";
         }
 
         // dummy content

@@ -63,7 +63,7 @@ Ultimate ORM Database
   * [whereNotIn](#wherenotin)
   * [groupBy](#groupby)
 * [Database Migration](#database-migration)
-  * [Create Database Tables](#create-database-tables)
+  * [Create Table Schema](#create-table-schema)
   * [Run Migration](#run-migration)
   * [Drop Table](#drop-table)
   * [Drop Column](#drop-column)
@@ -948,41 +948,38 @@ SELECT *
 
 ## Database Migration
 - Similar to Laravel DB Migration `Just to make database table creation more easier`
-    - Add path to migration class
 
 | object name   |  Returns           |
 |---------------|--------------------|
-| create()      |  Used to create database table schema  |
-| up()          |  used for commence migration `send table_schema to database` |
-| drop()        |  used to drop table   |
-| column()      |  used to drop `column` |
+| create()      |  Create table schema  |
+| run()         |  Begin migration `up`/|`drop`/|`column` |
 
 ```
 use builder\Database\Migrations\Migration;
 ```
 
-### Create Database Tables 
-- To create a php file or database schema
-    - Takes param as `table name`
-        - Second parameter `boolean` `true|false` (optional) -If passed will create a dummy `jobs` table data
+### Create Table Schema
+- Takes param as `table name`
+    - Second parameter `string` `jobs|sessions` (optional) -If passed will create a dummy `jobs|sessions` table schema
 
 ```
 Migration::create('users');
 Migration::create('users_wallet');
-Migration::create('tb_jobs', true);
+Migration::create('tb_jobs', 'jobs');
+Migration::create('tb_sessions', 'sessions');
 
 
 Table `2023_04_19_1681860618_user` has been created successfully
 Table `2023_04_19_1681860618_user_wallet` has been created successfully
 Table `2023_04_19_1681860618_tb_jobs` has been created successfully
+Table `2023_04_19_1681860618_tb_sessions` has been created successfully
 ```
 
 ### Run Migration
 
-- You need to pass in the `object name` as a param
+- You need to pass in `up` as a param
     - This auto create folders/subfolder with read permission
         - The code above execute all files located in [root/database/migrations]
-            - This will only create table that doesn't exist only
 
 ```
 Migration::run('up');
