@@ -22,7 +22,7 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      */
     public function __construct($items = [])
     {
-        $this->attributes = $items;
+        $this->attributes = $this->convertOnInit($items);
         $this->getQuery   = get_query();
     }
 
@@ -184,6 +184,17 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
     public function getQuery()
     {
         return $this->getQuery;
+    }
+
+    /**
+     * Convert data to an array on Initializaiton
+     * @param mixed $items
+     * 
+     * @return array
+     */ 
+    private function convertOnInit(mixed $items = null)
+    {
+        return json_decode( json_encode($items), true);
     }
 
     /**
