@@ -394,10 +394,11 @@ abstract class Insertion extends Builder {
 
     /**
      * Count results
+     * @param bool $close
      *
      * @return int
      */
-    public function count()
+    public function count(?bool $close = true)
     {
         try {
             // convert query
@@ -405,9 +406,13 @@ abstract class Insertion extends Builder {
                     ->compileQuery()
                     ->execute();
             
-            $data = $this->getQueryResult( 
-                $this->tryFetchAll(false)[0] ?? [] 
-            );
+            // get data
+            $data = $this->tryFetchAll(false)[0] ?? [];
+
+            // get data and close connection
+            if($close){
+                $data = $this->getQueryResult( $data );
+            }
 
             return isset($data['count(*)']) && $data['count(*)'] >= self::ONE
                     ? $data['count(*)'] 

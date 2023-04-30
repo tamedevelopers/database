@@ -274,7 +274,7 @@ trait PaginateTrait{
         try {
             // Initialize a Data Pagination with previous count number
             $this->pagination = new Pagination([
-                'totalCount'    => $this->count(),
+                'totalCount'    => $this->count(false),
                 'perPage'       => $per_page
             ]);
 
@@ -292,7 +292,7 @@ trait PaginateTrait{
             
             // get data
             $stmt = $this->tryFetchAll();
-
+            
             $this->close();
             
             return [
