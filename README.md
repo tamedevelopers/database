@@ -456,7 +456,7 @@ $db->tableExist('users');
 |-------------------|-------------------------------------------|
 |  getAttributes()  |  `array` Returns an array of data         |
 |  getOriginal()    |  `object` Returns an object of data       |
-|  isEmpty()        |  `boolean` true/|false If data is empty   |
+|  isEmpty()        |  `boolean` true\|false If data is empty   |
 |  isNotEmpty()     |  `opposite` of `->isEmpty()`              |
 |  count()          |  `int` count data in items collection     |
 |  toArray()        |  `array` Convert items to array           |
@@ -945,7 +945,7 @@ SELECT *
 | object name   |  Returns           |
 |---------------|--------------------|
 | create()      |  Create table schema  |
-| run()         |  Begin migration `up`/|`drop`/|`column` |
+| run()         |  Begin migration `up`\|`drop`\|`column` |
 
 ```
 use builder\Database\Migrations\Migration;
@@ -1071,8 +1071,8 @@ $response = $import->DatabaseImport('orm.sql');
 |---------------|-------------------|
 | key           |  ENV key          |
 | value         |  ENV value        |
-| allow_quote   |  `true` /| `false` - Default is true (Allow quotes within value)  |
-| allow_space   | `true` /| `false`  - Default is false (Allow space between key and value)|
+| allow_quote   |  `true` \| `false` - Default is true (Allow quotes within value)  |
+| allow_space   | `true` \| `false`  - Default is false (Allow space between key and value)|
 
 ```
 use builder\Database\Methods\OrmDotEnv;
