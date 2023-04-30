@@ -974,8 +974,9 @@ Table `2023_04_19_1681860618_user_wallet` has been created successfully
 Table `2023_04_19_1681860618_tb_jobs` has been created successfully
 Table `2023_04_19_1681860618_tb_sessions` has been created successfully
 ```
-![Sample Jobs Schema](https://github.com/tamedevelopers/UltimateOrmDatabase/blob/main/jobs.png | width=100)
-![Sample Session Schema](https://github.com/tamedevelopers/UltimateOrmDatabase/blob/main/sessions.png | width=100)
+
+![Sample Jobs Schema](https://raw.githubusercontent.com/tamedevelopers/UltimateOrmDatabase/main/jobs.png | width=100)
+![Sample Session Schema](https://raw.githubusercontent.com/tamedevelopers/UltimateOrmDatabase/main/sessions.png | width=100)
 
 ### Run Migration
 
