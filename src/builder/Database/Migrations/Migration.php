@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace builder\Database\Migrations;
 
 use builder\Database\Schema\OrmDotEnv;
+use builder\Database\Migrations\Traits\ManagerTrait;
 use builder\Database\Migrations\Traits\FilePathTrait;
 
 class Migration{
 
-    use FilePathTrait;
+    use FilePathTrait,
+        ManagerTrait;
 
     static private $database;
     static private $migrations;
@@ -106,7 +108,7 @@ class Migration{
         }
 
         // Check if method exist
-        if(!in_array(strtolower($type), ['create', 'up', 'drop', 'column'])  || !method_exists(__CLASS__, strtolower($type))){
+        if(!in_array(strtolower($type), ['up', 'drop', 'column'])  || !method_exists(__CLASS__, strtolower($type))){
             throw new \Exception( 
                 sprintf("The method or type `%s` you're trying to call doesn't exist", $type)
             );
@@ -138,7 +140,7 @@ class Migration{
         $case_table = self::toSnakeCase($table_name);
 
         // Date convert
-        $fileName = sprintf( "%s_%s_%s", date('Y_m_d'), strtotime('now'), "{$case_table}.php" );
+        $fileName = sprintf( "%s_%s_%s", date('Y_m_d'), strtotime('today'), "{$case_table}.php" );
 
         // get directory
         $dummyPath = realpath(__DIR__) . "\..\Dummy\dummyMigration.php";
@@ -156,14 +158,31 @@ class Migration{
         // dummy content
         $dummyContent = str_replace('dummy_table', $case_table, file_get_contents($dummyPath));
 
+        // absolute path
+        $absoluteFile = self::$migrations . $fileName;
+
+        // check if file exists already
+        $style = (new self)->style;
+        if(file_exists($absoluteFile) && !is_dir($absoluteFile)){
+            echo sprintf("Table `%s` 
+                        <span style='background: #ee0707; {$style}'> 
+                            Failed
+                        </span> 
+                        Schema already exists <br> \n", basename($fileName, '.php'));
+            return;
+        }
+
         // start writting
-        @$fsource = fopen(self::$migrations . $fileName, 'w+s');
+        @$fsource = fopen($absoluteFile, 'w+s');
         if(is_resource($fsource)){
             @fwrite($fsource, $dummyContent );
             @fclose($fsource);
         }
 
-        echo sprintf("Table `%s` has been created successfully <br> \n", basename($fileName, '.php'));
+        echo sprintf("Table `%s` has been created
+                    <span style='background: #027b02; {$style}'> 
+                        Successfully
+                    </span> <br> \n", basename($fileName, '.php'));
     }
     
     /**

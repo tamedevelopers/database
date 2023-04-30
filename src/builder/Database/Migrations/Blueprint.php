@@ -8,6 +8,7 @@ use PDOException;
 use builder\Database\DB;
 use builder\Database\Constants;
 use builder\Database\Migrations\Traits\SchemaTrait;
+use builder\Database\Migrations\Traits\ManagerTrait;
 use builder\Database\Migrations\Traits\FilePathTrait;
 use builder\Database\Migrations\Traits\SchemaCollectionTrait;
 use builder\Database\MigrationTrait\Traits\TableStructureTrait;
@@ -17,7 +18,8 @@ class Blueprint extends Constants{
     use SchemaTrait, 
         SchemaCollectionTrait, 
         TableStructureTrait, 
-        FilePathTrait;
+        FilePathTrait,
+        ManagerTrait;
 
     /**
      * Creating Managers
@@ -58,12 +60,29 @@ class Blueprint extends Constants{
     {
         // Handle query
         try{
-            $this->db->query( $this->MySQLTemplate() )
-                    ->execute();
-            
+            // check if table already exist
+            if($this->db->tableExist($this->tableName)){
+                $message = "Migration runned 
+                <span style='background: #ee0707; {$this->style}'>
+                Failed
+                </span> Table already exist on `{$this->traceable($this->tableName)}` <br>\n";
+            }else{
+                $this->status_runned = true;
+                $message = "Migration runned 
+                                <span style='background: #027b02; {$this->style}'>
+                                    Successfully
+                                </span> on 
+                                `{$this->traceable($this->tableName)}` <br>\n";
+            }
+
+            // execute query
+            if($this->status_runned){
+                $this->db->query( $this->MySQLTemplate() )->execute();
+            }
+
             return [
                 'response'  => self::ERROR_200,
-                'message'   => "Migration runned successfully on `{$this->traceable($this->tableName)}` <br>\n",
+                'message'   => $message,
             ];
         } catch (PDOException $e){
             return ['response' => self::ERROR_404, 'message' => $e->getMessage()];

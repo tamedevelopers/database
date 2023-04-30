@@ -9,7 +9,6 @@ use Exception;
 
 trait FilePathTrait{
 
-
     /**
      * Get Traceable File name
      * @param string $name 
