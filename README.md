@@ -966,7 +966,7 @@ use builder\Database\Migrations\Migration;
 Migration::create('users');
 Migration::create('users_wallet');
 Migration::create('tb_jobs', 'jobs');
-Migration::create('tb_sessions', 'sessions');
+Migration::create('tb_sessions', 'sessions'); 
 
 
 Table `2023_04_19_1681860618_user` has been created successfully
