@@ -38,7 +38,7 @@ trait CollectionTrait{
      * @var array
      */
     static protected $proxies = [
-        'get'       => ['get', 'getArr'],
+        'get'       => ['get'],
         'first'     => ['first', 'firstorfail'],
         'insert'    => ['insert', 'insertorignore'],
         'paginate'  => ['paginate'],
@@ -137,9 +137,7 @@ trait CollectionTrait{
      */
     public function getAttributes()
     {
-        return $this->count() > 1 
-                ? null
-                : $this->toArray();
+        return $this->toArray();
     }
 
     /**
@@ -149,9 +147,7 @@ trait CollectionTrait{
      */
     public function getOriginal()
     {
-        return $this->count() > 1 
-                ? null
-                : $this->toObject();
+        return $this->toObject();
     }
 
     /**
@@ -183,7 +179,9 @@ trait CollectionTrait{
      */
     public function count(): int
     {
-        return count($this->items);
+        return  is_array($this->items) 
+                ? count($this->items)
+                : 0;
     }
 
     /**

@@ -366,7 +366,6 @@ Now the method automatically apply strict method of cleaning each values
 | object name   |  Returns           |
 |---------------|--------------------|
 | get()         |  array of objects  |
-| getArr()      |  array of arrays   |
 | first()       |  object            |
 | firstOrFail() |  object or exit with 404 status   |
 | count()       |  int               |
@@ -381,11 +380,6 @@ $db->table('users')->get();
 -- Query
 SELECT * 
     FROM `users`
-```
-
-### GetArr
-```
-$db->table('users')->getArr();
 ```
 
 ### First
@@ -447,14 +441,13 @@ $db->tableExist('users');
 ```
 
 ## Collections
-- You can directly used the methods on instance of any of the methods
+- You can directly use `methods` of `Collections Instance` on any of the below
     - All the below `methods` are received by Collection `class`
         1. get()
         2. first()
         3. firstOrFail()
-        4. paginate()
-        5. insert()
-        6. insertOrIgnore()
+        4. insert()
+        5. insertOrIgnore()
 
 
 
@@ -462,6 +455,7 @@ $db->tableExist('users');
 |    Methods        |          Description                      |
 |-------------------|-------------------------------------------|
 |  getAttributes()  |  `array` Returns an array of data         |
+|  getOriginal()    |  `object` Returns an object of data       |
 |  isEmpty()        |  `boolean` true/|false If data is empty   |
 |  isNotEmpty()     |  `opposite` of `->isEmpty()`              |
 |  count()          |  `int` count data in items collection     |
@@ -495,7 +489,6 @@ $users = $db->tableExist('users')
 
 if($users->isNotEmpty()){
     foreach($users as $user){
-
         $user->first_name
         $user['first_name']
         $user->toArray()

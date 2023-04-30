@@ -72,6 +72,10 @@ trait ReusableTrait{
             if($this->dump_final){
                 exit(1);
             }
+        } else{
+            if($this->dump_final){
+                exit(1);
+            }
         }
     }
     

@@ -611,26 +611,6 @@ class MySqlExec  extends Constants{
     }
 
     /**
-     * Same logic for Get and GetArr
-     *
-     * @return object|array\fetchCollector
-     */
-    protected function fetchCollector($type = true)
-    {
-        try {
-            // query builder
-            $this->compileQuery()->execute();
-
-            return $this->getQueryResult(
-                $this->tryFetchAll($type)
-            );
-        } catch (\Throwable $th) {
-            $this->dump_final = false;
-            $this->dump( $this->errorTemp($th)['message'] );
-        }
-    }
-
-    /**
      * Close all query and get results
      * 
      * @return mixed

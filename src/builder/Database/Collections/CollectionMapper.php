@@ -113,6 +113,40 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
     }
 
     /**
+     * Determine if the collection is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
+    /**
+     * Determine if the collection is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return $this->count() === 0 
+                    ? true 
+                    : false;
+    }
+
+    /**
+     * Count the number of items in the collection.
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        return  is_array($this->attributes) 
+                ? count($this->attributes)
+                : 0;
+    }
+
+    /**
      * Convert data to array
      * 
      * @return array

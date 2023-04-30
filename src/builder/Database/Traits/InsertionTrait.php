@@ -146,6 +146,25 @@ trait InsertionTrait{
             return $this->errorTemp($e, true);
         }
     }
+
+    /**
+     * get Query Try
+     *
+     * @return object
+     */
+    protected function getCollector()
+    {
+        try {
+            // query builder
+            $this->compileQuery()->execute();
+
+            return $this->getQueryResult(
+                $this->tryFetchAll(true)
+            );
+        } catch (\PDOException $e) {
+            return $this->errorTemp($e, true);
+        }
+    }
     
     /**
      * First or fail Query Try

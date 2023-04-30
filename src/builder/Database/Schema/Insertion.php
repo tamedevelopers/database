@@ -210,7 +210,7 @@ abstract class Insertion extends Builder {
      */
     public function get()
     {
-        return new Collection($this->fetchCollector());
+        return new Collection($this->getCollector());
     }
 
     /**
