@@ -180,7 +180,7 @@ $db->table('users')
 |-------------------|-----------|-----------------------|
 | DRIVER_NAME       |  string   |  mysql                |
 | APP_DEBUG         |  boolean  |  true                 |
-| APP_DEBUG_BG      |  string   |  Default value is `default` and other color \| `main`  \| `dark` \| `red` \| `blue` |
+| APP_DEBUG_BG      |  string   |  Default value is `default` and other color \| `main` \| `dark` \| `red` \| `blue` |
 | DB_HOST           |  string   |  `localhost`          |
 | DB_USERNAME       |  string   |                       |
 | DB_PASSWORD       |  string   |                       |
@@ -370,8 +370,8 @@ Now the method automatically apply strict method of cleaning each values
 | firstOrFail() |  object or exit with 404 status   |
 | count()       |  int               |
 | paginate()    |  array of objects  |
-| exists()      |  boolean `true`\| `false` |
-| tableExist()  |  boolean `true`\| `false` |
+| exists()      |  boolean `true` \| `false` |
+| tableExist()  |  boolean `true` \| `false` |
 
 ### GET
 ```
@@ -945,7 +945,7 @@ SELECT *
 | object name   |  Returns           |
 |---------------|--------------------|
 | create()      |  Create table schema  |
-| run()         |  Begin migration `up`\| `drop`\| `column` |
+| run()         |  Begin migration `up` \| `drop` \| `column` |
 
 ```
 use builder\Database\Migrations\Migration;
