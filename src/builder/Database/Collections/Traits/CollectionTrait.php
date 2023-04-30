@@ -203,9 +203,16 @@ trait CollectionTrait{
      */
     public function count(): int
     {
-        return  is_array($this->items) 
-                ? count($this->items)
-                : 0;
+        if(self::$check_paginate){
+            $items = $this->items['pagination'] ?? [];
+            return  is_array($items) 
+                    ? count($items)
+                    : 0;
+        } else{
+            return  is_array($this->items) 
+                    ? count($this->items)
+                    : 0;
+        }
     }
 
     /**
