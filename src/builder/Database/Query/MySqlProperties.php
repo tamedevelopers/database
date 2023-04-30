@@ -25,32 +25,22 @@ trait MySqlProperties{
     /**
      * @var object|null|void
      */
-    protected $stmt;
-
-    /**
-     * @var object|null|void
-     */
     protected $dbh;
 
     /**
      * @var string|null
      */
-    protected $query;
+    protected $special_key = '__**';
 
     /**
-     * @var mixed
+     * @var object|null|void
      */
-    public $attributes;
-
-    /**
-     * @var mixed
-     */
-    public $attribute;
+    protected $stmt;
 
     /**
      * @var string|null
      */
-    protected $special_key = '__**';
+    protected $query;
 
     /**
      * @var string|null
@@ -76,6 +66,11 @@ trait MySqlProperties{
      * @var string|null
      */
     protected $orderBy;
+
+    /**
+     * @var string
+     */
+    protected $groupBy;
 
     /**
      * @var string|null
@@ -111,12 +106,7 @@ trait MySqlProperties{
      * @var array
      */
     protected $where    = [];
-
-    /**
-     * @var string
-     */
-    protected $groupBy;
-
+    
     /**
      * @var array
      */

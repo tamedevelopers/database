@@ -95,7 +95,7 @@ Prior to installing `ultimate-orm-database` get the [Composer](https://getcompos
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^2.2.5" 
+    "peterson/ultimate-orm-database": "^2.2.6" 
 }
 ```
 

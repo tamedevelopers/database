@@ -560,26 +560,28 @@ class MySqlExec  extends Constants{
      */
     protected function closeQuery()
     {
-        $this->query                = null;
         $this->stmt                 = null;
-        $this->tempQuery            = null;
-        $this->tempRawQuery         = null;
-        $this->tempUpdateQuery      = null;
-        $this->tempIncrementQuery   = null;
-        $this->tempInsertQuery      = null;
+        $this->query                = null;
         $this->limit                = null;
         $this->limitCount           = null;
         $this->offset               = null;
         $this->offsetCount          = null;
+        $this->orderBy              = null;
         $this->groupBy              = null;
-        $this->where                = [];
+        $this->tempQuery            = null;
+        $this->tempRawQuery         = null;
+        $this->tempUpdateQuery      = null;
+        $this->tempInsertQuery      = null;
+        $this->tempIncrementQuery   = null;
         $this->joins                = [];
+        $this->where                = [];
         $this->selectColumns        = [];
+        $this->paramValues          = [];
         $this->selectQuery          = false;
-        $this->modelQuery           = false;
-        $this->rawQuery             = false;
         $this->PaginateQuery        = false;
         $this->countQuery           = false;
+        $this->modelQuery           = false;
+        $this->rawQuery             = false;
         $this->removeTags           = false;
         $this->runtime              = 0.00;
         $this->timer                = [
