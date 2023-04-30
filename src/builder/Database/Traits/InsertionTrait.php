@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace builder\Database\Traits;
 
 use builder\Database\Capsule\Manager;
-use builder\Database\Collections\Collection;
 
 
 trait InsertionTrait{
@@ -190,7 +189,7 @@ trait InsertionTrait{
                 }
             }
 
-            return new Collection($result);
+            return $result;
         } catch (\PDOException $e) {
             // first or fail
             if($firstOrFail){

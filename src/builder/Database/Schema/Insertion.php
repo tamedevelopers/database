@@ -216,21 +216,27 @@ abstract class Insertion extends Builder {
     /**
      * Get first query
      *
-     * @return object\builder\Database\Collections\Collection
+     * @return object|null\builder\Database\Collections\Collection
      */
     public function first()
     {
-        return $this->firstCollectionQuery(false);
+        $data = $this->firstCollectionQuery(false);
+        if(!is_null($data)){
+            return new Collection($data);
+        }
     }
 
     /**
      * Get first query or abort with response code
      *
-     * @return object\builder\Database\Collections\Collection
+     * @return object|null\builder\Database\Collections\Collection
      */
     public function firstOrFail()
     {
-        return $this->firstCollectionQuery();
+        $data = $this->firstCollectionQuery();
+        if(!is_null($data)){
+            return new Collection($data);
+        }
     }
     
     /**
