@@ -1,10 +1,5 @@
 <IfModule mod_rewrite.c>
     
-    # Negotiation
-    <IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
-    </IfModule>
-
     # Mod security
     <IfModule mod_security.c>
         SecFilterScanPOST Off
@@ -119,11 +114,8 @@
         </filesMatch>
     </IfModule>
 
+    # Start Engine
     RewriteEngine On
-
-    # Handle Authorization Header
-    RewriteCond %{HTTP:Authorization} .
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
     
 </IfModule>

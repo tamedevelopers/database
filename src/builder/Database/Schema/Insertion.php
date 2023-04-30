@@ -7,8 +7,9 @@ namespace builder\Database\Schema;
 use stdClass;
 use PDOException;
 use builder\Database\Query\Builder;
-use builder\Database\Trait\InsertionTrait;
-use builder\Database\Pagination\Trait\PaginateTrait;
+use builder\Database\Traits\InsertionTrait;
+use builder\Database\Collections\Collection;
+use builder\Database\Pagination\Traits\PaginateTrait;
 
 abstract class Insertion extends Builder {
 
@@ -36,11 +37,11 @@ abstract class Insertion extends Builder {
      * Table names's on index arrays
      * Optimize multiple table
      * 
-     * @param array $table
+     * @param string|array $table
      * 
      * @return object\builder\Database\optimize
      */
-    public function optimize(?array $table = [])
+    public function optimize(string|array $table = [])
     {
         $this->closeQuery();
 
@@ -51,6 +52,10 @@ abstract class Insertion extends Builder {
 
         // add to global table property
         $this->table = $table;
+
+        if(is_string($this->table)){
+            $this->table = [$this->table];
+        }
 
         // filter array
         $this->table = $this->console::arrayWalkerTrim($this->table);
@@ -81,6 +86,64 @@ abstract class Insertion extends Builder {
             'analize'   => $analize,
             'repair'    => $repair,
         ];
+    }
+
+    /**
+     * Table names
+     * Analize table
+     * 
+     * @param string $table
+     * 
+     * @return object\builder\Database\analize
+     */
+    public function analize(?string $table)
+    {
+        $this->closeQuery();
+
+        $this->modelQuery = false;
+
+        // micro start time
+        $this->startTimer();
+
+        // add to global table property
+        $this->table = $table;
+
+        // filter array
+        $this->table = trim((string) "`{$table}`");
+
+        // save to temp query data
+        $this->setQueryProperty();
+        
+        return (object) $this->analizeTable();
+    }
+
+    /**
+     * Table names
+     * Repair table
+     * 
+     * @param string $table
+     * 
+     * @return object\builder\Database\repair
+     */
+    public function repair(?string $table)
+    {
+        $this->closeQuery();
+
+        $this->modelQuery = false;
+
+        // micro start time
+        $this->startTimer();
+
+        // add to global table property
+        $this->table = $table;
+
+        // filter array
+        $this->table = trim((string) "`{$table}`");
+
+        // save to temp query data
+        $this->setQueryProperty();
+
+        return (object) $this->repairTable();
     }
 
     /**
@@ -141,29 +204,19 @@ abstract class Insertion extends Builder {
     }
 
     /**
-     * Get result data as an array of arrays
-     *
-     * @return array
-     */
-    public function getArr()
-    {
-        return $this->fetchCollector(false);
-    }
-
-    /**
      * Get result data as an arrays of objects
      *
-     * @return object|array
+     * @return object\builder\Database\Collections\Collection
      */
     public function get()
     {
-        return $this->fetchCollector();
+        return new Collection($this->fetchCollector());
     }
 
     /**
      * Get first query
      *
-     * @return object
+     * @return object\builder\Database\Collections\Collection
      */
     public function first()
     {
@@ -173,23 +226,22 @@ abstract class Insertion extends Builder {
     /**
      * Get first query or abort with response code
      *
-     * @return array|object|null|void
+     * @return object\builder\Database\Collections\Collection
      */
     public function firstOrFail()
     {
         return $this->firstCollectionQuery();
     }
-
     
     /**
      * Get result data as an arrays of objects
      * @param int $per_page
      *
-     * @return object|array
+     * @return object\builder\Database\Collections\Collection
      */
     public function paginate($per_page = 10)
     {
-        return (object) $this->getPagination($per_page);
+        return new Collection($this->getPagination($per_page));
     }
 
     /**
@@ -197,7 +249,7 @@ abstract class Insertion extends Builder {
      * 
      * @param array $param
      * 
-     * @return object
+     * @return object\builder\Database\Collections\Collection
      */ 
     public function insert(?array $param = [])
     {
@@ -215,7 +267,7 @@ abstract class Insertion extends Builder {
      * 
      * @param array $param
      * 
-     * @return object
+     * @return mixed\builder\Database\Collections\Collection
      */ 
     public function insertOrIgnore(?array $param = [])
     {

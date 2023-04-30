@@ -6,7 +6,7 @@ namespace builder\Database;
 
 use PDOException;
 use builder\Database\DB;
-use builder\Database\Trait\DBImportTrait;
+use builder\Database\Traits\DBImportTrait;
 
 
 class DBImport extends DB{

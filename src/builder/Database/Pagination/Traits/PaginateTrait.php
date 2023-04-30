@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Pagination\Trait;
+namespace builder\Database\Pagination\Traits;
 
 use Throwable;
 use yidas\data\Pagination;

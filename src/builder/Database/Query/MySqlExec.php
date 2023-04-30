@@ -10,8 +10,8 @@ use Throwable;
 use PDOException;
 use builder\Database\Constants;
 use builder\Database\Capsule\Manager;
-use builder\Database\Trait\ReusableTrait;
-use builder\Database\Trait\MySqlProperties;
+use builder\Database\Traits\ReusableTrait;
+use builder\Database\Traits\MySqlProperties;
 
 class MySqlExec  extends Constants{
 
@@ -109,11 +109,7 @@ class MySqlExec  extends Constants{
      */
     public function lastInsertId()
     {
-        try {
-            return $this->dbh->lastInsertId();
-        } catch (\Throwable $th) {
-            return $this->errorTemp($th, true, __FUNCTION__);
-        }
+        return $this->dbh->lastInsertId() ?? null;
     }
 
     /**
@@ -128,8 +124,8 @@ class MySqlExec  extends Constants{
         try {
             $this->query = str_replace("{$this->special_key} ", '', $query);
             $this->stmt  = $this->dbh->prepare($this->query);
-        } catch (\Throwable $th) {
-            return $this->errorTemp($th, true, __FUNCTION__);
+        } catch (\PDOException $th) {
+            return $this->errorTemp($th, true);
         }
 
         return $this;
@@ -170,7 +166,7 @@ class MySqlExec  extends Constants{
         try {
             $this->stmt->bindValue($param, $value, $type);
         } catch (\Throwable $th) {
-            return $this->errorTemp($th, true, __FUNCTION__);
+            return $this->errorTemp($th, true);
         }
 
         return $this;
@@ -234,11 +230,10 @@ class MySqlExec  extends Constants{
      * 
      * @param object $e\Instance of Throwable or PDOException class
      * @param bool $prepareQueryError
-     * @param string $method
      * 
      * @return array\builder\Database\errorTemp
      */ 
-    protected function errorTemp(Throwable|PDOException $e, $prepareQueryError = false, $method = 'default')
+    protected function errorTemp(Throwable|PDOException $e, $prepareQueryError = false)
     {
         $dbError        = "";
         $exception      = (new Exception);
@@ -301,7 +296,7 @@ class MySqlExec  extends Constants{
                 'time'      => $this->timer,
             ];
         } catch (\Throwable $th) {
-            return $this->errorTemp($th, true, __FUNCTION__);
+            return $this->errorTemp($th, true);
         }
         
         return $this;
@@ -339,7 +334,7 @@ class MySqlExec  extends Constants{
                 'time'      => $this->timer,
             ];
         } catch (\Throwable $th) {
-            return $this->errorTemp($th, true, __FUNCTION__);
+            return $this->errorTemp($th, true);
         }
         
         return $this;
@@ -611,7 +606,7 @@ class MySqlExec  extends Constants{
 
             return $this->stmt->fetchAll($getType);
         } catch (\Throwable $th) {
-            return $this->errorTemp($th, true, __FUNCTION__);
+            return $this->errorTemp($th, true);
         }
     }
 
@@ -668,7 +663,6 @@ class MySqlExec  extends Constants{
         // save to temp queri data
         $this->getQuery = [
             'stmt'          => $this->stmt,
-            // 'query'         => $this->query,
             'where'         => $this->where,
             'groupBy'       => $this->groupBy,
             'joins'         => $this->joins,

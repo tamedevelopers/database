@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Migrations\Trait;
+namespace builder\Database\Migrations\Traits;
 
 use Exception;
 

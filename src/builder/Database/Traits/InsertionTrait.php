@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Trait;
+namespace builder\Database\Traits;
 
 use builder\Database\Capsule\Manager;
+use builder\Database\Collections\Collection;
 
 
 trait InsertionTrait{
-    
     
     /**
      * Insert Query Try
@@ -36,12 +36,10 @@ trait InsertionTrait{
         try {
             // try execute
             $this->execute();
-
-
+            
             // results
             $result = $this->table($this->table)
                             ->where('id', $this->lastInsertId())
-                            ->limit(1)
                             ->first();
 
             // close query after execution
@@ -51,11 +49,11 @@ trait InsertionTrait{
         } catch (\PDOException $e) {
             if($tryOrFail){
                 if ($e->errorInfo[1] === 1062) {
-                    // Duplicate key error, ignore and return false
-                    return false;
+                    // Duplicate key error, ignore and return null
+                    return null;
                 }
             }
-            return $this->errorTemp($e, true, __FUNCTION__);
+            return $this->errorTemp($e, true);
         }
     }
 
@@ -101,7 +99,7 @@ trait InsertionTrait{
                     return 0;
                 }
             }
-            return $this->errorTemp($e, true, __FUNCTION__);
+            return $this->errorTemp($e, true);
         }
     }
 
@@ -145,7 +143,7 @@ trait InsertionTrait{
 
             return $result;
         } catch (\PDOException $e) {
-            return $this->errorTemp($e, true, __FUNCTION__);
+            return $this->errorTemp($e, true);
         }
     }
     
@@ -173,16 +171,13 @@ trait InsertionTrait{
                 }
             }
 
-            return $result;
+            return new Collection($result);
         } catch (\PDOException $e) {
             // first or fail
             if($firstOrFail){
                 (new Manager)::setHeaders();
             } else{
-                $this->dump_final = false;
-                $this->dump( 
-                    $this->errorTemp($e)['message'] 
-                );
+                return $this->errorTemp($e, true);
             }
         }
     }
@@ -217,7 +212,7 @@ trait InsertionTrait{
 
             return $result;
         } catch (\PDOException $e) {
-            return $this->errorTemp($e, true, __FUNCTION__);
+            return $this->errorTemp($e, true);
         }
     }
 

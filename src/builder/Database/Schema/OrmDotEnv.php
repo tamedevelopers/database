@@ -7,9 +7,9 @@ namespace builder\Database\Schema;
 use Exception;
 use Dotenv\Dotenv;
 use builder\Database\Constants;
-use builder\Database\Trait\ServerTrait;
+use builder\Database\Traits\ServerTrait;
 use builder\Database\Capsule\AppManager;
-use builder\Database\Trait\ReusableTrait;
+use builder\Database\Traits\ReusableTrait;
 
 class OrmDotEnv extends Constants{
     

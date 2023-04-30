@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace builder\Database\Migrations;
 
 use builder\Database\Schema\OrmDotEnv;
-use builder\Database\Migrations\Trait\FilePathTrait;
+use builder\Database\Migrations\Traits\FilePathTrait;
 
 class Migration{
 
@@ -123,10 +123,12 @@ class Migration{
     /**
      * Create migration name
      * @param string $table_name 
+     * @param bool $jobs 
+     * - optional $jobs\To create dummy Jobs table Data
      * 
      * @return void
      */
-    static public function create(?string $table_name)
+    static public function create(?string $table_name,?bool $jobs = false)
     {
         self::initStatic();
 
@@ -140,6 +142,11 @@ class Migration{
 
         // get directory
         $dummyPath = realpath(__DIR__) . "\..\Dummy\dummyMigration.php";
+
+        // if we're to create a jobs table
+        if($jobs){
+            $dummyPath = realpath(__DIR__) . "\..\Dummy\dummyJobsMigration.php";
+        }
 
         // dummy content
         $dummyContent = str_replace('dummy_table', $case_table, file_get_contents($dummyPath));

@@ -23,13 +23,23 @@ Ultimate ORM Database
   * [Raw](#raw)
 * [Fetching Data](#fetching-data)
     * [Get](#get)
-    * [Get Arr](#getarr)
     * [First](#first)
     * [First or Fail](#first-or-fail)
     * [Count](#count)
     * [Paginate](#paginate)
     * [Exist](#exists)
-    * [Table Exist](#table-xists)
+    * [Table Exist](#table-exist)
+* [Collections](#collections)
+    * [Collection Methods](#collection-methods)
+    * [Collection Usage](#collection-usage)
+* [Pagination](#pagination)
+    * [Global Configuration](#global-configuration)
+    * [Pagination Query](#pagination-query)
+    * [Pagination Data](#pagination-data)
+    * [Pagination Links](#pagination-links)
+    * [Pagination Links Config](#pagination-links-config)
+    * [Pagination Showing](#pagination-showing)
+    * [Pagination Showing Config](#pagination-showing-config)
 * [Clause](#clause)
   * [select](#select)
   * [orderBy](#orderby)
@@ -57,18 +67,10 @@ Ultimate ORM Database
   * [Run Migration](#run-migration)
   * [Drop Table](#drop-table)
   * [Drop Column](#drop-column)
-* [toArray](#toarray)
-* [toObject](#toobject)
-* [toJson](#toJson)
-* [Pagination](#pagination)
-    * [Global Configuration](#global-configuration)
-    * [Pagination Query](#pagination-query)
-    * [Get Pagination Data](#get-pagination-data)
-    * [Get Pagination Links](#get-pagination-links)
-    * [Direct Pagination Links Config](#direct-pagination-links-config)
-    * [Get Pagination Showing of](#get-pagination-showing-of)
-    * [Direct Pagination Showing Config](#direct-pagination-showing-config)
-    * [Pagination Showing Configuration](#pagination-showing-configuration)
+* [Optimize Table](#optimize-table)
+    * [Optimize](#optimize)
+    * [Analize](#analize)
+    * [Repair](#repair)
 * [Get Database Query](#get-database-query)
 * [Get Database Config Data](#get-database-config-data)
 * [Get Database Connection](#get-database-connection)
@@ -93,7 +95,7 @@ Prior to installing `ultimate-orm-database` get the [Composer](https://getcompos
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^2.2.4" 
+    "peterson/ultimate-orm-database": "^2.2.5" 
 }
 ```
 
@@ -420,14 +422,11 @@ $users = $db->table('users')->paginate(40);
 SELECT * FROM `users` 
     LIMIT 0, 40 
 
-object {
-    "data": []
-    "pagination": builder\Database\DB {}
-}
 
-$users->data // this will return the data objects
-$users->paginate->links() // this will return the paginations links view
-$users->pagination->showing() // Display items of total results
+$users // this will return the data objects
+
+$users->links() // this will return the paginations links view
+$users->showing() // Display items of total results
 ```
 
 ### Exists
@@ -445,6 +444,178 @@ SELECT EXISTS(SELECT 1 FROM `users` WHERE email=:email OR name=:name) as `exists
 - Takes param as `string` `$table_name`
 ```
 $db->tableExist('users');
+```
+
+## Collections
+- You can directly used the methods on instance of any of the methods
+    - All the below `methods` are received by Collection `class`
+        1. get()
+        2. first()
+        3. firstOrFail()
+        4. paginate()
+        5. insert()
+        6. insertOrIgnore()
+
+
+
+### Collection Methods
+|    Methods        |          Description                      |
+|-------------------|-------------------------------------------|
+|  getAttributes()  |  `array` Returns an array of data         |
+|  isEmpty()        |  `boolean` true/|false If data is empty   |
+|  isNotEmpty()     |  `opposite` of `->isEmpty()`              |
+|  count()          |  `int` count data in items collection     |
+|  toArray()        |  `array` Convert items to array           |
+|  toObject()       |  `object` Convert items to object         |
+|  toJson()         |  `string` Convert items to json           |
+|  getQuery()       |  `object` Get Query information           |
+ 
+
+### Collection Usage
+- Takes one param as `mixed` data
+    - Convert data into an array or arrays
+
+```
+$user = $db->tableExist('users')
+            ->first();
+
+$user->first_name
+$user['first_name']
+
+$user->toArray()
+$user->getAttributes()
+```
+
+```
+$users = $db->tableExist('users')
+            ->where('is_active', 1),
+            ->random(),
+            ->get();
+
+
+if($users->isNotEmpty()){
+    foreach($users as $user){
+
+        $user->first_name
+        $user['first_name']
+        $user->toArray()
+        $user->getAttributes()
+    }
+}
+```
+
+
+## Pagination
+- Configuring Pagination
+
+| key       | Data Type               |  Description    |
+|-----------|-------------------------|-----------------|
+| allow     | `true` \| `false`       | Default `false` Setting to true will allow the system use this settings across app|
+| class     | string                  | Css `selector` For pagination ul tag in the browser |
+| span      | string                  | Default `.pagination-highlight` Css `selector` For pagination Showing Span tags in the browser |
+| view      | `bootstrap` \| `simple` | Default `simple` - For pagination design |
+| first     | string                  | Change the letter of `First` |
+| last      | string                  | Change the letter of `Last` |
+| next      | string                  | Change the letter of `Next` |
+| prev      | string                  | Change the letter of `Prev` |
+| showing   | string                  | Change the letter of `Showing` |
+| of        | string                  | Change the letter `of` |
+| to        | string                  | Change the letter `to` |
+| results   | string                  | Change the letter `results` |
+
+
+### Global Configuration 
+- 1 Setup global pagination on ENV autostart `most preferred` method
+```
+AutoloadEnv::configurePagination([
+    'allow' => true, 
+    'prev'  => 'Prev Page', 
+    'last'  => 'Last Page', 
+    'next'  => 'Next Page', 
+    'view'  => 'bootstrap',
+    'class' => 'Custom-Class-Css-Selector', 
+]);
+
+or Helpers Function
+
+configure_pagination([
+
+]);
+```
+
+- 2 Can also be called using the `$db->configurePagination` method
+```
+$db->configurePagination([
+    'allow' => true, 
+    'view'  => 'bootstrap',
+    'class' => 'Custom-Class-Css-Selector', 
+]);
+```
+
+- 3 Can be called same time initializing the DB 
+```
+$db = new DB([
+    'allow' => true, 
+    'prev'  => 'Prev Page', 
+]);
+```
+
+### Pagination Query
+```
+$users = $db->table('users')
+            ->paginate(40);
+
+-- Query
+SELECT * 
+    FROM `users` 
+    LIMIT 0, 40
+```
+
+### Pagination Data
+```
+$users
+// This will return `Collections` of pagination data
+```
+
+### Pagination Links
+```
+$users->links();
+// This will return pagination links view
+```
+
+### Pagination Links Config
+- You can directly configure pagination links
+    - Note: If `configurePagination()` `allow` is set to `true`
+        - It'll override every other settings
+```
+$users->links([
+    'first' => 'First Page',
+    'last'  => 'Last Page',
+    'prev'  => 'Previous Page',
+    'next'  => 'Next Page',
+])
+```
+
+### Pagination Showing
+```
+$users->showing();
+
+// This will create a span html element with text
+<span class='pagination-highlight'>
+    Showing 0 to 40 of 500 results
+</span>
+```
+
+### Pagination Showing Config
+- You can configure showing text directly as well
+```
+$users->showing([
+    'showing'  => 'Showing',
+    'to'       => 'To',
+    'of'       => 'out of',
+    'results'  => 'Results',
+    'span'     => 'css-selector',
+])
 ```
 
 ## Clause
@@ -793,14 +964,17 @@ use builder\Database\Migrations\Migration;
 ### Create Database Tables 
 - To create a php file or database schema
     - Takes param as `table name`
+        - Second parameter `boolean` `true|false` (optional) -If passed will create a dummy `jobs` table data
 
 ```
 Migration::create('users');
 Migration::create('users_wallet');
+Migration::create('tb_jobs', true);
 
 
 Table `2023_04_19_1681860618_user` has been created successfully
 Table `2023_04_19_1681860618_user_wallet` has been created successfully
+Table `2023_04_19_1681860618_tb_jobs` has been created successfully
 ```
 
 ### Run Migration
@@ -832,143 +1006,34 @@ Migration::run('drop');
 Migration::run('column', 'column_name);
 ```
 
-## toArray
-- Takes one param as `mixed` data
-    - Convert data into an array or arrays
 
-| object            | Helpers      |
-|-------------------|--------------|
-| $db->toArray([])  | to_array([])  |
+## Optimize-table
+- Database table optimization
 
 
-## toObject
-- Takes one param as `mixed` data
-    - Convert data into an array or objects
-
-| object             | Helpers      |
-|--------------------|--------------|
-| $db->toObject([])  | to_object([]) |
-
-
-## toJson
-- Takes one param as `mixed` data
-    - Convert data into a json object
-
-| object           | Helpers     |
-|------------------|-------------|
-| $db->toJson([])  | to_json([])  |
-
-
-## Pagination
-- Configuring Pagination
-
-| key       | Data Type               |  Description    |
-|-----------|-------------------------|-----------------|
-| allow     | `true` \| `false`       | Default `false` Setting to true will allow the system use this settings across app|
-| class     | string                  | Css `selector` For pagination ul tag in the browser |
-| span      | string                  | Default `.pagination-highlight` Css `selector` For pagination Showing Span tags in the browser |
-| view      | `bootstrap` \| `simple` | Default `simple` - For pagination design |
-| first     | string                  | Change the letter of `First` |
-| last      | string                  | Change the letter of `Last` |
-| next      | string                  | Change the letter of `Next` |
-| prev      | string                  | Change the letter of `Prev` |
-| showing   | string                  | Change the letter of `Showing` |
-| of        | string                  | Change the letter `of` |
-| to        | string                  | Change the letter `to` |
-| results   | string                  | Change the letter `results` |
-
-
-### Global Configuration 
-- 1 Setup global pagination on ENV autostart `most preferred` method
+### Optimize
+- Optimize Multiple Tables
+    - Takes a param as an `array` table_name
+        - This will automatically `Analize` and `Repair` each tables
+        
 ```
-AutoloadEnv::configurePagination([
-    'allow' => true, 
-    'prev'  => 'Prev Page', 
-    'last'  => 'Last Page', 
-    'next'  => 'Next Page', 
-    'view'  => 'bootstrap',
-    'class' => 'Custom-Class-Css-Selector', 
-]);
-
-or
-configure_pagination([
-
-]);
+$db->optimize(['tb_wallet', 'tb_user']);
 ```
 
-- 2 Can also be called using the `$db->configurePagination` method
-```
-$db->configurePagination([
-    'allow' => true, 
-    'view'  => 'bootstrap',
-    'class' => 'Custom-Class-Css-Selector', 
-]);
+### Analize
+- Analize Single Table
+    - Takes a param as an `string` table_name
 
-- 3 Can be called same time initializing the DB 
 ```
-$db = new DB([
-    'allow' => true, 
-    'prev'  => 'Prev Page', 
-]);
-```
+$db->analize('tb_wallet');
 ```
 
-### Pagination Query
-```
-$users = $db->table('users')
-            ->paginate(40);
+### Repair
+- Repair Single Table
+    - Takes a param as an `string` table_name
 
--- Query
-SELECT * 
-    FROM `users` 
-    LIMIT 0, 40
 ```
-
-### Get Pagination Data
-```
-$users->data
-// This will return the pagination data objects
-```
-
-### Get Pagination Links
-```
-$users->pagination->links();
-// This will return the view of pagination links
-```
-
-### Direct Pagination Links Config
-- You can directly configure pagination links
-    - Note: If `configurePagination()` `allow` is set to `true`
-        - It'll override every other settings
-```
-$users->paginate->links([
-    'first' => 'First Page',
-    'last'  => 'Last Page',
-    'prev'  => 'Previous Page',
-    'next'  => 'Next Page',
-])
-```
-
-### Get Pagination Showing of
-```
-$users->pagination->showing();
-
-// This will create a span html element with text
-<span class='pagination-highlight'>
-    Showing 0 to 40 of 500 results
-</span>
-```
-
-### Direct Pagination Showing Config
-- You can configure showing text directly as well
-```
-$users->paginate->showing([
-    'showing'  => 'Showing',
-    'to'       => 'To',
-    'of'       => 'out of',
-    'results'  => 'Results',
-    'span'     => 'css-selector',
-])
+$db->repair('tb_wallet');
 ```
 
 ## Get Database Query
@@ -1030,6 +1095,7 @@ true|false
 ```
 
 ## Collation And Charset
+- Collation and Charset Data `listing`
 
 ### Collation
 - utf8_bin
@@ -1063,7 +1129,7 @@ class PostClass extends DB{
     -- You now have access to the DB public instances
     public function getPost(){
         return $this->table('posts')
-            ->select(['images', 'title', 'description', 'date'])
+            ->select(['images', 'title', 'description'])
             ->get();
     }
 }
@@ -1071,30 +1137,30 @@ class PostClass extends DB{
 
 ## Helpers
 
-| function                  | Description     |
-|---------------------------|-----------------|
-| base_dir()                | Return `server` base directory |
-| orm_db()                  | Return `new DB($options)` class |
-| orm_migration()           | Return `(new Migration)` class |
-| orm_dot_env()             | Return `(new OrmDotEnv)` class |
-| autoload_env()            | Return `(new AutoloadEnv)` class |
-| env_start()               | Same as `AutoloadEnv::start()` |
+| function                  | Description                       |
+|---------------------------|-----------------------------------|
+| base_dir()                | Return `server` base directory    |
+| orm_db()                  | Return instance of `new DB($options)` class   |
+| orm_migration()           | Return instance of `(new Migration)` class    |
+| orm_dot_env()             | Return instance of `(new OrmDotEnv)` class    |
+| autoload_env()            | Return instance of `(new AutoloadEnv)` class  |
+| env_start()               | Same as `AutoloadEnv::start()`    |
 | config_database()         | Same as `Direct DB Connection` get access to `DATABASE_CONNECTION` Constant |
 | configure_pagination()    | Same as `$db->configurePagination()` or `AutoloadEnv::configurePagination` |
-| app_config()              | Same as `$db->AppConfig()` |
-| get_connection()          | Same as `$db->getConnection()` |
+| app_config()              | Same as `$db->AppConfig()`        |
+| get_connection()          | Same as `$db->getConnection()`    |
 | get_app_data()            | Get `path` `database` & `pagination` info |
-| get_query()               | Same as `$db->getQuery()` |
-| to_array()                | Same as `$db->toArray()` |
-| to_object()               | Same as `$db->toObject()` |
-| to_json()                 | Same as `$db->toJson()` |
+| get_query()               | Same as `$db->getQuery()`         |
+| to_array()                | `array` Convert items to array    |
+| to_object()               | `object` Convert items to object  |
+| to_json()                 | `string` Convert items to json    |
 
 ## Error Dump
 
 | function  | Description     |
 |-----------|-----------------|
 | ddump     | Custom made error dump  |
-| dump      | Better error handling |
+| dump      | Dump error handling |
 | dd        | Dump and Die - Error handling |
 
 
@@ -1107,4 +1173,5 @@ class PostClass extends DB{
 
 - If you love this PHP Library, you can [Buy Tame Developers a coffee](https://www.buymeacoffee.com/tamedevelopers)
 - Link to Youtube Video Tutorial on usage will be available soon
+- Udemy Course on Usage [Coming Soon]()
 

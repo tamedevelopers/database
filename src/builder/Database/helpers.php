@@ -213,38 +213,38 @@ if (! function_exists('get_query')) {
 if (! function_exists('to_array')) {
     /**
      * Convert data to array
-     * @param mixed $data
+     * @param mixed $items
      * 
      * @return array
      */ 
-    function to_array(mixed $data)
+    function to_array(mixed $items)
     {
-        return get_orm_db_exec()->toArray($data);
+        return json_decode( json_encode($items), true);
     }
 }
 
 if (! function_exists('to_object')) {
     /**
      * Convert data to object
-     * @param mixed $data
+     * @param mixed $items
      * 
      * @return mixed
      */ 
-    function to_object(mixed $data)
+    function to_object(mixed $items)
     {
-        return get_orm_db_exec()->toObject($data);
+        return json_decode( json_encode($items), false);
     }
 }
 
 if (! function_exists('to_json')) {
     /**
      * Convert data to json
-     * @param mixed $data
+     * @param mixed $items
      * 
      * @return mixed
      */ 
-    function to_json(mixed $data)
+    function to_json(mixed $items)
     {
-        return get_orm_db_exec()->toJson($data);
+        return json_encode( $items );
     }
 }

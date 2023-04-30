@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Trait;
+namespace builder\Database\Traits;
 
 
 trait MySqlProperties{
-
-
+    
     /**
      * @var array|null
      */
@@ -176,39 +175,6 @@ trait MySqlProperties{
      * @var mixed
      */
     protected $getQuery;
-
-    /**
-     * Convert data to array
-     * @param mixed $data
-     * 
-     * @return array\builder\Database\toArray
-     */ 
-    public function toArray(mixed $data)
-    {
-        return json_decode( json_encode($data), TRUE);
-    }
-    
-    /**
-     * Convert data to object
-     * @param mixed $data
-     * 
-     * @return mixed\builder\Database\toObject
-     */ 
-    public function toObject(mixed $data)
-    {
-        return json_decode( json_encode($data), FALSE);
-    }
-    
-    /**
-     * Convert data to json
-     * @param mixed $data
-     * 
-     * @return mixed\builder\Database\toJson
-     */ 
-    public function toJson(mixed $data)
-    {
-        return json_encode( $data );
-    }
 }
 
 

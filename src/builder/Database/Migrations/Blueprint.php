@@ -7,10 +7,10 @@ namespace builder\Database\Migrations;
 use PDOException;
 use builder\Database\DB;
 use builder\Database\Constants;
-use builder\Database\Migrations\Trait\SchemaTrait;
-use builder\Database\Migrations\Trait\FilePathTrait;
-use builder\Database\Migrations\Trait\SchemaCollectionTrait;
-use builder\Database\MigrationTrait\Trait\TableStructureTrait;
+use builder\Database\Migrations\Traits\SchemaTrait;
+use builder\Database\Migrations\Traits\FilePathTrait;
+use builder\Database\Migrations\Traits\SchemaCollectionTrait;
+use builder\Database\MigrationTrait\Traits\TableStructureTrait;
 
 class Blueprint extends Constants{
     

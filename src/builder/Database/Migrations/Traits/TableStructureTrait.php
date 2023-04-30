@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\MigrationTrait\Trait;
+namespace builder\Database\MigrationTrait\Traits;
 
 trait TableStructureTrait{
     

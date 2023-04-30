@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Trait;
+namespace builder\Database\Traits;
 
 
 trait DBImportTrait{
