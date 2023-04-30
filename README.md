@@ -370,8 +370,8 @@ Now the method automatically apply strict method of cleaning each values
 | firstOrFail() |  object or exit with 404 status   |
 | count()       |  int               |
 | paginate()    |  array of objects  |
-| exists()      |  boolean `true\|false` |
-| tableExist()  |  boolean `true\|false` |
+| exists()      |  boolean `true`\| `false` |
+| tableExist()  |  boolean `true`\| `false` |
 
 ### GET
 ```
@@ -456,7 +456,7 @@ $db->tableExist('users');
 |-------------------|-------------------------------------------|
 |  getAttributes()  |  `array` Returns an array of data         |
 |  getOriginal()    |  `object` Returns an object of data       |
-|  isEmpty()        |  `boolean` true\|false If data is empty   |
+|  isEmpty()        |  `boolean` `true \| false` If data is empty|
 |  isNotEmpty()     |  `opposite` of `->isEmpty()`              |
 |  count()          |  `int` count data in items collection     |
 |  toArray()        |  `array` Convert items to array           |
@@ -945,7 +945,7 @@ SELECT *
 | object name   |  Returns           |
 |---------------|--------------------|
 | create()      |  Create table schema  |
-| run()         |  Begin migration `up`\|`drop`\|`column` |
+| run()         |  Begin migration `up`\| `drop`\| `column` |
 
 ```
 use builder\Database\Migrations\Migration;
