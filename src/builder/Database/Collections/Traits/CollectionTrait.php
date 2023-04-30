@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace builder\Database\Collections\Traits;
 
 use Exception;
-use builder\Database\Collections\Collection;
 use builder\Database\Collections\CollectionMapper;
 
 
@@ -45,6 +44,20 @@ trait CollectionTrait{
     ];
 
     /**
+     * The methods that can be proxied.
+     *
+     * @var array
+     */
+    static protected $proxies_compact = [
+        'get',
+        'first',
+        'firstorfail',
+        'insert',
+        'insertorignore',
+        'paginate',
+    ];
+
+    /**
      * Check if is object without array
      *
      * @var bool
@@ -79,9 +92,20 @@ trait CollectionTrait{
     {
         // get Trace
         $getTrace = (new Exception)->getTrace();
+        
+        // instance functions
+        $functions = array_map('strtolower', array_column($getTrace, 'function'));
+        
+        // get array interests
+        $interest = array_intersect(self::$proxies_compact, $functions);
 
+        // reset keys
+        if(is_array($interest) && count($interest) > 0){
+            $interest = array_values($interest);
+        }
+        
         // instance of DB fetch request
-        self::$instance = strtolower(end($getTrace)['function']) ?? null;
+        self::$instance = $interest[0] ?? null;
 
         // instance of DB Paginate request
         self::$check_paginate = in_array(self::$instance, self::$proxies['paginate']);
