@@ -1,9 +1,11 @@
-# Lightweight ORM PHP Database Model - builder\Database
+# Lightweight PHP ORM Database
+-   @author Fredrick Peterson (Tame Developers)
+-   Ultimate ORM Database
 
-### @author Fredrick Peterson (Tame Developers)
-Lightweight ORM PHP Database Model
+[![Total Downloads](https://poser.pugx.org/peterson/phpOrmDatabase/downloads)](https://packagist.org/packages/peterson/phpOrmDatabase)
+[![Latest Stable Version](https://poser.pugx.org/peterson/phpOrmDatabase/version.png)](https://packagist.org/packages/peterson/phpOrmDatabase)
+[![License](https://poser.pugx.org/peterson/phpOrmDatabase/license)](https://packagist.org/packages/peterson/phpOrmDatabase)
 
-Ultimate ORM Database
 
 * [Requirements](#requirements)
 * [Installation](#installation)
@@ -95,7 +97,7 @@ Prior to installing `ultimate-orm-database` get the [Composer](https://getcompos
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^2.2.8" 
+    "peterson/ultimate-orm-database": "^2.2.9" 
 }
 ```
 
