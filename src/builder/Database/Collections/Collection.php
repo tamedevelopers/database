@@ -104,7 +104,9 @@ class Collection implements IteratorAggregate, ArrayAccess
      */
     public function offsetUnset($offset): void
     {
-        unset($this->items[$offset]);
+        if(is_array($this->items)){
+            unset($this->items[$offset]);
+        }
     }
 
     /**

@@ -78,7 +78,9 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      */
     public function offsetUnset($offset): void
     {
-        unset($this->attributes[$offset]);
+        if(is_array($this->items)){
+            unset($this->attributes[$offset]);
+        }
     }
 
      /**
