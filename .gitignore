@@ -1,0 +1,13 @@
+.env
+# .gitignore
+/database
+/vendor
+/.idea
+/.vscode
+.htaccess
+.user.ini
+php.ini
+test.php
+init.php
+composer.lock
+sessions.png

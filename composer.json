@@ -1,9 +1,9 @@
 {
-    "name": "peterson/ultimate-orm-database",
+    "name": "peterson/php-orm-database",
     "type": "library",
-    "description": "Lightweight ORM PHP Database Model.",
-    "keywords": ["ultimate orm database", "php orm database", "php database", "php database github", "orm database"],
-    "homepage": "https://github.com/tamedevelopers/php-database-orm-model",
+    "description": "Lightweight PHP ORM Database Model.",
+    "keywords": ["php orm database", "orm database", "php database", "php orm github"],
+    "homepage": "https://github.com/tamedevelopers/php-orm-database",
     "license": "MIT",
     "authors": [
         {
@@ -23,7 +23,7 @@
     },
     "autoload": {
         "files": [
-            "src/builder/Database/helpers.php"
+            "src/helpers.php"
         ],
         "psr-4": {
             "builder\\Database\\": "src/"

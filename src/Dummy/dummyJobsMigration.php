@@ -17,10 +17,17 @@ return new class extends Migration
         Schema::create('dummy_table', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->index()->nullable();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->text('payload');
-            $table->integer('last_activity')->index();
+            $table->json('payload')->nullable();
+            $table->json('file')->nullable();
+            $table->string('email');
+            $table->string('subject');
+            $table->longText('message');
+            $table->text('alt_message')->nullable();
+            $table->string('error')->nullable();
+            $table->string('type')->nullable();
+            $table->integer('status')->default(0)->index();
+            $table->integer('attempts')->default(0)->index();
+            $table->timestamps();
         });
     }
 
