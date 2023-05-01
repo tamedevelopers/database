@@ -1,10 +1,13 @@
-# Lightweight PHP ORM Database
--   @author Fredrick Peterson (Tame Developers)
--   Ultimate ORM Database
-
+# Lightweight PHP ORM Database [Fredrick Peterson]
 [![Total Downloads](https://poser.pugx.org/peterson/phpOrmDatabase/downloads)](https://packagist.org/packages/peterson/phpOrmDatabase)
 [![Latest Stable Version](https://poser.pugx.org/peterson/phpOrmDatabase/version.png)](https://packagist.org/packages/peterson/phpOrmDatabase)
 [![License](https://poser.pugx.org/peterson/phpOrmDatabase/license)](https://packagist.org/packages/peterson/phpOrmDatabase)
+
+## Inspiration
+
+Having be instroduced to Laravel Framework, over the past yr(s), Coming back to vanilla PHP database,
+was pretty tough. So i decided to create a much more easier way of communicating with Database.
+
 
 
 * [Requirements](#requirements)
@@ -1164,6 +1167,9 @@ class PostClass extends DB{
 
 ## Useful Links
 
+- @author Fredrick Peterson (Tame Developers)   
+- [Ultimate ORM Database](https://github.com/tamedevelopers/phpOrmDatabase)
+- 
 - If you love this PHP Library, you can [Buy Tame Developers a coffee](https://www.buymeacoffee.com/tamedevelopers)
 - Link to Youtube Video Tutorial on usage will be available soon
 - Udemy Course on Usage [Coming Soon]()
