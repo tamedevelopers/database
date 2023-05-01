@@ -29,7 +29,7 @@ trait CollectionTrait{
      *
      * @var mixed
      */
-    static protected $pagination_data;
+    static protected $pagination_data = [];
 
     /**
      * Instance of Database Paginate request method
@@ -126,11 +126,11 @@ trait CollectionTrait{
      * @return array
      */
     protected function wrapArrayIntoCollectionMappers(mixed $items)
-    {   
+    {
         // if pagination request is true\ The collect the Pagination `data`
         // Otherwise, get the `items` passed as param
         $items = self::$check_paginate
-                    ? self::$pagination_data ?? []
+                    ? self::$pagination_data
                     : $items;
 
         if (is_array($items) && count($items) > 0) {
@@ -153,9 +153,7 @@ trait CollectionTrait{
     {
         // first or insert request
         if ($this->unescapeIsObjectWithoutArray) {
-            return  !is_null($items)
-                    ? $items
-                    : null;
+            return  self::convertOnInit($items);
         }
 
         return $items;
@@ -211,15 +209,12 @@ trait CollectionTrait{
     public function count(): int
     {
         if(self::$check_paginate){
-            $items = self::$pagination_data ?? [];
-            return  is_array($items) 
-                    ? count($items)
-                    : 0;
-        } else{
-            return  is_array($this->items) 
-                    ? count($this->items)
-                    : 0;
-        }
+            return count(self::$pagination_data);
+        } elseif($this->unescapeIsObjectWithoutArray){
+            return  0;
+        } 
+
+        return is_array($this->items) ? count($this->items): 0;
     }
 
     /**
@@ -260,6 +255,17 @@ trait CollectionTrait{
     public function getQuery()
     {
         return get_query();
+    }
+    
+    /**
+     * Convert data to an array on Initializaiton
+     * @param mixed $items
+     * 
+     * @return array
+     */ 
+    static private function convertOnInit(mixed $items = null)
+    {
+        return json_decode( json_encode($items), true);
     }
 
 }

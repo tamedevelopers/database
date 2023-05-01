@@ -22,7 +22,7 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      */
     public function __construct($items = [])
     {
-        $this->attributes = $this->convertOnInit($items);
+        $this->attributes = self::convertOnInit($items);
         $this->getQuery   = get_query();
     }
 
@@ -78,9 +78,7 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      */
     public function offsetUnset($offset): void
     {
-        if(is_array($this->items)){
-            unset($this->attributes[$offset]);
-        }
+        unset($this->attributes[$offset]);
     }
 
      /**
@@ -194,7 +192,7 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      * 
      * @return array
      */ 
-    private function convertOnInit(mixed $items = null)
+    static private function convertOnInit(mixed $items = null)
     {
         return json_decode( json_encode($items), true);
     }
