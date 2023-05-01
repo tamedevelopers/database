@@ -95,12 +95,12 @@ was pretty tough. So i decided to create a much more easier way of communicating
 
 ## Installation
 
-Prior to installing `ultimate-orm-database` get the [Composer](https://getcomposer.org) dependency manager for PHP because it'll simplify installation.
+Prior to installing `php-orm-database` get the [Composer](https://getcomposer.org) dependency manager for PHP because it'll simplify installation.
 
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/ultimate-orm-database": "^2.2.9" 
+    "peterson/php-orm-database": "^2.2.9" 
 }
 ```
 
@@ -111,7 +111,7 @@ composer update
 
 **Or composer require**:
 ```
-composer require peterson/ultimate-orm-database
+composer require peterson/php-orm-database
 ```
 
 ## Instantiate
