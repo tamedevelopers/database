@@ -25,6 +25,13 @@ trait CollectionTrait{
     static protected $pagination;
 
     /**
+     * Get pagination data
+     *
+     * @var mixed
+     */
+    static protected $pagination_data;
+
+    /**
      * Instance of Database Paginate request method
      *
      * @var mixed
@@ -123,7 +130,7 @@ trait CollectionTrait{
         // if pagination request is true\ The collect the Pagination `data`
         // Otherwise, get the `items` passed as param
         $items = self::$check_paginate
-                    ? $items['data'] ?? []
+                    ? self::$pagination_data ?? []
                     : $items;
 
         if (is_array($items) && count($items) > 0) {
@@ -204,7 +211,7 @@ trait CollectionTrait{
     public function count(): int
     {
         if(self::$check_paginate){
-            $items = $this->items['data'] ?? [];
+            $items = self::$pagination_data ?? [];
             return  is_array($items) 
                     ? count($items)
                     : 0;
@@ -222,7 +229,7 @@ trait CollectionTrait{
      */ 
     public function toArray()
     {
-        return json_decode( json_encode($this->items), true);
+        return json_decode( json_encode(self::$check_paginate ? self::$pagination_data : $this->items), true);
     }
     
     /**
@@ -232,7 +239,7 @@ trait CollectionTrait{
      */ 
     public function toObject()
     {
-        return json_decode( json_encode($this->items), false);
+        return json_decode( json_encode(self::$check_paginate ? self::$pagination_data : $this->items), false);
     }
     
     /**
@@ -242,7 +249,7 @@ trait CollectionTrait{
      */ 
     public function toJson()
     {
-        return json_encode($this->items);
+        return json_encode(self::$check_paginate ? self::$pagination_data : $this->items);
     }
 
     /**
