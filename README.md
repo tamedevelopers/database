@@ -1169,7 +1169,6 @@ class PostClass extends DB{
 
 - @author Fredrick Peterson (Tame Developers)   
 - [Ultimate ORM Database](https://github.com/tamedevelopers/phpOrmDatabase)
-- 
 - If you love this PHP Library, you can [Buy Tame Developers a coffee](https://www.buymeacoffee.com/tamedevelopers)
 - Link to Youtube Video Tutorial on usage will be available soon
 - Udemy Course on Usage [Coming Soon]()
