@@ -1,7 +1,7 @@
 # Lightweight PHP ORM Database [Fredrick Peterson]
-[![Total Downloads](https://poser.pugx.org/peterson/phpOrmDatabase/downloads)](https://packagist.org/packages/peterson/phpOrmDatabase)
-[![Latest Stable Version](https://poser.pugx.org/peterson/phpOrmDatabase/version.png)](https://packagist.org/packages/peterson/phpOrmDatabase)
-[![License](https://poser.pugx.org/peterson/phpOrmDatabase/license)](https://packagist.org/packages/peterson/phpOrmDatabase)
+[![Total Downloads](https://poser.pugx.org/peterson/php-orm-database/downloads)](https://packagist.org/packages/peterson/php-orm-database)
+[![Latest Stable Version](https://poser.pugx.org/peterson/php-orm-database/version.png)](https://packagist.org/packages/peterson/php-orm-database)
+[![License](https://poser.pugx.org/peterson/php-orm-database/license)](https://packagist.org/packages/peterson/php-orm-database)
 
 ## Inspiration
 
