@@ -2,9 +2,9 @@
 [![Total Downloads](https://poser.pugx.org/peterson/php-orm-database/downloads)](https://packagist.org/packages/peterson/php-orm-database)
 [![Latest Stable Version](https://poser.pugx.org/peterson/php-orm-database/version.png)](https://packagist.org/packages/peterson/php-orm-database)
 [![License](https://poser.pugx.org/peterson/php-orm-database/license)](https://packagist.org/packages/peterson/php-orm-database)
-[![Build Status](https://github.com/tamedevelopers/phpOrmDatabase/actions/workflows/php.yml/badge.svg)](https://github.com/tamedevelopers/phpOrmDatabase/actions/workflows/php.yml/badge.svg)
+[![Build Status](https://github.com/tamedevelopers/phpOrmDatabase/actions/workflows/php.yml/badge.svg)](https://github.com/tamedevelopers/phpOrmDatabase/actions)
 [![Code Coverage](https://codecov.io/gh/peterson/php-orm-database/branch/2.2.x/graph/badge.svg)](https://codecov.io/gh/peterson/php-orm-database/branch/2.2.x)
-[![Gitter](https://badges.gitter.im/peterson/php-orm-database.svg)](https://gitter.im/tamedevelopers/php-orm-database)
+[![Gitter](https://badges.gitter.im/peterson/php-orm-database.svg)](https://app.element.io/#/room/#php-orm-database:gitter.im)
 
 ## Inspiration
 
