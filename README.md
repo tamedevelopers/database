@@ -8,8 +8,8 @@
 
 ## Inspiration
 
-Having be instroduced to Laravel Framework, over the past yr(s), Coming back to vanilla PHP database,
-was pretty tough. So i decided to create a much more easier way of communicating with Database.
+Having been introduced to learning Laravel Framework; Over the past yr(s), Coming back to vanilla PHP,
+was pretty tough. So i decided to create a much more easier way of communicating with Database, using native `PHP PDO:: Driver`.
 
 
 
