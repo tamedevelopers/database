@@ -1,7 +1,10 @@
-# Lightweight PHP ORM Database [Fredrick Peterson]
+# Lightweight PHP ORM Database
 [![Total Downloads](https://poser.pugx.org/peterson/php-orm-database/downloads)](https://packagist.org/packages/peterson/php-orm-database)
 [![Latest Stable Version](https://poser.pugx.org/peterson/php-orm-database/version.png)](https://packagist.org/packages/peterson/php-orm-database)
 [![License](https://poser.pugx.org/peterson/php-orm-database/license)](https://packagist.org/packages/peterson/php-orm-database)
+[![Build Status](https://github.com/peterson/php-orm-database/workflows/Continuous%20Integration/badge.svg)](https://github.com/peterson/php-orm-database/actions?query=workflow%3A%22Continuous+Integration%22)
+[![Code Coverage](https://codecov.io/gh/peterson/php-orm-database/branch/2.2.x/graph/badge.svg)](https://codecov.io/gh/peterson/php-orm-database/branch/2.2.x)
+[![Gitter](https://badges.gitter.im/peterson/php-orm-database.svg)](https://gitter.im/doctrine/php-orm-database)
 
 ## Inspiration
 
