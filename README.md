@@ -332,18 +332,18 @@ $db->table('users')
     ]);
 ```
 
-### Raw
-- Allows you to use direct raw `SQL query syntax`
+### Query
+- Allows you to use direct `SQL query syntax`
 
 - 1 usage
 ```
-$db->raw('SHOW COLUMNS FROM users')->get();
-$db->raw('DROP TABLE users;')->execute();
+$db->query('SHOW COLUMNS FROM users')->get();
+$db->query('DROP TABLE users')->execute();
 ```
 
 - 2 usage
 ```
-$db->raw('SELECT count(*) FROM users WHERE status=:status');
+$db->query('SELECT count(*) FROM users WHERE status=:status');
 $db->bind('status', 1);
 $db->get();
 
