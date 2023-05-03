@@ -1,15 +1,12 @@
-# PHP ORM Database
-[![Total Downloads](https://poser.pugx.org/peterson/php-orm-database/downloads)](https://packagist.org/packages/peterson/php-orm-database)
-[![Latest Stable Version](https://poser.pugx.org/peterson/php-orm-database/version.png)](https://packagist.org/packages/peterson/php-orm-database)
-[![License](https://poser.pugx.org/peterson/php-orm-database/license)](https://packagist.org/packages/peterson/php-orm-database)
-[![Build Status](https://github.com/tamedevelopers/phpOrmDatabase/actions/workflows/php.yml/badge.svg)](https://github.com/tamedevelopers/phpOrmDatabase/actions)
-[![Code Coverage](https://codecov.io/gh/peterson/php-orm-database/branch/2.2.x/graph/badge.svg)](https://codecov.io/gh/peterson/php-orm-database/branch/2.2.x)
-[![Gitter](https://badges.gitter.im/peterson/php-orm-database.svg)](https://app.element.io/#/room/#php-orm-database:gitter.im)
+# Lightweight PHP ORM Database [Fredrick Peterson]
+[![Total Downloads](https://poser.pugx.org/peterson/phpOrmDatabase/downloads)](https://packagist.org/packages/peterson/phpOrmDatabase)
+[![Latest Stable Version](https://poser.pugx.org/peterson/phpOrmDatabase/version.png)](https://packagist.org/packages/peterson/phpOrmDatabase)
+[![License](https://poser.pugx.org/peterson/phpOrmDatabase/license)](https://packagist.org/packages/peterson/phpOrmDatabase)
 
 ## Inspiration
 
-Having been introduced to learning Laravel Framework; Over the past yr(s), Coming back to vanilla PHP,
-was pretty tough. So i decided to create a much more easier way of communicating with Database, using native `PHP PDO:: Driver`.
+Having be instroduced to Laravel Framework, over the past yr(s), Coming back to vanilla PHP database,
+was pretty tough. So i decided to create a much more easier way of communicating with Database.
 
 
 
@@ -27,8 +24,8 @@ was pretty tough. So i decided to create a much more easier way of communicating
   * [Delete](#delete)
   * [Increment](#increment)
   * [Decrement](#decrement)
+  * [Query](#query)
   * [Remove Tags](#remove-tags)
-  * [Raw](#raw)
 * [Fetching Data](#fetching-data)
     * [Get](#get)
     * [First](#first)
@@ -49,6 +46,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
     * [Pagination Showing](#pagination-showing)
     * [Pagination Showing Config](#pagination-showing-config)
 * [Clause](#clause)
+  * [Raw](#raw)
   * [select](#select)
   * [orderBy](#orderby)
   * [orderByRaw](#orderbyraw)
@@ -331,18 +329,18 @@ $db->table('users')
     ]);
 ```
 
-### Raw
-- Allows you to use direct raw `SQL query syntax`
+### Query
+- Allows you to use direct `SQL query syntax`
 
 - 1 usage
 ```
-$db->raw('SHOW COLUMNS FROM users')->get();
-$db->raw('DROP TABLE users;')->execute();
+$db->query('SHOW COLUMNS FROM users')->get();
+$db->query('DROP TABLE users')->execute();
 ```
 
 - 2 usage
 ```
-$db->raw('SELECT count(*) FROM users WHERE status=:status');
+$db->query('SELECT count(*) FROM users WHERE status=:status');
 $db->bind('status', 1);
 $db->get();
 
@@ -622,7 +620,23 @@ $users->showing([
 ## Clause
 - Multiple clause
 
-### Select
+<details>
+<summary>Raw</summary>
+- Allows you to use direct raw `SQL query syntax`
+
+- 1 usage
+```
+$db->table()
+    ->raw('date >= $date')
+    ->raw('NOW() > created_at')
+    ->get();
+
+$db->raw('DROP TABLE users')->execute();
+```
+</details>
+
+<details>
+<summary>Select</summary>
 - Used to select needed columns from database
 ```
 $db->table('users')
@@ -636,6 +650,7 @@ SELECT first_name, email
     WHERE user_id=:user_id 
     LIMIT 1
 ```
+</details>
 
 ### orderBy
 - Takes two param `$column` and `$direction`
@@ -663,6 +678,8 @@ SELECT *
     FROM `wallet`
     ORDER By CAST(`amount` AS UNSIGNED) DESC
 ```
+
+
 
 ### Latest
 - Takes one param `$column` by default the column used is `id`
@@ -1171,7 +1188,8 @@ class PostClass extends DB{
 ## Useful Links
 
 - @author Fredrick Peterson (Tame Developers)   
-- [Lightweight - PHP ORM Database](https://github.com/tamedevelopers/phpOrmDatabase)
+- [Ultimate ORM Database](https://github.com/tamedevelopers/phpOrmDatabase)
 - If you love this PHP Library, you can [Buy Tame Developers a coffee](https://www.buymeacoffee.com/tamedevelopers)
+- Link to Youtube Video Tutorial on usage will be available soon
 - Udemy Course on Usage [Coming Soon]()
 
