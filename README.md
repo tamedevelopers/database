@@ -104,7 +104,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^1.0.5" 
+    "peterson/php-orm-database": "^2.1.1" 
 }
 ```
 
@@ -183,6 +183,8 @@ $db->table('users')
 </details>
 
 ## More Database Connection Keys
+<details><summary>Read more...</summary>
+
 - All available connection keys
     - The DRIVER_NAME uses only `mysql`
         - No other connection type is supported for now.
@@ -199,7 +201,7 @@ $db->table('users')
 | DB_PORT           |  int      |  `3306`               |
 | DB_CHARSET        |  string   |  `utf8mb4_unicode_ci` |
 | DB_COLLATION      |  string   |  `utf8mb4`            |
-
+</details>
 
 ## Usage 
 - All Methods of usage 
@@ -250,6 +252,8 @@ $db->table('users')
 ```
 
 ### Update Or Ignore
+<details><summary>Read more...</summary>
+
 - Same as `update()` method
     - Returns an `int` numbers of affected rows or `0` on error
 
@@ -260,6 +264,7 @@ $db->table('users')
         'first_name' => 'Alfred C.',
     ]);
 ```
+</details>
 
 ### Delete
 - Returns an `int`
@@ -271,10 +276,10 @@ $db->table('users')
 ```
 
 ### Increment
+<details><summary>Read more...</summary>
+
 - Takes three parameter
     - Only the first param is required
-
-<details><summary>Read more...</summary>
 
 | param             |  Data types     |
 |-------------------|-----------------|
@@ -1119,8 +1124,9 @@ Migration::run('column', 'column_name);
 ## Optimize-table 
 - Database table optimization
 
-<details><summary>Read more...</summary>
 ### Optimize
+<details><summary>Read more...</summary>
+
 - Optimize Multiple Tables
     - Takes a param as an `array` table_name
         - This will automatically `Analize` and `Repair` each tables
