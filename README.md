@@ -624,17 +624,19 @@ $users->showing([
 - Multiple clause
 
 ### Raw
-<details><summary>Raw Usage</summary>
-- Allows you to use direct raw `SQL query syntax`
+<details><summary>Allows you to use direct raw `SQL query syntax`</summary>
 
-- 1 usage
-``` 
-$db->table()
-    ->raw('date >= $date')
-    ->raw('NOW() > created_at')
+```
+$db->table("tb_wallet")
+    ->where('email', 'email@gmail.com')
+    ->raw("date >= 1681178855")
+    ->raw("NOW() > created_at")
+    ->raw("YEAR(created_at) = '2022'")
+    ->limit(10)
+    ->random()
     ->get();
 
-$db->raw('DROP TABLE users')->execute();
+SELECT * FROM `tb_wallet` WHERE email=:email AND date >= 1681178855 AND NOW() > created_at AND YEAR(created_at) = '2022' ORDER BY RAND() LIMIT 10
 ```
 </details>
 
