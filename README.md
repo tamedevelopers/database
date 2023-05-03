@@ -104,7 +104,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^2.2.9" 
+    "peterson/php-orm-database": "^1.0.5" 
 }
 ```
 
@@ -527,6 +527,8 @@ if($users->isNotEmpty()){
 
 
 ### Global Configuration 
+<details><summary>Read more...</summary>
+
 - 1 Setup global pagination on ENV autostart `most preferred` method
 ```
 AutoloadEnv::configurePagination([
@@ -561,6 +563,7 @@ $db = new DB([
     'prev'  => 'Prev Page', 
 ]);
 ```
+</details>
 
 ### Pagination Query
 ```
@@ -586,6 +589,8 @@ $users->links();
 ```
 
 ### Pagination Links Config
+<details><summary>Read more...</summary>
+
 - You can directly configure pagination links
     - Note: If `configurePagination()` `allow` is set to `true`
         - It'll override every other settings
@@ -597,6 +602,7 @@ $users->links([
     'next'  => 'Next Page',
 ])
 ```
+</details>
 
 ### Pagination Showing
 ```
@@ -609,6 +615,8 @@ $users->showing();
 ```
 
 ### Pagination Showing Config
+<details><summary>Read more...</summary>
+
 - You can configure showing text directly as well
 ```
 $users->showing([
@@ -619,29 +627,42 @@ $users->showing([
     'span'     => 'css-selector',
 ])
 ```
+</details>
 
 ## Clause
 - Multiple clause
 
-<details><summary>[Raw](###Raw)</summary>
+### Raw
+<details><summary>Read more...</summary>
 - Allows you to use direct raw `SQL query syntax`
 
 ```
+$date = strtotime('next week');
+
+
 $db->table("tb_wallet")
-    ->where('email', 'email@gmail.com')
-    ->raw("date >= 1681178855")
+    ->raw("date >= $date")
     ->raw("NOW() > created_at")
     ->raw("YEAR(created_at) = '2022'")
+    ->where('email', 'email@gmail.com')
     ->limit(10)
     ->random()
     ->get();
 
-SELECT * FROM `tb_wallet` WHERE email=:email AND date >= 1681178855 AND NOW() > created_at AND YEAR(created_at) = '2022' ORDER BY RAND() LIMIT 10
+
+-- Query
+SELECT * FROM `tb_wallet` 
+        WHERE date >= 1681178855 
+        AND NOW() > created_at 
+        AND YEAR(created_at) = '2022' 
+        AND email=:email
+        ORDER BY RAND() LIMIT 10
 ```
 </details>
 
 
-<details><summary>[Select](###Select)</summary>
+### Select
+<details><summary>Read more...</summary>
 - Used to select needed columns from database
 
 ```
@@ -660,8 +681,10 @@ SELECT first_name, email
 
 
 ### orderBy
+<details><summary>Read more...</summary>
 - Takes two param `$column` and `$direction`
     - By default  `$direction` param is set to `ASC`
+
 ```
 $db->table('wallet')
     ->orderBy('date', 'DESC')
@@ -672,9 +695,13 @@ SELECT *
     FROM `wallet`
     ORDER By date DESC
 ```
+</details>
+
 
 ### orderByRaw
+<details><summary>Read more...</summary>
 - Takes one param `$query`
+
 ```
 $db->table('wallet')
     ->orderByRaw('CAST(`amount` AS UNSIGNED) DESC')
@@ -685,8 +712,12 @@ SELECT *
     FROM `wallet`
     ORDER By CAST(`amount` AS UNSIGNED) DESC
 ```
+</details>
+
 
 ### Latest
+<details><summary>Read more...</summary>
+
 - Takes one param `$column` by default the column used is `id`
 ```
 $db->table('wallet')
@@ -698,8 +729,12 @@ SELECT *
     FROM `wallet`
     ORDER By date DESC
 ```
+</details>
+
 
 ### Oldest
+<details><summary>Read more...</summary>
+
 - Takes one param `$column` by default the column used is `id`
 ```
 $db->table('wallet')
@@ -711,8 +746,11 @@ SELECT *
     FROM `wallet`
     ORDER By id ASC
 ```
+</details>
 
 ### inRandomOrder
+<details><summary>Read more...</summary>
+
 ```
 $db->table('wallet')
     ->inRandomOrder()
@@ -723,16 +761,22 @@ SELECT *
     FROM `wallet`
     ORDER BY RAND()
 ```
+</details>
 
 ### random
+<details><summary>Read more...</summary>
+
 - Same as `inRandomOrder()`
 ```
 $db->table('wallet')
     ->random()
     ->get();
 ```
+</details>
 
 ### limit
+<details><summary>Read more...</summary>
+
 - Takes one param `$limit` as int. By default value is `1`
 ```
 $db->table('wallet')
@@ -744,8 +788,11 @@ SELECT *
     FROM `wallet`
     LIMIT 10
 ```
+</details>
 
 ### offset
+<details><summary>Read more...</summary>
+
 - Takes one param `$offset` as int. By default value is `0`
 ```
 $db->table('wallet')
@@ -759,6 +806,7 @@ SELECT *
     LIMIT 2, 3
 ```
 
+
 - Example 2 (Providing only offset will return as LIMIT without error)
 ```
 $db->table('wallet')
@@ -770,8 +818,11 @@ SELECT *
     FROM `wallet`
     LIMIT 2
 ```
+</details>
 
 ### join
+<details><summary>Read more...</summary>
+
 | Params        |  Description      |
 |---------------|-------------------|
 | table         |  table            |
@@ -788,8 +839,11 @@ SELECT *
     FROM `wallet`
     INNER JOIN `users` ON users.user_id = wallet.user_id
 ```
+</details>
 
 ### leftJoin
+<details><summary>Read more...</summary>
+
 - Same as `join`
 ```
 $db->table('wallet')
@@ -800,8 +854,11 @@ SELECT *
     FROM `wallet`
     LEFT JOIN `users` ON users.user_id = wallet.user_id
 ```
+</details>
 
 ### where
+<details><summary>Read more...</summary>
+
 - Takes three parameter
     - Only the first param is required
 
@@ -822,8 +879,11 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND amount >: amount AND balance >= : balance
 ```
+</details>
 
 ### orWhere
+<details><summary>Read more...</summary>
+
 - Same as Where clause
 ```
 $db->table('wallet')
@@ -839,8 +899,11 @@ SELECT *
     WHERE user_id=:user_id AND amount > :amount
     OR first_name like :first_name AND amount <= :amount
 ```
+</details>
 
 ### whereColumn
+<details><summary>Read more...</summary>
+
 - Takes three parameter `column` `operator` `column2`
 ```
 $db->table('wallet')
@@ -855,8 +918,11 @@ SELECT *
     WHERE user_id=:user_id AND amount=tax
     AND amount <= balance
 ```
+</details>
 
 ### whereNull
+<details><summary>Read more...</summary>
+
 - Takes one parameter `column`
 ```
 $db->table('wallet')
@@ -869,8 +935,11 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND email_status IS NULL
 ```
+</details>
 
 ### whereNotNull
+<details><summary>Read more...</summary>
+
 - Takes one parameter `column`
 ```
 $db->table('wallet')
@@ -883,8 +952,11 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND email_status IS NOT NULL
 ```
+</details>
 
 ### whereBetween
+<details><summary>Read more...</summary>
+
 - Takes two parameter `column` as string `param` as array
     - Doesn't support float value
 
@@ -904,8 +976,11 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND amount BETWEEN :0 AND :100
 ```
+</details>
 
 ### whereNotBetween
+<details><summary>Read more...</summary>
+
 - Same as `whereBetween()` method
 
 ```
@@ -919,8 +994,11 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND amount NOT BETWEEN :0 AND :100
 ```
+</details>
 
 ### whereIn
+<details><summary>Read more...</summary>
+
 - Takes two parameter `column` as string `param` as array
     - Doesn't support float value
 
@@ -940,8 +1018,11 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND amount IN (:10, :20, :40, :100)
 ```
+</details>
 
 ### whereNotIn
+<details><summary>Read more...</summary>
+
 Same as `whereIn()` method
 ```
 $db->table('wallet')
@@ -954,8 +1035,11 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND amount NOT IN (:10, :20, :40, :100)
 ```
+</details>
 
 ### groupBy
+<details><summary>Read more...</summary>
+
 - Takes one param `$column`
 ```
 $db->table('wallet')
@@ -968,6 +1052,7 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id GROUP BY amount
 ```
+</details>
 
 ## Database Migration
 - Similar to Laravel DB Migration `Just to make database table creation more easier`
@@ -982,6 +1067,8 @@ use builder\Database\Migrations\Migration;
 ```
 
 ### Create Table Schema
+<details><summary>Read more...</summary>
+
 - Takes param as `table name`
     - Second parameter `string` `jobs|sessions` (optional) -If passed will create a dummy `jobs|sessions` table schema
 
@@ -998,6 +1085,7 @@ Table `2023_04_19_1681860618_tb_jobs` has been created successfully
 Table `2023_04_19_1681860618_tb_sessions` has been created successfully
 ```
 ![Sample Session Schema](https://raw.githubusercontent.com/tamedevelopers/UltimateOrmDatabase/main/sessions.png)
+</details>
 
 ### Run Migration
 
