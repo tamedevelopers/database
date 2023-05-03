@@ -1,12 +1,15 @@
-# Lightweight PHP ORM Database [Fredrick Peterson]
-[![Total Downloads](https://poser.pugx.org/peterson/phpOrmDatabase/downloads)](https://packagist.org/packages/peterson/phpOrmDatabase)
-[![Latest Stable Version](https://poser.pugx.org/peterson/phpOrmDatabase/version.png)](https://packagist.org/packages/peterson/phpOrmDatabase)
-[![License](https://poser.pugx.org/peterson/phpOrmDatabase/license)](https://packagist.org/packages/peterson/phpOrmDatabase)
+# PHP ORM Database
+[![Total Downloads](https://poser.pugx.org/peterson/php-orm-database/downloads)](https://packagist.org/packages/peterson/php-orm-database)
+[![Latest Stable Version](https://poser.pugx.org/peterson/php-orm-database/version.png)](https://packagist.org/packages/peterson/php-orm-database)
+[![License](https://poser.pugx.org/peterson/php-orm-database/license)](https://packagist.org/packages/peterson/php-orm-database)
+[![Build Status](https://github.com/tamedevelopers/phpOrmDatabase/actions/workflows/php.yml/badge.svg)](https://github.com/tamedevelopers/phpOrmDatabase/actions)
+[![Code Coverage](https://codecov.io/gh/peterson/php-orm-database/branch/2.2.x/graph/badge.svg)](https://codecov.io/gh/peterson/php-orm-database/branch/2.2.x)
+[![Gitter](https://badges.gitter.im/peterson/php-orm-database.svg)](https://app.element.io/#/room/#php-orm-database:gitter.im)
 
 ## Inspiration
 
-Having be instroduced to Laravel Framework, over the past yr(s), Coming back to vanilla PHP database,
-was pretty tough. So i decided to create a much more easier way of communicating with Database.
+Having been introduced to learning Laravel Framework; Over the past yr(s), Coming back to vanilla PHP,
+was pretty tough. So i decided to create a much more easier way of communicating with Database, using native `PHP PDO:: Driver`.
 
 
 
@@ -329,18 +332,18 @@ $db->table('users')
     ]);
 ```
 
-### Query
-- Allows you to use direct `SQL query syntax`
+### Raw
+- Allows you to use direct raw `SQL query syntax`
 
 - 1 usage
 ```
-$db->query('SHOW COLUMNS FROM users')->get();
-$db->query('DROP TABLE users')->execute();
+$db->raw('SHOW COLUMNS FROM users')->get();
+$db->raw('DROP TABLE users;')->execute();
 ```
 
 - 2 usage
 ```
-$db->query('SELECT count(*) FROM users WHERE status=:status');
+$db->raw('SELECT count(*) FROM users WHERE status=:status');
 $db->bind('status', 1);
 $db->get();
 
@@ -620,12 +623,12 @@ $users->showing([
 ## Clause
 - Multiple clause
 
-<details>
-<summary>Raw</summary>
+### Raw
+<details><summary>Raw Usage</summary>
 - Allows you to use direct raw `SQL query syntax`
 
 - 1 usage
-```
+``` 
 $db->table()
     ->raw('date >= $date')
     ->raw('NOW() > created_at')
@@ -635,9 +638,10 @@ $db->raw('DROP TABLE users')->execute();
 ```
 </details>
 
-<details>
-<summary>Select</summary>
+### Select
+<details><summary>Select</summary>
 - Used to select needed columns from database
+
 ```
 $db->table('users')
     ->where('user_id', 10000001)
@@ -678,8 +682,6 @@ SELECT *
     FROM `wallet`
     ORDER By CAST(`amount` AS UNSIGNED) DESC
 ```
-
-
 
 ### Latest
 - Takes one param `$column` by default the column used is `id`
@@ -1188,8 +1190,7 @@ class PostClass extends DB{
 ## Useful Links
 
 - @author Fredrick Peterson (Tame Developers)   
-- [Ultimate ORM Database](https://github.com/tamedevelopers/phpOrmDatabase)
+- [Lightweight - PHP ORM Database](https://github.com/tamedevelopers/phpOrmDatabase)
 - If you love this PHP Library, you can [Buy Tame Developers a coffee](https://www.buymeacoffee.com/tamedevelopers)
-- Link to Youtube Video Tutorial on usage will be available soon
 - Udemy Course on Usage [Coming Soon]()
 
