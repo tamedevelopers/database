@@ -229,6 +229,8 @@ $db->table('users')->insert([
 ```
 
 ### Insert Or Ignore
+<details><summary>Read more...</summary>
+
 - Same as `insert()` method
     - It returns an object of created data or `false` on error
 
@@ -238,6 +240,7 @@ $db->table('users')->insertOrIgnore([
     'first_name' => 'Alfred',
 ]);
 ```
+</details>
 
 ### Update
 - Takes one parameter as assoc array `column_name => value`
@@ -436,19 +439,23 @@ SELECT count(*)
 - Takes param as `int` `$per_page`
     - By default if no param is given, then it displays 10 per page
 ```
-$users = $db->table('users')->paginate(40);
-
-SELECT * FROM `users` 
-    LIMIT 0, 40 
+$users = $db->table('users')
+            ->paginate(40);
 
 
 $users // this will return the data objects
-
 $users->links() // this will return the paginations links view
 $users->showing() // Display items of total results
+
+
+-- Query
+SELECT * FROM `users` 
+    LIMIT 0, 40 
 ```
 
 ### Exists
+<details><summary>Read more...</summary>
+
 ```
 $db->table('users')
     ->where('email', 'email@gmail.com')
@@ -458,6 +465,7 @@ $db->table('users')
 -- Query
 SELECT EXISTS(SELECT 1 FROM `users` WHERE email=:email OR name=:name) as `exists`
 ```
+</details>
 
 ### Table Exist
 - Takes param as `string` `$table_name`
@@ -1093,6 +1101,7 @@ Table `2023_04_19_1681860618_tb_sessions` has been created successfully
 </details>
 
 ### Run Migration
+<details><summary>Read more...</summary>
 
 - You need to pass in `up` as a param
     - This auto create folders/subfolder with read permission
@@ -1105,21 +1114,27 @@ Migration::run('up');
 Migration runned successfully on `2023_04_19_1681860618_user` 
 Migration runned successfully on `2023_04_19_1681860618_user_wallet` 
 ```
+</details>
 
 ### Drop Table
+<details><summary>Read more...</summary>
+
 - Be careful as this will execute and drop all files table `located in the migration`
 
 ```
 Migration::run('drop');
 ```
+</details>
 
 ### Drop Column
+<details><summary>Read more...</summary>
+
 - To Drop Column `takes two param`
     - This will drop the column available
 ```
 Migration::run('column', 'column_name);
 ```
-
+</details>
 
 ## Optimize-table 
 - Database table optimization
@@ -1239,11 +1254,10 @@ true|false
 - latin1
 
 ## Extend DB Class
-- You can as well extends the DB class and use along 
-    - If inherited class must use a __construct, Then you must use `parent::__construct();`
-
 <details><summary>Read more...</summary>
 
+- You can as well extends the DB class and use along 
+    - If inherited class must use a __construct, Then you must use `parent::__construct();`
 ```
 use builder\Database\DB;
 
