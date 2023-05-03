@@ -623,8 +623,8 @@ $users->showing([
 ## Clause
 - Multiple clause
 
-### Raw
-<details><summary>Allows you to use direct raw `SQL query syntax`</summary>
+<details><summary>[Raw](###Raw)</summary>
+- Allows you to use direct raw `SQL query syntax`
 
 ```
 $db->table("tb_wallet")
@@ -640,8 +640,8 @@ SELECT * FROM `tb_wallet` WHERE email=:email AND date >= 1681178855 AND NOW() > 
 ```
 </details>
 
-### Select
-<details><summary>Select</summary>
+
+<details><summary>[Select](###Select)</summary>
 - Used to select needed columns from database
 
 ```
@@ -657,6 +657,7 @@ SELECT first_name, email
     LIMIT 1
 ```
 </details>
+
 
 ### orderBy
 - Takes two param `$column` and `$direction`
