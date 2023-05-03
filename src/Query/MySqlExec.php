@@ -73,32 +73,8 @@ class MySqlExec  extends Constants{
         $this->closeQuery();
         $this->startTimer();
         $this->table        = $table;
-        $this->rawQuery     = false;
         $this->modelQuery   = true;
 
-        return $this;
-    }
-
-    /**
-     * Query raw DB
-     *
-     * @param string $query 
-     * @return object\builder\Database\raw
-     */ 
-    public function raw($query = null)
-    {
-        $this->closeQuery();
-        
-        $this->modelQuery   = false;
-        $this->rawQuery     = true;
-        
-        if($this->rawQuery){
-            $this->startTimer();
-            $this->tempRawQuery = "$query";
-
-            // query builder
-            $this->compileQueryBuilder();
-        }
         return $this;
     }
 
@@ -179,7 +155,9 @@ class MySqlExec  extends Constants{
      */
     public function execute()
     {
-        return $this->stmt->execute();
+        $this->stmt->execute();
+
+        return $this;
     }
 
     /**
@@ -411,19 +389,8 @@ class MySqlExec  extends Constants{
         $joins = $this->console::formatJoinQuery($this->joins);
         $limit = $this->console::getLimitQuery($this->limit);
         
-        // if raw query
-        if($this->rawQuery){
-            return $this->console::replaceWhiteSpace( 
-                "{$this->rawCountQueryFinder()} 
-                {$joins} 
-                {$this->tempQuery} 
-                {$this->groupBy} 
-                {$this->orderBy} 
-                {$limit}"
-            );
-        }
         // if query is count(*) only | perform SELECT By columns query 
-        else if($this->countQuery || $this->selectQuery){
+        if($this->countQuery || $this->selectQuery){
             $query = "SELECT 
                         {$this->formatSelectQuery()} 
                         FROM `{$this->table}`";
@@ -434,11 +401,32 @@ class MySqlExec  extends Constants{
         return $this->console::replaceWhiteSpace(
             "{$query}
             {$joins} 
-            {$this->tempQuery} 
+            {$this->rawAndWherePositionBuilder()}
             {$this->groupBy} 
             {$this->orderBy} 
             {$limit}"
         );
+    }
+
+    /**
+     * Position Raw and Where Queries
+     * 1 === where
+     * 2 === raw
+     * 
+     * @return string
+     */ 
+    protected function rawAndWherePositionBuilder()
+    {
+        $isInt = is_int($this->bt_raw_and_where);
+
+        // query default
+        $query = "{$this->tempQuery} {$this->tempRawQuery}";
+
+        if($isInt && $this->bt_raw_and_where === 2){
+            $query = "{$this->tempRawQuery} {$this->tempQuery}";
+        } 
+
+        return $query;
     }
 
     /**
@@ -483,15 +471,11 @@ class MySqlExec  extends Constants{
      * 
      * @return string
      */ 
-    protected function rawCountQueryFinder()
+    protected function saveTempRawQuery(?array $query = [])
     {
-        if($this->countQuery && !$this->PaginateQuery){
-            if(!is_null($this->tempRawQuery)){
-                $this->tempRawQuery =  str_replace("SELECT *", "SELECT count(*) as `count`", $this->tempRawQuery);
-            }
-        }
+        $this->tempRawQuery = $this->console::saveTempQuery($query);
 
-        return $this->tempRawQuery;
+        return $this;
     }
 
     /**
@@ -573,15 +557,16 @@ class MySqlExec  extends Constants{
         $this->tempUpdateQuery      = null;
         $this->tempInsertQuery      = null;
         $this->tempIncrementQuery   = null;
+        $this->bt_raw_and_where     = null;
         $this->joins                = [];
         $this->where                = [];
+        $this->rawQuery             = [];
         $this->selectColumns        = [];
         $this->paramValues          = [];
         $this->selectQuery          = false;
         $this->PaginateQuery        = false;
         $this->countQuery           = false;
         $this->modelQuery           = false;
-        $this->rawQuery             = false;
         $this->removeTags           = false;
         $this->runtime              = 0.00;
         $this->timer                = [
@@ -645,6 +630,7 @@ class MySqlExec  extends Constants{
         // save to temp queri data
         $this->getQuery = [
             'stmt'          => $this->stmt,
+            'raw'           => $this->rawQuery,
             'where'         => $this->where,
             'groupBy'       => $this->groupBy,
             'joins'         => $this->joins,

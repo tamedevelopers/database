@@ -156,7 +156,7 @@ abstract class Insertion extends Builder {
     public function tableExist(?string $table_name = null)
     {
         try{
-            $this->raw("SELECT 1 FROM `{$table_name}` LIMIT 1")->execute();
+            $this->query("SELECT 1 FROM `{$table_name}` LIMIT 1")->execute();
             
             $this->close();
             
@@ -425,7 +425,22 @@ abstract class Insertion extends Builder {
         }
     }
 
-     /**
+    /**
+     * Get SQL Query
+     *
+     * @return string\toSql
+     */
+    public function toSql()
+    {
+        $this->compileQuery();
+
+        $query = $this->query;
+        $this->closeQuery();
+
+        return $query;
+    }
+
+    /**
      * Close all queries and restore back to default
      *
      * @return void\close

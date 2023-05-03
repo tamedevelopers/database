@@ -186,6 +186,33 @@ class Builder extends MySqlExec{
     }
 
     /**
+     * Raw Query string 
+     * 
+     * @param string $query
+     * 
+     * @return object
+     */ 
+    public function raw(?string $query = null)
+    {
+        // if query already exists
+        if($this->isRawExist()){
+            $this->rawQuery[] = [
+                'query' => " AND $query",
+            ];
+        }else{
+            // first query
+            $this->rawQuery[] = [
+                'query' => " WHERE $query",
+            ];
+        }
+
+        // get into query
+        $this->saveTempRawQuery($this->rawQuery);
+
+        return $this;
+    }
+
+    /**
      * PDO where clause. Expects three params (only two mandatory)
      * By default if you provide two param (seperator becomes =) equals to. And Value becomes 2nd param
      * If you provide three values then, operator must be the middle param
@@ -204,7 +231,7 @@ class Builder extends MySqlExec{
         $operator   = $temp['operator'];
 
         // if query already exists
-        if(count($this->where) > 0){
+        if($this->isWhereExist()){
             $this->where[] = [
                 'query' => " AND {$column}{$operator}:{$column}",
                 'data'  => [
@@ -289,7 +316,7 @@ class Builder extends MySqlExec{
         // Adding 'Special Key to Query' as Trackable strings to remove later on
         // As this will allow us bind this data separately
         // if query already exists
-        if(count($this->where) > 0){
+        if($this->isWhereExist()){
             $this->where[] = [
                 'query' => " AND {$this->special_key} {$placeholders}",
                 'data'  => [
@@ -326,7 +353,7 @@ class Builder extends MySqlExec{
     public function whereNull($column)
     {
         // if query already exists
-        if(count($this->where) > 0){
+        if($this->isWhereExist()){
             $this->where[] = [
                 'query' => " AND {$column} IS NULL",
                 'data'  => [
@@ -359,7 +386,7 @@ class Builder extends MySqlExec{
     public function whereNotNull($column)
     {
         // if query already exists
-        if(count($this->where) > 0){
+        if($this->isWhereExist()){
             $this->where[] = [
                 'query' => " AND {$column} IS NOT NULL",
                 'data'  => [
@@ -396,7 +423,7 @@ class Builder extends MySqlExec{
         $param = $param ?? [];
 
         // if query already exists
-        if(count($this->where) > 0){
+        if($this->isWhereExist()){
             $this->where[] = [
                 'query' => " AND {$column} BETWEEN :{$param[0]} AND :{$param[1]}",
                 'data'  => [
@@ -435,7 +462,7 @@ class Builder extends MySqlExec{
         $param = $param ?? [];
 
         // if query already exists
-        if(count($this->where) > 0){
+        if($this->isWhereExist()){
             $this->where[] = [
                 'query' => " AND {$column} NOT BETWEEN :{$param[0]} AND :{$param[1]}",
                 'data'  => [
@@ -479,7 +506,7 @@ class Builder extends MySqlExec{
         }, $param));
 
         // if query already exists
-        if(count($this->where) > 0){
+        if($this->isWhereExist()){
             $this->where[] = [
                 'query' => " AND {$column} IN ($placeholders)",
                 'data'  => [
@@ -523,7 +550,7 @@ class Builder extends MySqlExec{
         }, $param));
 
         // if query already exists
-        if(count($this->where) > 0){
+        if($this->isWhereExist()){
             $this->where[] = [
                 'query' => " AND {$column} NOT IN ($placeholders)",
                 'data'  => [
@@ -579,6 +606,44 @@ class Builder extends MySqlExec{
         $this->selectColumns = $columns;
 
         return $this;
+    }
+
+    /**
+     * Check if Raw or Where clause already exist
+     * 
+     * @return bool
+     */ 
+    private function isRawExist()
+    {
+        // position
+        if(is_null($this->bt_raw_and_where)){
+            $this->bt_raw_and_where = 2;
+        }
+
+        if(count($this->where) > 0 || count($this->rawQuery) > 0){
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if Raw or Where clause already exist
+     * 
+     * @return bool
+     */ 
+    private function isWhereExist()
+    {
+        // position
+        if(is_null($this->bt_raw_and_where)){
+            $this->bt_raw_and_where = 1;
+        }
+
+        if(count($this->where) > 0 || count($this->rawQuery) > 0){
+            return true;
+        }
+
+        return false;
     }
 
     /**

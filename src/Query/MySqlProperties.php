@@ -28,6 +28,12 @@ trait MySqlProperties{
     protected $dbh;
 
     /**
+     * @var int
+     * When to position raw query
+     */
+    protected $bt_raw_and_where;
+
+    /**
      * @var string|null
      */
     protected $special_key = '__**';
@@ -100,12 +106,17 @@ trait MySqlProperties{
     /**
      * @var array
      */
-    protected $joins    = [];
+    protected $joins = [];
 
     /**
      * @var array
      */
-    protected $where    = [];
+    protected $rawQuery = [];
+
+    /**
+     * @var array
+     */
+    protected $where = [];
     
     /**
      * @var array
@@ -135,17 +146,12 @@ trait MySqlProperties{
     /**
      * @var bool
      */
-    protected $modelQuery  = false;
+    protected $modelQuery = false;
 
     /**
      * @var bool
      */
-    protected $rawQuery    = false;
-
-    /**
-     * @var bool
-     */
-    protected $removeTags  = false;
+    protected $removeTags = false;
 
     /**
      * @var array

@@ -150,6 +150,8 @@ env_start([
 ```
 
 ### Direct DB Connection - `Supported but ![Recommended]`
+<details><summary>Read more...</summary>
+
 - When initializing the class
     - Pass an array as a param to the class
         - Why not recommended? Because you must use thesame varaible name `$db` everywhere in your app
@@ -178,7 +180,7 @@ $db->table('users')
     ->limit(10),
     ->get();
 ```
-
+</details>
 
 ## More Database Connection Keys
 - All available connection keys
@@ -272,6 +274,8 @@ $db->table('users')
 - Takes three parameter
     - Only the first param is required
 
+<details><summary>Read more...</summary>
+
 | param             |  Data types     |
 |-------------------|-----------------|
 | column `required` |  string         |
@@ -320,6 +324,7 @@ $db->table('users')
         'status'     => 1,
     ]);
 ```
+</details>
 
 ### Decrement
 - Same as Increment
@@ -333,6 +338,8 @@ $db->table('users')
 ```
 
 ### Query
+<details><summary>Read more...</summary>
+
 - Allows you to use direct `SQL query syntax`
 
 - 1 usage
@@ -350,8 +357,11 @@ $db->get();
 -- Query
 SELECT count(*) FROM users WHERE status=:status
 ```
+</details>
 
 ### Remove Tags
+<details><summary>Read more...</summary>
+
 - Helps against `XSS attacks` 
     - By default we remove-prevention of `XSS attacks` as this should already been handled by Forms Validation before sending into the Database
         -> Applies to `insert` `update` `increment` `decrement` methods.
@@ -369,6 +379,7 @@ $db->table('post')
 The value should be 'empty' if found as an attack
 Now the method automatically apply strict method of cleaning each values
 ```
+</details>
 
 ## Fetching Data
 
@@ -465,16 +476,19 @@ $db->tableExist('users');
 |-------------------|-------------------------------------------|
 |  getAttributes()  |  `array` Returns an array of data         |
 |  getOriginal()    |  `object` Returns an object of data       |
-|  isEmpty()        |  `boolean` `true \| false` If data is empty|
+|  isEmpty()        |  `boolean` `true \| false` If data is empty |
 |  isNotEmpty()     |  `opposite` of `->isEmpty()`              |
 |  count()          |  `int` count data in items collection     |
 |  toArray()        |  `array` Convert items to array           |
 |  toObject()       |  `object` Convert items to object         |
 |  toJson()         |  `string` Convert items to json           |
 |  getQuery()       |  `object` Get Query information           |
+|  toSql()          |  `string` Sql Query String without execution |
  
 
 ### Collection Usage
+<details><summary>Read more...</summary>
+
 - Takes one param as `mixed` data
     - Convert data into an array or arrays
 
@@ -505,7 +519,7 @@ if($users->isNotEmpty()){
     }
 }
 ```
-
+</details>
 
 ## Pagination
 - Configuring Pagination
@@ -662,7 +676,6 @@ SELECT * FROM `tb_wallet`
 
 
 ### Select
-<details><summary>Read more...</summary>
 - Used to select needed columns from database
 
 ```
@@ -677,7 +690,6 @@ SELECT first_name, email
     WHERE user_id=:user_id 
     LIMIT 1
 ```
-</details>
 
 
 ### orderBy
@@ -749,8 +761,6 @@ SELECT *
 </details>
 
 ### inRandomOrder
-<details><summary>Read more...</summary>
-
 ```
 $db->table('wallet')
     ->inRandomOrder()
@@ -761,7 +771,6 @@ SELECT *
     FROM `wallet`
     ORDER BY RAND()
 ```
-</details>
 
 ### random
 <details><summary>Read more...</summary>
@@ -775,8 +784,6 @@ $db->table('wallet')
 </details>
 
 ### limit
-<details><summary>Read more...</summary>
-
 - Takes one param `$limit` as int. By default value is `1`
 ```
 $db->table('wallet')
@@ -788,7 +795,6 @@ SELECT *
     FROM `wallet`
     LIMIT 10
 ```
-</details>
 
 ### offset
 <details><summary>Read more...</summary>
@@ -857,8 +863,6 @@ SELECT *
 </details>
 
 ### where
-<details><summary>Read more...</summary>
-
 - Takes three parameter
     - Only the first param is required
 
@@ -879,7 +883,6 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND amount >: amount AND balance >= : balance
 ```
-</details>
 
 ### orWhere
 <details><summary>Read more...</summary>
@@ -1038,8 +1041,6 @@ SELECT *
 </details>
 
 ### groupBy
-<details><summary>Read more...</summary>
-
 - Takes one param `$column`
 ```
 $db->table('wallet')
@@ -1052,7 +1053,6 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id GROUP BY amount
 ```
-</details>
 
 ## Database Migration
 - Similar to Laravel DB Migration `Just to make database table creation more easier`
@@ -1116,10 +1116,10 @@ Migration::run('column', 'column_name);
 ```
 
 
-## Optimize-table
+## Optimize-table 
 - Database table optimization
 
-
+<details><summary>Read more...</summary>
 ### Optimize
 - Optimize Multiple Tables
     - Takes a param as an `array` table_name
@@ -1128,22 +1128,29 @@ Migration::run('column', 'column_name);
 ```
 $db->optimize(['tb_wallet', 'tb_user']);
 ```
+</details>
 
 ### Analize
+<details><summary>Read more...</summary>
+
 - Analize Single Table
     - Takes a param as an `string` table_name
 
 ```
 $db->analize('tb_wallet');
 ```
+</details>
 
 ### Repair
+<details><summary>Read more...</summary>
+
 - Repair Single Table
     - Takes a param as an `string` table_name
 
 ```
 $db->repair('tb_wallet');
 ```
+</details>
 
 ## Get Database Query
 
@@ -1165,6 +1172,8 @@ $db->repair('tb_wallet');
 | $db->getConnection()  | get_connection() |
 
 ## Database Import
+<details><summary>Read more...</summary>
+
 - You can use this class to import .sql into a database programatically
 
 ```
@@ -1175,14 +1184,16 @@ $import = new DBImport();
 // needs absolute path to database file
 $response = $import->DatabaseImport('orm.sql');
 
-
 - Status code
 ->response == 404 (Failed to read file or File does'nt exists
 ->response == 400 (Query to database error
 ->response == 200 (Success importing to database
 ```
+</details>
 
 ## Update Env Variable
+<details><summary>Read more...</summary>
+
 - You can use this class to import .sql into a database programatically
 
 | Params        |  Description      |
@@ -1202,6 +1213,7 @@ OrmDotEnv::updateENV('DB_CHARSET', 'utf8', false);
 Returns - Boolean
 true|false
 ```
+</details>
 
 ## Collation And Charset
 - Collation and Charset Data `listing`
@@ -1224,6 +1236,8 @@ true|false
 - You can as well extends the DB class and use along 
     - If inherited class must use a __construct, Then you must use `parent::__construct();`
 
+<details><summary>Read more...</summary>
+
 ```
 use builder\Database\DB;
 
@@ -1243,6 +1257,7 @@ class PostClass extends DB{
     }
 }
 ```
+<details>
 
 ## Helpers
 
