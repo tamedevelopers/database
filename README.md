@@ -1277,7 +1277,7 @@ class PostClass extends DB{
     }
 }
 ```
-<details>
+</details>
 
 ## Helpers
 
