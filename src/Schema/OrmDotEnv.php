@@ -124,11 +124,9 @@ class OrmDotEnv extends Constants{
         
         // if file doesn't exist and not a directory
         if(!file_exists($path) && !is_dir($path)){
-            @$fsource = fopen($path, 'w+');
-            if(is_resource($fsource)){
-                @fwrite($fsource, self::envTxt());
-                @fclose($fsource);
-            }
+            
+            // Write the contents to the new file
+            file_put_contents($path, self::envTxt());
         }
     }
 

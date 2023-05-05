@@ -188,75 +188,134 @@ class AutoloadEnv{
      */
     static protected function createDummy()
     {
-        $realPath = DOT_ENV_CONNECTION['self_path']['path'];
-        $paths = [
-            'init' => [
-                'path'  => "{$realPath}\init.php",
-                'dummy' => realpath(__DIR__) . "\Dummy\dummyInit.php",
-            ],
-            'gitignore' => [
-                'path'  => "{$realPath}\.gitignore",
-                'dummy' => realpath(__DIR__) . "\Dummy\dummyGitIgnore.php",
-            ],
-            'htaccess' => [
-                'path'  => "{$realPath}\.htaccess",
-                'dummy' => realpath(__DIR__) . "\Dummy\dummyHtaccess.php",
-            ],
-            'phpini' => [
-                'path'  => "{$realPath}\php.ini",
-                'dummy' => realpath(__DIR__) . "\Dummy\dummyPhpIni.php",
-            ],
-            'userini' => [
-                'path'  => "{$realPath}\.user.ini",
-                'dummy' => realpath(__DIR__) . "\Dummy\dummyUserIni.php",
-            ],
-        ];
+        $paths = self::getPathsData();
+
+        // only create when files are not present
+        if(self::isDummyNotPresent()){
+            // create for init 
+            if(!file_exists($paths['init']['path']) && !is_dir($paths['init']['path'])){
+                // Read the contents of the dummy file
+                $dummyContent = file_get_contents($paths['init']['dummy']);
+    
+                // Write the contents to the new file
+                file_put_contents($paths['init']['path'], $dummyContent);
+            }
+    
+            // create for gitignore
+            if(!file_exists($paths['gitignore']['path']) && !is_dir($paths['gitignore']['path'])){
+                // Read the contents of the dummy file
+                $dummyContent = file_get_contents($paths['gitignore']['dummy']);
+    
+                // Write the contents to the new file
+                file_put_contents($paths['gitignore']['path'], $dummyContent);
+            }
+    
+            // create for htaccess
+            if(!file_exists($paths['htaccess']['path']) && !is_dir($paths['htaccess']['path'])){
+                // Read the contents of the dummy file
+                $dummyContent = file_get_contents($paths['htaccess']['dummy']);
+    
+                // Write the contents to the new file
+                file_put_contents($paths['htaccess']['path'], $dummyContent);
+            }
+    
+            // create for phpini
+            if(!file_exists($paths['phpini']['path']) && !is_dir($paths['phpini']['path'])){
+                // Read the contents of the dummy file
+                $dummyContent = file_get_contents($paths['phpini']['dummy']);
+    
+                // Write the contents to the new file
+                file_put_contents($paths['phpini']['path'], $dummyContent);
+            }
+    
+            // create for userini
+            if(!file_exists($paths['userini']['path']) && !is_dir($paths['userini']['path'])){
+                // Read the contents of the dummy file
+                $dummyContent = file_get_contents($paths['userini']['dummy']);
+    
+                // Write the contents to the new file
+                file_put_contents($paths['userini']['path'], $dummyContent);
+            }
+        }
+    }
+
+    /**
+     * Check if dummy data is present
+     * 
+     * @return bool
+     */
+    static private function isDummyNotPresent()
+    {
+        $paths = self::getPathsData();
+        $present = [false];
 
         // create for init 
-        if(!file_exists($paths['init']['path']) && !is_dir($paths['init']['path'])){
-            @$fsource = fopen($paths['init']['path'], 'w+s');
-            if(is_resource($fsource)){
-                @fwrite($fsource, file_get_contents($paths['init']['dummy']));
-                @fclose($fsource);
-            }
+        if(file_exists($paths['init']['path']) && !is_dir($paths['init']['path'])){
+            $present[] = true;
         }
 
         // create for gitignore
-        if(!file_exists($paths['gitignore']['path']) && !is_dir($paths['gitignore']['path'])){
-            @$fsource = fopen($paths['gitignore']['path'], 'w+s');
-            if(is_resource($fsource)){
-                @fwrite($fsource, file_get_contents($paths['gitignore']['dummy']));
-                @fclose($fsource);
-            }
+        if(file_exists($paths['gitignore']['path']) && !is_dir($paths['gitignore']['path'])){
+            $present[] = true;
         }
 
         // create for htaccess
-        if(!file_exists($paths['htaccess']['path']) && !is_dir($paths['htaccess']['path'])){
-            @$fsource = fopen($paths['htaccess']['path'], 'w+s');
-            if(is_resource($fsource)){
-                @fwrite($fsource, file_get_contents($paths['htaccess']['dummy']));
-                @fclose($fsource);
-            }
+        if(file_exists($paths['htaccess']['path']) && !is_dir($paths['htaccess']['path'])){
+            $present[] = true;
         }
 
         // create for phpini
-        if(!file_exists($paths['phpini']['path']) && !is_dir($paths['phpini']['path'])){
-            @$fsource = fopen($paths['phpini']['path'], 'w+s');
-            if(is_resource($fsource)){
-                @fwrite($fsource, file_get_contents($paths['phpini']['dummy']));
-                @fclose($fsource);
-            }
+        if(file_exists($paths['phpini']['path']) && !is_dir($paths['phpini']['path'])){
+            $present[] = true;
         }
 
         // create for userini
-        if(!file_exists($paths['userini']['path']) && !is_dir($paths['userini']['path'])){
-            @$fsource = fopen($paths['userini']['path'], 'w+s');
-            if(is_resource($fsource)){
-                @fwrite($fsource, file_get_contents($paths['userini']['dummy']));
-                @fclose($fsource);
-            }
+        if(file_exists($paths['userini']['path']) && !is_dir($paths['userini']['path'])){
+            $present[] = true;
         }
 
+        // Check if all elements in $present are false
+        $allFalse = empty(array_filter($present));
+
+        // All elements in $present are false
+        if ($allFalse) {
+            return false;
+        } 
+
+        return true;
+    }
+
+    /**
+     * Get all dummy contents path data
+     * 
+     * @return array
+     */
+    static private function getPathsData()
+    {
+        $serverPath = DOT_ENV_CONNECTION['self_path']['path'];
+        $realPath   = str_replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
+        return [
+            'init' => [
+                'path'  => "{$serverPath}init.php",
+                'dummy' => "{$realPath}/Dummy/dummyInit.php",
+            ],
+            'gitignore' => [
+                'path'  => "{$serverPath}\.gitignore",
+                'dummy' => "{$realPath}/Dummy/dummyGitIgnore.php",
+            ],
+            'htaccess' => [
+                'path'  => "{$serverPath}\.htaccess",
+                'dummy' => "{$realPath}/Dummy/dummyHtaccess.php",
+            ],
+            'phpini' => [
+                'path'  => "{$serverPath}\php.ini",
+                'dummy' => "{$realPath}/Dummy/dummyPhpIni.php",
+            ],
+            'userini' => [
+                'path'  => "{$serverPath}\.user.ini",
+                'dummy' => "{$realPath}/Dummy/dummyUserIni.php",
+            ],
+        ];
     }
     
 }

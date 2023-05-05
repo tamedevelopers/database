@@ -57,16 +57,13 @@ class Migration{
 
             // create file if not exist
             if (!file_exists($gitignore) && !is_dir($gitignore)) {
-                @$fsource = fopen($gitignore, 'w+');
-                if(is_resource($fsource)){
-                    fwrite($fsource, preg_replace(
-                        '/^[ \t]+|[ \t]+$/m', '', 
-                        ".
-                        /database
-                        .env"
-                    ));
-                    fclose($fsource);
-                }
+                // Write the contents to the new file
+                file_put_contents($gitignore, preg_replace(
+                    '/^[ \t]+|[ \t]+$/m', '', 
+                    ".
+                    /database
+                    .env"
+                ));
             }
         }
 
@@ -142,17 +139,20 @@ class Migration{
         // Date convert
         $fileName = sprintf( "%s_%s_%s", date('Y_m_d'), strtotime('today'), "{$case_table}.php" );
 
+        // real path
+        $realPath   = str_replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
+
         // get directory
-        $dummyPath = realpath(__DIR__) . "\..\Dummy\dummyMigration.php";
+        $dummyPath = "{$realPath}/../Dummy/dummyMigration.php";
 
 
         // If type creation passed
         if(!empty($type) && in_array(strtolower($type), ['job', 'jobs'])){
             // create a jobs table
-            $dummyPath = realpath(__DIR__) . "\..\Dummy\dummyJobsMigration.php";
+            $dummyPath = "{$realPath}/../Dummy/dummyJobsMigration.php";
         } elseif(!empty($type) && in_array(strtolower($type), ['session', 'sessions'])){
             // create a sessions table
-            $dummyPath = realpath(__DIR__) . "\..\Dummy\dummySessionsMigration.php";
+            $dummyPath = "{$realPath}/../Dummy/dummySessionsMigration.php";
         }
 
         // dummy content
@@ -173,11 +173,8 @@ class Migration{
         }
 
         // start writting
-        @$fsource = fopen($absoluteFile, 'w+s');
-        if(is_resource($fsource)){
-            @fwrite($fsource, $dummyContent );
-            @fclose($fsource);
-        }
+        // Write the contents to the new file
+        file_put_contents($absoluteFile, $dummyContent);
 
         echo sprintf("Table `%s` has been created
                     <span style='background: #027b02; {$style}'> 

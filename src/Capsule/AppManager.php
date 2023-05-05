@@ -10,9 +10,7 @@ use builder\Database\Constants;
 
 class AppManager extends Constants{
     
-
     static private $year;
-    
 
     static function initAppManager() 
     {
@@ -68,10 +66,9 @@ class AppManager extends Constants{
             PUSHER_SCHEME=https
             PUSHER_APP_CLUSTER=mt1
             
-            #ORM Model Builder
-            #©Copyright - '. self::$year .'
-            APP_DEVELOPER="Fredrick Peterson"
-            APP_DEVELOPER_EMAIL="tamedevelopers@gmail.com"
+            #©Copyright '. self::$year .'
+            APP_DEVELOPER=
+            APP_DEVELOPER_EMAIL=
         ');
     }
 
