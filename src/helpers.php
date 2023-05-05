@@ -1,6 +1,7 @@
 <?php 
 
 use builder\Database\DB;
+use builder\Database\DBImport;
 use builder\Database\AutoloadEnv;
 use builder\Database\Query\MySqlExec;
 use builder\Database\Schema\OrmDotEnv;
@@ -17,6 +18,18 @@ if (! function_exists('orm_db')) {
     function orm_db(?array $options = [])
     {
         return new DB($options);
+    }
+}
+
+if (! function_exists('orm_import')) {
+    /**
+     * Get Database Import Instance
+     * 
+     * @return object\builder\Database\DBImport
+     */
+    function orm_import()
+    {
+        return (new DBImport);
     }
 }
 

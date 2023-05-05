@@ -104,7 +104,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^3.0.1" 
+    "peterson/php-orm-database": "^3.1.1" 
 }
 ```
 
@@ -1285,6 +1285,7 @@ class PostClass extends DB{
 |---------------------------|-----------------------------------|
 | base_dir()                | Return `server` base directory    |
 | orm_db()                  | Return instance of `new DB($options)` class   |
+| orm_import()              | Return instance of `(new DBImport)` class     |
 | orm_migration()           | Return instance of `(new Migration)` class    |
 | orm_dot_env()             | Return instance of `(new OrmDotEnv)` class    |
 | autoload_env()            | Return instance of `(new AutoloadEnv)` class  |
