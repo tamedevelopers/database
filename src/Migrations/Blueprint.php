@@ -12,20 +12,21 @@ use builder\Database\Migrations\Traits\ManagerTrait;
 use builder\Database\Migrations\Traits\FilePathTrait;
 use builder\Database\Migrations\Traits\SchemaCollectionTrait;
 use builder\Database\MigrationTrait\Traits\TableStructureTrait;
+use builder\Database\Migrations\Traits\SchemaConfigurationTrait;
 
 class Blueprint extends Constants{
     
     use SchemaTrait, 
-        SchemaCollectionTrait, 
+        SchemaCollectionTrait,
+        SchemaConfigurationTrait, 
         TableStructureTrait, 
         FilePathTrait,
         ManagerTrait;
 
     /**
      * Creating Managers
-     * @param string $tableName 
      * 
-     * @return void
+     * @param string $tableName 
      */
     public function __construct(?string $tableName = null) 
     {

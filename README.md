@@ -104,7 +104,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^3.1.1" 
+    "peterson/php-orm-database": "^3.1.2" 
 }
 ```
 
@@ -1080,8 +1080,6 @@ use builder\Database\Migrations\Migration;
 ```
 
 ### Create Table Schema
-<details><summary>Read more...</summary>
-
 - Takes param as `table name`
     - Second parameter `string` `jobs|sessions` (optional) -If passed will create a dummy `jobs|sessions` table schema
 
@@ -1098,11 +1096,8 @@ Table `2023_04_19_1681860618_tb_jobs` has been created successfully
 Table `2023_04_19_1681860618_tb_sessions` has been created successfully
 ```
 ![Sample Session Schema](https://raw.githubusercontent.com/tamedevelopers/UltimateOrmDatabase/main/sessions.png)
-</details>
 
 ### Run Migration
-<details><summary>Read more...</summary>
-
 - You need to pass in `up` as a param
     - This auto create folders/subfolder with read permission
         - The code above execute all files located in [root/database/migrations]
@@ -1114,7 +1109,6 @@ Migration::run('up');
 Migration runned successfully on `2023_04_19_1681860618_user` 
 Migration runned successfully on `2023_04_19_1681860618_user_wallet` 
 ```
-</details>
 
 ### Drop Table
 <details><summary>Read more...</summary>
@@ -1284,14 +1278,16 @@ class PostClass extends DB{
 | function                  | Description                       |
 |---------------------------|-----------------------------------|
 | base_dir()                | Return `server` base directory    |
-| orm_db()                  | Return instance of `new DB($options)` class   |
-| orm_import()              | Return instance of `(new DBImport)` class     |
-| orm_migration()           | Return instance of `(new Migration)` class    |
-| orm_dot_env()             | Return instance of `(new OrmDotEnv)` class    |
+| db()                      | Return instance of `new DB($options)` class   |
+| db_exec()                 | Return instance of `(new MySqlExec)` class    |
+| import()                  | Return instance of `(new DBImport)` class     |
+| migration()               | Return instance of `(new Migration)` class    |
+| schema()                  | Return instance of `(new Schema)` class       |
+| dot_env()                 | Return instance of `(new OrmDotEnv)` class    |
 | autoload_env()            | Return instance of `(new AutoloadEnv)` class  |
 | env_start()               | Same as `AutoloadEnv::start()`    |
-| config_database()         | Same as `Direct DB Connection` get access to `DATABASE_CONNECTION` Constant |
-| configure_pagination()    | Same as `$db->configurePagination()` or `AutoloadEnv::configurePagination` |
+| config_database()         | Same as `Direct DB Connection` get access to `DATABASE_CONNECTION` Constant   |
+| configure_pagination()    | Same as `$db->configurePagination()` or `AutoloadEnv::configurePagination`    |
 | app_config()              | Same as `$db->AppConfig()`        |
 | get_connection()          | Same as `$db->getConnection()`    |
 | get_app_data()            | Get `path` `database` & `pagination` info |

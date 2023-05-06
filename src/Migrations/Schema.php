@@ -16,7 +16,6 @@ class Schema extends Constants{
     static protected $tableName;
     static protected $object;
 
-
     /**
      * Creating Instance of Database
      * 
@@ -25,6 +24,24 @@ class Schema extends Constants{
     static private function initSchemaDatabase() 
     {
         self::$db = new DB();
+    }
+
+    /**
+     * Create a default string length for Database Schema
+     * @param $length int $length The default length to use for string columns (default: 255)
+     * 
+     * @return void
+     */
+    static public function defaultStringLength($length = 255) 
+    {
+        // Check if the provided length is greater than the maximum allowed by MySQL.
+        if ($length > 15950) {
+            $length = 15950;
+        }
+
+        if( ! defined('ORM_MAX_STRING_LENGTH') ){
+            define('ORM_MAX_STRING_LENGTH', $length);
+        }
     }
 
     /**

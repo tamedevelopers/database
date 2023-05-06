@@ -20,7 +20,6 @@ class MySqlExec  extends Constants{
 
     /**
      * Constructor
-     * @return void
      */
 	public function __construct()
     {

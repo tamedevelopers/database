@@ -6,7 +6,6 @@ namespace builder\Database\MigrationTrait\Traits;
 
 trait TableStructureTrait{
     
-
     protected $db;
     protected $charSet;
     protected $tableName;
@@ -31,18 +30,15 @@ trait TableStructureTrait{
 
         // Creating table queries
         $this->createTableQuery();
-        
-        // add indexes
-        $this->addIndexs();
-        
+
         // alter primary key
-        $this->addPrimaryKey();
+        $this->alterPrimaryKey();
 
         // Add triggers
         $this->createTriggers();
 
-        // create constriants
-        $this->createConstraints();
+        // alter constriants
+        $this->alterConstraints();
 
         // implode to string
         $Query = implode('', $this->collectionQuery);
@@ -50,16 +46,7 @@ trait TableStructureTrait{
         // end commit
         $Query .= "COMMIT;";
 
-        // Replace the comma with comma + newline
-        $Query = preg_replace("/,\s*/m", ",\n", $Query);
-
-        // clean string from begining and ending
-        $Query = preg_replace("/^[ \t]+|[ \t]+$/m", "", $Query);
-
-        // clean forward slash
-        $Query = str_replace('\\', '', $Query);
-
-        return $Query;
+        return $this->regixifyQuery($Query);
     }
 
     /**
@@ -77,15 +64,15 @@ trait TableStructureTrait{
                 switch ($column) {
                     case isset($column['primary']):
                         $this->primaryKeyValue  = $column;
-                        $this->queryIndex[] = "ADD PRIMARY KEY (`{$column['name']}`)";
+                        $this->queryIndex[] = "PRIMARY KEY (`{$column['name']}`)";
                         break;
                     
                     case isset($column['unique']):
-                        $this->queryIndex[] = "ADD UNIQUE KEY `{$column['unique']}` (`{$column['name']}`)";
+                        $this->queryIndex[] = "UNIQUE KEY `{$column['unique']}` (`{$column['name']}`)";
                         break;
                     
                     case isset($column['index']):
-                        $this->queryIndex[] = "ADD KEY `{$column['index']}` (`{$column['name']}`)";
+                        $this->queryIndex[] = "KEY `{$column['index']}` (`{$column['name']}`)";
                         break;
                 }
             }
@@ -104,7 +91,7 @@ trait TableStructureTrait{
                 $this->queryConstraints[] = "
                     ADD CONSTRAINT `{$column['generix']}` 
                     FOREIGN KEY (`{$column['name']}`) 
-                    REFERENCES `{$column['references']}` (`{$column['on']}`) 
+                    REFERENCES `{$column['on']}` (`{$column['references']}`) 
                     ON DELETE {$onDelete} 
                     ON UPDATE {$onUpdate}
                 ";
@@ -124,8 +111,9 @@ trait TableStructureTrait{
      */
     private function addCollectionQuery($query = '')
     {
-        if(!empty($query))
+        if(!empty($query)){
             $this->collectionQuery[] = $query;
+        }
     }
 
     /**
@@ -154,39 +142,31 @@ trait TableStructureTrait{
                 -- Table structure for table `{$this->tableName}`
                 --
                 CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
-                    {$this->queryStructure}
+                    {$this->queryStructure}{$this->createIndexs()}
                 ) ENGINE=InnoDB DEFAULT CHARSET={$this->charSet} COLLATE={$this->collation};
             "
         );
     }
 
     /**
-     * Add indexs key queries
+     * Create indexs key queries
      * 
-     * @return void
+     * @return mixed
      */
-    private function addIndexs()
+    private function createIndexs()
     {
         if(is_array($this->queryIndex) && count($this->queryIndex) > 0){
-            $this->queryIndex = implode(', ', $this->queryIndex);
-            $this->addCollectionQuery(
-                "
-                    --
-                    -- Indexes for table `{$this->tableName}`
-                    --
-                    ALTER TABLE `{$this->tableName}` 
-                    {$this->queryIndex};
-                "
-            );
+            $queryIndex = implode(', ', $this->queryIndex);
+            return ", {$queryIndex}";
         }
     }
 
     /**
-     * Add primary key queries
+     * Alter primary key queries
      * 
      * @return void
      */
-    private function addPrimaryKey()
+    private function alterPrimaryKey()
     {
         if(is_array($this->primaryKeyValue)){
             // check for auto increment
@@ -208,11 +188,11 @@ trait TableStructureTrait{
     }
 
     /**
-     * Create constraints queries
+     * Alter constraints queries
      * 
      * @return void
      */
-    private function createConstraints()
+    private function alterConstraints()
     {
         if(is_array($this->queryConstraints) && count($this->queryConstraints) > 0){
             $this->queryConstraints = implode(', ', $this->queryConstraints);
@@ -277,6 +257,25 @@ trait TableStructureTrait{
                 }
             }
         }
+    }
+
+    /**
+     * Format Query with Regix
+     * 
+     * @return string
+     */
+    private function regixifyQuery(?string $formatted)
+    {
+        // Replace the comma with comma + newline
+        $formatted = preg_replace("/,\s*/m", ",\n", $formatted);
+
+        // clean string from begining and ending
+        $formatted = preg_replace("/^[ \t]+|[ \t]+$/m", "", $formatted);
+
+        // replace back-slash
+        $formatted = str_replace('\\', '', $formatted);
+
+        return $formatted;
     }
 
 }

@@ -19,7 +19,10 @@ class DBImport extends DB{
     private $realpath;
     private $template;
     private $array = [];
-
+    
+    /**
+     * Construct Instance of Database
+     */
     public function __construct() {
         parent::__construct();
 

@@ -4,11 +4,19 @@ declare(strict_types=1);
 
 namespace builder\Database\Migrations\Traits;
 
-use Exception;
-
-
 trait SchemaCollectionTrait{
-    
+
+    /**
+     * Creating column
+     * 
+     * @return object\unsigned
+     */
+    public function unsigned()
+    {
+        $this->columns[count($this->columns) - 1]['unsigned'] = true;
+        return $this;
+    }
+
     /**
      * Creating Default value
      * @param string $value 
@@ -36,33 +44,33 @@ trait SchemaCollectionTrait{
     /**
      * Creating Indexs
      * @param string $name 
-     * @param bool $autoIncrement \Default is true
-     * @param bool $unsigned \Default is false
      * 
-     * @return object|string|null\id
+     * @return object\id
      */
-    public function id($name = 'id', $autoIncrement = true, $unsigned = false)
+    public function id($name = 'id')
     {
         return $this->addColumn($name, 'integer', [
             'primary'           => "PRIMARY", 
-            'unsigned'          => $unsigned, 
-            'auto_increment'    => $autoIncrement,
+            'unsigned'          => true, 
+            'auto_increment'    => true,
         ]);
     }
 
     /**
      * Creating Indexs
      * @param string $name 
+     * @param bool $autoIncrement \Default is true
+     * @param bool $unsigned \Default is true
      * 
      * @return object\primary
      */
-    public function primary(?string $name = null, $unsigned = false, $autoIncrement = true)
+    public function primary(?string $name, $autoIncrement = true, $unsigned = true)
     {
-        $this->columns[count($this->columns) - 1]['primary'] = "PRIMARY";
-        $this->columns[count($this->columns) - 1]['unsigned'] = $unsigned;
-        $this->columns[count($this->columns) - 1]['auto_increment'] = $autoIncrement;
-
-        return $this;
+        return $this->addColumn($name, 'integer', [
+            'primary'           => "PRIMARY", 
+            'unsigned'          => $unsigned, 
+            'auto_increment'    => $autoIncrement,
+        ]);
     }
 
     /**
@@ -93,7 +101,8 @@ trait SchemaCollectionTrait{
 
     /**
      * Creating Constraints Property
-     * @param string $column 
+     * @param string $column
+     * - Child column name
      * 
      * @return object\foreign
      */
@@ -105,6 +114,7 @@ trait SchemaCollectionTrait{
     /**
      * Creating Constraints Property
      * @param string $referencedColumn 
+     * <code> - Parent Table References Column name </code>
      * 
      * @return object\references
      */
@@ -118,6 +128,7 @@ trait SchemaCollectionTrait{
     /**
      * Creating Constraints Property
      * @param string $referencedTable 
+     * - Table name you're referencing to
      * 
      * @return object\on
      */
@@ -150,256 +161,5 @@ trait SchemaCollectionTrait{
         $this->columns[count($this->columns) - 1]['onUpdate'] = $action;
         return $this;
     }
-
-    /**
-     * Adding to columns
-     * @param string $name 
-     * @param string $type
-     * @param int|null $length
-     * 
-     * @return object\addColumn
-    */
-    public function addColumn($name, $type, $length = null)
-    {
-        $column = [
-            'name' => $name, 
-            'type' => $type
-        ];
-
-        // add legnth
-        if(is_int($length)){
-            $column['length'] = $length;
-        }elseif(is_array($length)){
-            $column = array_merge($column, $length);
-        }
-
-        $this->columns[] = $column;
-
-        return $this;
-    }
-
-    /**
-     * Create a column definition with optional length and default value
-     * @param array $options 
-     * 
-     * @return string\createColumnDefinition
-     */
-    public function createColumnDefinition(?array $options)
-    {
-        $default = [
-            'name'      => $options['name']     ?? '',
-            'type'      => $options['type']     ?? '',
-            'length'    => $options['length']   ?? null,
-            'default'   => $options['default']  ?? null,
-            'nullable'  => $options['nullable'] ?? false,
-        ];
-
-        // create default string
-        $getType    = $this->getColumnType($default['type']);
-        $unassigned = $this->getUnAssigned($default['type']);
-        $columnDef  = "`{$default['name']}` {$getType}";
-
-        // for enum
-        if(isset($options['values'])){
-            array_walk($options['values'], function (&$value, $key){
-                $value = "\'{$value}\'";
-            });
-            $values = implode(', ', $options['values']);
-            $columnDef .= "({$values})";
-        }
-        // decimal|double
-        elseif(isset($options['places'])){
-            $columnDef .= "({$options['total']}, {$options['places']})";
-        }
-        // add for legnth
-        else{
-            $getLength = $this->getColumnLength($default['type'], $default['length']);
-            if (!is_null($getLength)) {
-                $columnDef .= "({$getLength})";
-            }
-        }
-
-        // unassigned is set
-        if(isset($options['unsigned'])){
-            if($options['unsigned']){
-                $columnDef .= " UNSIGNED";
-            }
-        }
-        elseif(!is_null($unassigned)){
-            $columnDef .= " {$unassigned}";
-        }
-
-        // add collate
-        if(in_array($getType, ['varchar', 'enum', 'text', 'mediumText', 'longText'])){
-            if(!empty($this->collation)){
-                $columnDef .= " COLLATE {$this->collation}";
-            }
-        }
-
-        // add for nullable
-        if ($default['nullable']) {
-            $columnDef .= ' NULL';
-        } else {
-            $columnDef .= ' NOT NULL';
-        }
-
-        // add for default values
-        if (!is_null($default['default'])) {
-
-            // for enum
-            if(isset($options['values'])){
-                $columnDef .= " DEFAULT '{$default['default']}'";
-            }else{
-                $columnDef .= " DEFAULT {$default['default']}";
-            }
-        }
-
-        return $columnDef;
-    }
-
-    /**
-     * Get the corresponding column type for a given type string
-     * @param string $type 
-     * 
-     * @return string\getColumnType
-     */
-    protected function getColumnType(?string $type)
-    {
-        $typeMap = [
-            'increments'            => 'int',
-            'bigIncrements'         => 'bigint',
-            'string'                => 'varchar',
-            'text'                  => 'text',
-            'boolean'               => 'boolean',
-            'integer'               => 'int',
-            'tinyInteger'           => 'tinyint',
-            'bigInteger'            => 'bigint',
-            'unsignedInteger'       => 'int',
-            'unsignedBigInteger'    => 'bigint',
-            'unsignedTinyInteger'   => 'tinyint',
-            'unsignedSmallInteger'  => 'smallint',
-            'unsignedMediumInteger' => 'mediumint',
-            'unsignedDecimal'       => 'decimal',
-            'float'                 => 'float',
-            'double'                => 'double',
-            'decimal'               => 'decimal',
-            'char'                  => 'char',
-            'binary'                => 'binary',
-            'date'                  => 'date',
-            'dateTime'              => 'datetime',
-            'time'                   => 'time',
-            'timestamp'             => 'timestamp',
-            'timestamps'            => 'timestamp',
-            'rememberToken'         => 'varchar',
-            'json'                  => 'json',
-            'jsonb'                 => 'json',
-            'uuid'                  => 'char',
-            'ipAddress'             => 'varchar',
-            'macAddress'            => 'varchar',
-            'year'                  => 'year',
-            'enum'                  => 'enum',
-            'set'                   => 'set',
-        ];
-
-        return $typeMap[$type] ?? $type;
-    }
-
-    /**
-     * Get the corresponding column length for a given type string
-     * @param string $type 
-     * 
-     * @return string\getColumnLength
-     */
-    protected function getColumnLength(string $type, ?int $length = null)
-    {
-        $defaultLengths = [
-            'increments'            => 11,
-            'bigIncrements'         => 20,
-            'string'                => ($type === 'text') ? null : $length ?? 255,
-            'text'                  => null,
-            'boolean'               => null,
-            'integer'               => 11,
-            'tinyInteger'           => 6,
-            'bigInteger'            => 20,
-            'unsignedBigInteger'    => 20,
-            'unsignedInteger'       => 10,
-            'unsignedTinyInteger'   => 3,
-            'unsignedSmallInteger'  => 5,
-            'unsignedMediumInteger' => 9,
-            'unsignedDecimal'       => null,
-            'float'                 => null,
-            'double'                => null,
-            'decimal'               => '10, 0',
-            'char'                  => 255,
-            'binary'                => null,
-            'date'                  => null,
-            'dateTime'              => null,
-            'time'                  => null,
-            'timestamp'             => null,
-            'timestamps'            => null,
-            'rememberToken'         => null,
-            'json'                  => null,
-            'jsonb'                 => null,
-            'uuid'                  => 36,
-            'ipAddress'             => 45,
-            'macAddress'            => 17,
-            'year'                  => 4,
-            'enum'                  => null,
-            'set'                   => null,
-        ];
-
-        return $length ?? $defaultLengths[$type] ?? null;
-    }
-
-    /**
-     * Get the corresponding Unassigned string
-     * @param string $type 
-     * 
-     * @return string\getUnAssigned
-     */
-    protected function getUnAssigned(?string $type)
-    {
-        $typeUnassigned = [
-            'increments'            => 'UNSIGNED',
-            'bigIncrements'         => 'UNSIGNED',
-            'unsignedInteger'       => 'UNSIGNED',
-            'unsignedBigInteger'    => 'UNSIGNED',
-            'unsignedTinyInteger'   => 'UNSIGNED',
-            'unsignedSmallInteger'  => 'UNSIGNED',
-            'unsignedMediumInteger' => 'UNSIGNED',
-            'unsignedDecimal'       => 'UNSIGNED',
-        ];
-
-        return $typeUnassigned[$type] ?? null;
-    }
-
-    /**
-     * Create generix identifier name
-     * @param string $name
-     * 
-     * @return string\generix_name
-     */
-    protected function generix_name(?string $name = null)
-    {
-        $column = $this->columns[count($this->columns) - 1];
-        $unique = (new Exception)->getTrace()[1]['function'] ?? '__';
-        
-        // for foreign keys
-        if($column['type'] == 'foreign'){
-            $name = "{$column['name']}_{$column['references']}_{$column['type']}";
-        }else{
-            // create unique name
-            if(is_null($name)){
-                $name = "{$this->tableName}_{$column['name']}_{$unique}";
-            }else{
-                $name = "{$this->tableName}_{$name}";
-            }
-        }
-
-        return $name;
-    }
     
-
-}
-
-
+} 

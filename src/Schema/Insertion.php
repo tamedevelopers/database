@@ -18,9 +18,8 @@ abstract class Insertion extends Builder {
 
     /**
      * Constructor
-     * @param array $options\Database options settings
      * 
-     * @return void
+     * @param array $options\Database options settings
      */
 	public function __construct(?array $options = [])
     {

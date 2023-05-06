@@ -21,9 +21,8 @@ class OrmDotEnv extends Constants{
 
     /**
      * Define custom Server root path
-     * @param string $path
      * 
-     * @return void
+     * @param string $path
      */
     public function __construct(?string $path = null) 
     {

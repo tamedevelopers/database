@@ -16,6 +16,11 @@ use builder\Database\Schema\Insertion;
 
 class DB extends Insertion{
     
+    /**
+     * Extending Settings
+     * 
+     * @param  array $options
+     */
     public function __construct(?array $options = []) {
         parent::__construct($options);
 

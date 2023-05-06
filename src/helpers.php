@@ -6,54 +6,66 @@ use builder\Database\AutoloadEnv;
 use builder\Database\Query\MySqlExec;
 use builder\Database\Schema\OrmDotEnv;
 use builder\Database\Migrations\Migration;
+use builder\Database\Migrations\Schema;
 
-
-if (! function_exists('orm_db')) {
+if (! function_exists('db')) {
     /**
      * Get Database 
      * @param array $options
      * 
      * @return object\builder\Database\DB
      */
-    function orm_db(?array $options = [])
+    function db(?array $options = [])
     {
         return new DB($options);
     }
 }
 
-if (! function_exists('orm_import')) {
+if (! function_exists('import')) {
     /**
      * Get Database Import Instance
      * 
      * @return object\builder\Database\DBImport
      */
-    function orm_import()
+    function import()
     {
         return (new DBImport);
     }
 }
 
-if (! function_exists('orm_dot_env')) {
+if (! function_exists('dot_env')) {
     /**
-     * Get ORM Dot Env
+     * Get Dot Env
      * 
      * @return object\builder\Database\Schema\OrmDotEnv
      */
-    function orm_dot_env()
+    function dot_env()
     {
         return (new OrmDotEnv);
     }
 }
 
-if (! function_exists('orm_migration')) {
+if (! function_exists('migration')) {
     /**
      * Get Migration Helpers
      * 
      * @return object\builder\Database\Migration
      */
-    function orm_migration()
+    function migration()
     {
         return (new Migration);
+    }
+}
+
+if (! function_exists('schema')) {
+    /**
+     * Get Migration Helpers
+     * 
+     * @return object\builder\Database\Migration
+     */
+    function schema()
+    {
+        return (new Schema);
     }
 }
 
@@ -69,13 +81,13 @@ if (! function_exists('autoload_env')) {
     }
 }
 
-if (! function_exists('get_orm_db_exec')) {
+if (! function_exists('db_exec')) {
     /**
      * Get MySqlExec
      * 
      * @return object\builder\Database\Query\MySqlExec
      */
-    function get_orm_db_exec()
+    function db_exec()
     {
         return (new MySqlExec);
     }
@@ -90,7 +102,7 @@ if (! function_exists('ddump')) {
      */
     function ddump(...$data)
     {
-        return get_orm_db_exec()->dump($data);
+        return db_exec()->dump($data);
     }
 }
 
@@ -116,7 +128,7 @@ if (! function_exists('config_database')) {
     function config_database(?array $options = [])
     {
         if ( ! defined('DATABASE_CONNECTION') ) {
-            define('DATABASE_CONNECTION', orm_db($options));
+            define('DATABASE_CONNECTION', db($options));
         }
     }
 }
@@ -142,7 +154,7 @@ if (! function_exists('base_dir')) {
      */
     function base_dir()
     {
-        return orm_dot_env()->getDirectory();
+        return dot_env()->getDirectory();
     }
 }
 
@@ -154,7 +166,7 @@ if (! function_exists('app_config')) {
      */
     function app_config()
     {
-        return get_orm_db_exec()->AppConfig();
+        return db_exec()->AppConfig();
     }
 }
 
@@ -170,7 +182,7 @@ if (! function_exists('get_connection')) {
         // get database connection
         $connection = defined('DATABASE_CONNECTION') 
                     ? DATABASE_CONNECTION->getConnection($type)
-                    : orm_db()->getConnection($type);
+                    : db()->getConnection($type);
 
         return (object) $connection;
     }
@@ -187,18 +199,18 @@ if (! function_exists('get_app_data')) {
         // get base root path
         $getPath = defined('DOT_ENV_CONNECTION') 
                     ? DOT_ENV_CONNECTION['self_path']['path'] 
-                    : orm_dot_env()->getDirectory();
+                    : dot_env()->getDirectory();
 
         // get database
         $database = defined('DATABASE_CONNECTION') 
                     ? DATABASE_CONNECTION
-                    : orm_db();
+                    : db();
 
         // get pagination
         $pagination = defined('PAGINATION_CONFIG') 
                     && PAGINATION_CONFIG['allow'] === true
                     ? PAGINATION_CONFIG
-                    : orm_db()->pagination_settings;
+                    : db()->pagination_settings;
 
         return [
             'path'          => $getPath,
@@ -219,7 +231,7 @@ if (! function_exists('get_query')) {
         // get query
         return defined('DATABASE_CONNECTION') 
                     ? DATABASE_CONNECTION->getQuery()
-                    : get_orm_db_exec()->getQuery();
+                    : db_exec()->getQuery();
     }
 }
 

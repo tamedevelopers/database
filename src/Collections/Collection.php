@@ -35,8 +35,6 @@ class Collection implements IteratorAggregate, ArrayAccess
      * Create a new collection.
      *
      * @param  array $items
-     * 
-     * @return void
      */
     public function __construct($items = [])
     {
