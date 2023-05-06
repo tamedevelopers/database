@@ -155,10 +155,15 @@ abstract class Insertion extends Builder {
     public function tableExist(?string $table_name = null)
     {
         try{
+            // check if DB connection has been established 
+            if($this->getConnection()['status'] != self::ERROR_200){
+                return false;
+            }
+
             $this->query("SELECT 1 FROM `{$table_name}` LIMIT 1")->execute();
-            
+
             $this->close();
-            
+
             return true;
         }catch (PDOException $e){
             return false;
