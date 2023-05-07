@@ -14,18 +14,16 @@ class DBImport extends DB{
     use DBImportTrait;
     
     private $db_connection;
-    private $error;
-    private $message;
     private $realpath;
-    private $template;
-    private $array = [];
+    public $error;
+    public $message;
     
     /**
      * Construct Instance of Database
      */
     public function __construct() {
         parent::__construct();
-
+        $this->error = self::ERROR_404;
         $this->db_connection = $this->getConnection();
     }
 
@@ -33,7 +31,7 @@ class DBImport extends DB{
      * Database Importation
      * @param string path_to_sql
      * 
-     * @return 
+     * @return object\builder\Database\DatabaseImport
      */
     public function DatabaseImport($path_to_sql = NULL)
     {
@@ -42,81 +40,40 @@ class DBImport extends DB{
         /**
          * If SQL file does'nt exists
          */
-        if(!file_exists($this->realpath) || is_dir($this->realpath))
-        {
-            return [
-                'response'  => self::ERROR_404, 
-                'message'   => "Failed to open stream: `{$path_to_sql}` does'nt exist."
-            ];
-
+        if(!file_exists($this->realpath) || is_dir($this->realpath)){
+            $this->message  = "Failed to open stream: `{$path_to_sql}` does'nt exist.";
         } else{
 
             // read a file into an array
             $readFile = file($this->realpath);
 
             // is readable
-            if(!$this->isReadable($readFile))
-            {
-                return [
-                    'response'  => self::ERROR_404, 
-                    'message'   => "Failed to read file or empty data."
-                ];
+            if(!$this->isReadable($readFile)){
+                $this->message  = "Failed to read file or empty data.";
             } else{
 
-                // Begin our final importation
-                foreach($readFile as $key => $query)
-                {
-                    // skip if its a comment
-                    if($this->isComment($query))
-                        continue;
-                    
-                    //Add to the current segment
-                    $this->template .= $query;
-                    
-                    // Check if it's a query
-                    if($this->isQuery($query))
-                    {
-                        // check if connection test is okay
-                        if($this->DBConnect()){
-                            try{
-                                //Query the database
-                                $this->query($this->template)->execute();
+                // check if connection test is okay
+                if($this->DBConnect()){
+                    try{
+                        // connection driver
+                        $Driver = $this->connection['driver'];
 
-                            } catch(PDOException $e){
+                        // get content
+                        $sql = file_get_contents($this->realpath);
 
-                                // get error msg
-                                $errorMsg = $e->getMessage();
+                        // execute query
+                        $Driver->exec($sql);
 
-                                if($errorMsg != '0'){
-                                    if(
-                                        strpos($errorMsg, "Multiple primary key defined") === false 
-                                        && strpos($errorMsg, "Duplicate entry") === false){
-
-                                        $this->message = "- Performing query: <strong style='color: #000'>{$errorMsg}</strong>";
-                                        $this->array[] = $this->message;
-                                    }
-                                    $this->error = self::ERROR_400;
-                                }
-                            }
-                        }else{
-                            $this->message  = $this->db_connection['message'];
-                            $this->array[]  = $this->message;
-                            $this->error    = $this->db_connection['status'];
-                            break;
-                        }
-                        
-                        // Set the template to an empty string
-                        $this->template = '';
+                        $this->error    = self::ERROR_200;
+                        $this->message  = "- Database has been imported successfully.";
+                    } catch(PDOException $e){
+                        $this->message  = "- Performing query: <strong style='color: #000'>{$e->getMessage()}</strong>";
+                        $this->error    = self::ERROR_400;
                     }
+                } else{
+                    $this->message  = $this->db_connection['message'];
                 }
             }
-        }
-        
-        // successful and no errors
-        if(count($this->array) === 0 && $this->db_connection['status'] == self::ERROR_200){
-            $this->error    = self::ERROR_200;
-            $this->message  = "- Database has been imported successfully.";
-            $this->array[0] = $this->message;
         }
         
         /*
@@ -128,9 +85,11 @@ class DBImport extends DB{
         |   if ->response === 200 (Success importing to database
         */ 
         
-        return [
-            'response'  => $this->error, 
-            'message'   => $this->array
+        return (object) [
+            'response' => $this->error, 
+            'message'  => is_array($this->message) 
+                            ? implode('\n<br>', $this->message)
+                            : $this->message
         ];
     }
     

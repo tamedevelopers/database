@@ -104,7 +104,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^3.1.3" 
+    "peterson/php-orm-database": "^3.1.4" 
 }
 ```
 
@@ -1207,8 +1207,6 @@ $response = $import->DatabaseImport('orm.sql');
 </details>
 
 ## Update Env Variable
-<details><summary>Read more...</summary>
-
 - You can use this class to import .sql into a database programatically
 
 | Params        |  Description      |
@@ -1225,10 +1223,12 @@ OrmDotEnv::updateENV('DB_PASSWORD', 'newPassword');
 OrmDotEnv::updateENV('APP_DEBUG', false);
 OrmDotEnv::updateENV('DB_CHARSET', 'utf8', false);
 
+or
+dot_env()->updateENV('DB_CHARSET', 'utf8', false);
+
 Returns - Boolean
 true|false
 ```
-</details>
 
 ## Collation And Charset
 - Collation and Charset Data `listing`

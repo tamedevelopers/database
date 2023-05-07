@@ -223,12 +223,11 @@ trait TableStructureTrait{
                             --
                             -- Trigger to set created_at timestamp on insert
                             --
-                            CREATE TRIGGER {$this->tableName}_created_at
-                            BEFORE INSERT ON {$this->tableName}
-                            FOR EACH ROW
+                            DROP TRIGGER IF EXISTS `{$this->tableName}_created_at`;
+                            CREATE TRIGGER `{$this->tableName}_created_at` BEFORE INSERT ON `{$this->tableName}` FOR EACH ROW 
                             BEGIN
-                                IF (SELECT COUNT(*) FROM information_schema.columns 
-                                    WHERE table_name = '{$this->tableName}' 
+                                IF (SELECT COUNT(*) FROM information_schema.columns
+                                    WHERE table_name = '{$this->tableName}'
                                     AND column_name = 'created_at') > 0 THEN
                                     SET NEW.created_at = IFNULL(NEW.created_at, NOW());
                                     SET NEW.updated_at = NOW();
@@ -242,12 +241,11 @@ trait TableStructureTrait{
                             --
                             -- Trigger to update updated_at timestamp on update
                             --
-                            CREATE TRIGGER {$this->tableName}_updated_at
-                            BEFORE UPDATE ON {$this->tableName}
-                            FOR EACH ROW
+                            DROP TRIGGER IF EXISTS `{$this->tableName}_updated_at`;
+                            CREATE TRIGGER `{$this->tableName}_updated_at` BEFORE UPDATE ON `{$this->tableName}` FOR EACH ROW 
                             BEGIN
-                                IF (SELECT COUNT(*) FROM information_schema.columns 
-                                    WHERE table_name = '{$this->tableName}' 
+                                IF (SELECT COUNT(*) FROM information_schema.columns
+                                    WHERE table_name = '{$this->tableName}'
                                     AND column_name = 'updated_at') > 0 THEN
                                     SET NEW.updated_at = NOW();
                                 END IF;
