@@ -7,8 +7,9 @@ namespace builder\Database\Schema;
 use Exception;
 use Dotenv\Dotenv;
 use builder\Database\Constants;
-use builder\Database\Traits\ServerTrait;
+use builder\Database\Capsule\Manager;
 use builder\Database\Capsule\AppManager;
+use builder\Database\Traits\ServerTrait;
 use builder\Database\Traits\ReusableTrait;
 
 class OrmDotEnv extends Constants{
@@ -130,6 +131,86 @@ class OrmDotEnv extends Constants{
     }
 
     /**
+     * Turn off error reporting and log errors to a file
+     * 
+     * @param string $logFile The name of the file to log errors to
+     * 
+     * @return void
+     */
+    static public function error_logger() 
+    {
+        // Directory path
+        $dir = self::$path . "storage/logs/";
+
+        // create custom file name
+        $filename = "{$dir}orm.log";
+
+        // if \storage folder not found
+        if(!is_dir(self::$path. "storage")){
+            @mkdir(self::$path. "storage", 0777);
+        }
+
+        // if \storage\logs\ folder not found
+        if(!is_dir($dir)){
+            @mkdir($dir, 0777);
+        }
+
+        // If the log file doesn't exist, create it
+        if(!file_exists($filename)) {
+            touch($filename);
+            chmod($filename, 0777);
+        }
+
+        // Determine the log message format
+        $log_format = "[%s] %s in %s on line %d\n";
+
+        $append     = true;
+        $max_size   = 1024*1024;
+
+        // Define the error level mapping
+        $error_levels = array(
+            E_ERROR             => 'Fatal Error',
+            E_USER_ERROR        => 'User Error',
+            E_PARSE             => 'Parse Error',
+            E_WARNING           => 'Warning',
+            E_USER_WARNING      => 'User Warning',
+            E_NOTICE            => 'Notice',
+            E_USER_NOTICE       => 'User Notice',
+            E_STRICT            => 'Strict Standards',
+            E_DEPRECATED        => 'Deprecated',
+            E_USER_DEPRECATED   => 'User Deprecated',
+        );
+
+        // if true
+        if(self::is_production()){
+            // Define the error handler function
+            $error_handler = function($errno, $errstr, $errfile, $errline) use ($filename, $append, $max_size, $log_format, $error_levels) {
+                // Construct the log message
+                $error_level = isset($error_levels[$errno]) ? $error_levels[$errno] : 'Unknown Error';
+                $log_message = sprintf($log_format, date('Y-m-d H:i:s'), $error_level . ': ' . $errstr, $errfile, $errline);
+    
+                // Write the log message to the file
+                if ($append && file_exists($filename)) {
+                    $current_size = filesize($filename);
+                    if ($current_size > $max_size) {
+                        file_put_contents($filename, "{$log_message}");
+                    } else {
+                        file_put_contents($filename, "{$log_message}", FILE_APPEND);
+                    }
+                } else {
+                    file_put_contents($filename, $log_message);
+                }
+    
+                // Let PHP handle the error in the normal way
+                return false;
+            };
+    
+            // Set the error handler function
+            set_error_handler($error_handler);
+        }
+    }
+
+    /**
      * Update Environment path .env file
      * @param string $key \Environment key you want to update
      * @param string|bool $value \Value allocated to the key
@@ -184,6 +265,20 @@ class OrmDotEnv extends Constants{
 
         return false;
     }
+
+    /**
+     * Determines if the application is running in production environment.
+     *
+     * @return bool Returns true if the application is running in production environment, false otherwise.
+     */
+    static private function is_production() {
+        // check using default setting
+        if(Manager::setEnvBool(app_config('APP_DEBUG')) && app_config('APP_ENV') == 'local'){
+            return true;
+        }
+        
+        return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' && $_SERVER['SERVER_ADDR'] !== '127.0.0.1';
+    }    
 
     /**
      * Check if environment key is set

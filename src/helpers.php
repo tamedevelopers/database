@@ -161,12 +161,22 @@ if (! function_exists('base_dir')) {
 if (! function_exists('app_config')) {
     /**
      * Get App Configuration
+     * @param string $key
      * 
      * @return mixed
      */
-    function app_config()
+    function app_config(?string $key = null)
     {
-        return db_exec()->AppConfig();
+        // get Config data from ENV file
+        $AppConfig = db_exec()->AppConfig();
+
+        // Convert all keys to lowercase
+        $AppConfig = array_change_key_case($AppConfig, CASE_UPPER);
+
+        // convert to upper-case
+        $key = strtoupper(trim((string) $key));
+
+        return $AppConfig[$key] ?? $AppConfig;
     }
 }
 

@@ -80,3 +80,19 @@ $db->configurePagination([
    'allow'  => false,
    'view'   => 'simple',
 ]);
+
+
+/*
+|--------------------------------------------------------------------------
+| ERROR HANDLER WHEN APP_DEBUG is set to FALSE
+| Disable error on server and log to a file
+| path => \storage\logs\orm.log
+|
+| To enable error logs ?
+| Set the below information, As the custom logger only works on production environment
+| APP_ENV=local
+| APP_DEBUG = true 
+|
+|--------------------------------------------------------------------------
+*/
+$dotEnv['self']::error_logger();

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace builder\Database\Schema;
 
-use stdClass;
 use PDOException;
 use builder\Database\Query\Builder;
 use builder\Database\Traits\InsertionTrait;

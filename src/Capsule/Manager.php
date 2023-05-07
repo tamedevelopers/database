@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace builder\Database\Capsule;
 
 use Exception;
-use builder\Database\DB;
 use builder\Database\Constants;
-use builder\Database\Query\Builder;
 
 
 class Manager extends Constants{
