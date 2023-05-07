@@ -292,7 +292,7 @@ class AutoloadEnv{
      */
     static private function getPathsData()
     {
-        $serverPath = DOT_ENV_CONNECTION['self_path']['path'];
+        $serverPath = str_replace('\\', '/', DOT_ENV_CONNECTION['self_path']['path']);
         $realPath   = str_replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
         return [
             'init' => [
@@ -300,19 +300,19 @@ class AutoloadEnv{
                 'dummy' => "{$realPath}/Dummy/dummyInit.php",
             ],
             'gitignore' => [
-                'path'  => "{$serverPath}\.gitignore",
+                'path'  => "{$serverPath}.gitignore",
                 'dummy' => "{$realPath}/Dummy/dummyGitIgnore.php",
             ],
             'htaccess' => [
-                'path'  => "{$serverPath}\.htaccess",
+                'path'  => "{$serverPath}.htaccess",
                 'dummy' => "{$realPath}/Dummy/dummyHtaccess.php",
             ],
             'phpini' => [
-                'path'  => "{$serverPath}\php.ini",
+                'path'  => "{$serverPath}php.ini",
                 'dummy' => "{$realPath}/Dummy/dummyPhpIni.php",
             ],
             'userini' => [
-                'path'  => "{$serverPath}\.user.ini",
+                'path'  => "{$serverPath}.user.ini",
                 'dummy' => "{$realPath}/Dummy/dummyUserIni.php",
             ],
         ];
