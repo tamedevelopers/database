@@ -181,8 +181,15 @@ class OrmDotEnv extends Constants{
             E_USER_DEPRECATED   => 'User Deprecated',
         );
 
+        // If APP_DEBUG = false
+        // Turn off error reporsting for the application
+        if(!self::is_debug()){
+            error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+            ini_set('display_errors', 0);
+        }
+
         // if true
-        if(self::is_production()){
+        if(self::is_local()){
             // Define the error handler function
             $error_handler = function($errno, $errstr, $errfile, $errline) use ($filename, $append, $max_size, $log_format, $error_levels) {
                 // Construct the log message
@@ -267,13 +274,24 @@ class OrmDotEnv extends Constants{
     }
 
     /**
-     * Determines if the application is running in production environment.
+     * GET Application debug
      *
-     * @return bool Returns true if the application is running in production environment, false otherwise.
+     * @return bool 
      */
-    static private function is_production() {
+    static private function is_debug() 
+    {
+        return Manager::setEnvBool(app_config('APP_DEBUG'));
+    }    
+
+    /**
+     * Determines if the application is running in local environment.
+     *
+     * @return bool Returns true if the application is running in local environment, false otherwise.
+     */
+    static private function is_local()
+    {
         // check using default setting
-        if(Manager::setEnvBool(app_config('APP_DEBUG')) && app_config('APP_ENV') == 'local'){
+        if(self::is_debug() && app_config('APP_ENV') == 'local'){
             return true;
         }
         
