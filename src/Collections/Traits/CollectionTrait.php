@@ -211,7 +211,7 @@ trait CollectionTrait{
         if(self::$check_paginate){
             return count(self::$pagination_data);
         } elseif($this->unescapeIsObjectWithoutArray){
-            return  0;
+            return  1;
         } 
 
         return is_array($this->items) ? count($this->items): 0;
