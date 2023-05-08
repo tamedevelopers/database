@@ -1,4 +1,5 @@
 # PHP ORM Database
+
 [![Total Downloads](https://poser.pugx.org/peterson/php-orm-database/downloads)](https://packagist.org/packages/peterson/php-orm-database)
 [![Latest Stable Version](https://poser.pugx.org/peterson/php-orm-database/version.png)](https://packagist.org/packages/peterson/php-orm-database)
 [![License](https://poser.pugx.org/peterson/php-orm-database/license)](https://packagist.org/packages/peterson/php-orm-database)
@@ -11,6 +12,8 @@
 Having been introduced to learning Laravel Framework; Over the past yr(s), Coming back to vanilla PHP,
 was pretty tough. So i decided to create a much more easier way of communicating with Database, using native `PHP PDO:: Driver`.
 
+
+## Documentation
 
 * [Requirements](#requirements)
 * [Installation](#installation)
