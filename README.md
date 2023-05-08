@@ -12,7 +12,6 @@ Having been introduced to learning Laravel Framework; Over the past yr(s), Comin
 was pretty tough. So i decided to create a much more easier way of communicating with Database, using native `PHP PDO:: Driver`.
 
 
-
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Instantiate](#instantiate)
@@ -104,7 +103,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^3.1.4" 
+    "peterson/php-orm-database": "^3.1.5" 
 }
 ```
 
@@ -183,8 +182,6 @@ $db->table('users')
 </details>
 
 ## More Database Connection Keys
-<details><summary>Read more...</summary>
-
 - All available connection keys
     - The DRIVER_NAME uses only `mysql`
         - No other connection type is supported for now.
@@ -201,7 +198,6 @@ $db->table('users')
 | DB_PORT           |  int      |  `3306`               |
 | DB_CHARSET        |  string   |  `utf8mb4_unicode_ci` |
 | DB_COLLATION      |  string   |  `utf8mb4`            |
-</details>
 
 ## Usage 
 - All Methods of usage 
@@ -279,7 +275,6 @@ $db->table('users')
 ```
 
 ### Increment
-<details><summary>Read more...</summary>
 
 - Takes three parameter
     - Only the first param is required
@@ -301,25 +296,20 @@ $db->table('users')
 $db->table('users')
     ->where('user_id', 10000001)
     ->increment('wallet_bal', 10);
-    
--- Query
-UPDATE `users` 
-    SET wallet_bal=wallet_bal+:10 
-    WHERE user_id=:user_id
 ```
 
 - You can also pass in a second or third parameter to update additional columns
 ```
 $db->table('users')
     ->where('user_id', 10000001)
-    ->increment('wallet_bal', 10, [
+    ->increment('wallet_bal', 100.23, [
         'first_name' => 'F. Peterson',
         'status'     => 1,
     ]);
 
 -- Query
 UPDATE `users` 
-    SET wallet_bal=wallet_bal+:10, first_name=:first_name, status=:status
+    SET wallet_bal=wallet_bal + :wallet_bal, first_name=:first_name, status=:status
     WHERE user_id=:user_id
 ```
 
@@ -332,7 +322,6 @@ $db->table('users')
         'status'     => 1,
     ]);
 ```
-</details>
 
 ### Decrement
 - Same as Increment
@@ -368,26 +357,23 @@ SELECT count(*) FROM users WHERE status=:status
 </details>
 
 ### Remove Tags
-<details><summary>Read more...</summary>
-
-- Helps against `XSS attacks` 
-    - By default we remove-prevention of `XSS attacks` as this should already been handled by Forms Validation before sending into the Database
-        -> Applies to `insert` `update` `increment` `decrement` methods.
+- Takes one param as `bool` Default is `false`
+    - Helps against `XSS attacks` 
+        - By default we did not handle `XSS attacks`. As we assume this should be done by `Forms Validation` before sending to Database
+            -> Applies to `insert` `update` `increment` `decrement` methods.
 
 - 1 usage
 ```
 $db->table('post')
-    ->removeTags()
+    ->removeTags(true)
     ->insert([
-        'description' => '<script> alert(2); console.log('Blossom');</script>',
+        'description' => "<script> alert(2); console.log('Blossom');</script>",
         'user_id' => 
     ])
 
--- Query
-The value should be 'empty' if found as an attack
-Now the method automatically apply strict method of cleaning each values
+- If param set to true, then this will allow all possible tags
+- If false, it will allow few supported HTML5 tags
 ```
-</details>
 
 ## Fetching Data
 
@@ -454,8 +440,6 @@ SELECT * FROM `users`
 ```
 
 ### Exists
-<details><summary>Read more...</summary>
-
 ```
 $db->table('users')
     ->where('email', 'email@gmail.com')
@@ -465,7 +449,6 @@ $db->table('users')
 -- Query
 SELECT EXISTS(SELECT 1 FROM `users` WHERE email=:email OR name=:name) as `exists`
 ```
-</details>
 
 ### Table Exist
 - Takes param as `string` `$table_name`
@@ -476,11 +459,11 @@ $db->tableExist('users');
 ## Collections
 - You can directly use `methods` of `Collections Instance` on any of the below
     - All the below `methods` are received by Collection `class`
-        1. get()
-        2. first()
-        3. firstOrFail()
-        4. insert()
-        5. insertOrIgnore()
+    1. get()
+    2. first()
+    3. firstOrFail()
+    4. insert()
+    5. insertOrIgnore()
 
 
 
@@ -660,7 +643,6 @@ $users->showing([
 - Multiple clause
 
 ### Raw
-<details><summary>Read more...</summary>
 - Allows you to use direct raw `SQL query syntax`
 
 ```
@@ -670,7 +652,7 @@ $date = strtotime('next week');
 $db->table("tb_wallet")
     ->raw("date >= $date")
     ->raw("NOW() > created_at")
-    ->raw("YEAR(created_at) = '2022'")
+    ->raw("YEAR(created_at) = 2022")
     ->where('email', 'email@gmail.com')
     ->limit(10)
     ->random()
@@ -681,12 +663,10 @@ $db->table("tb_wallet")
 SELECT * FROM `tb_wallet` 
         WHERE date >= 1681178855 
         AND NOW() > created_at 
-        AND YEAR(created_at) = '2022' 
+        AND YEAR(created_at) = 2022
         AND email=:email
         ORDER BY RAND() LIMIT 10
 ```
-</details>
-
 
 ### Select
 - Used to select needed columns from database

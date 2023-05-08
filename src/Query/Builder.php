@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace builder\Database\Query;
 
+use Config;
+use Exception;
+use HTMLPurifier;
+
 class Builder extends MySqlExec{
     
     /**
@@ -661,18 +665,25 @@ class Builder extends MySqlExec{
             }
             
             // Convert input to string
-            $filteredInput = (string) $input;
+            $html = (string) $input;
 
-            // Remove any script or style tags and their contents
-            $filteredInput = preg_replace('/<(script|style)[^>]*?>.*?<\/\\1>/si', '', $filteredInput);
+            $allowedTags = null;
+            if ($this->allowAllTags) {
+                // Allow all HTML tags except those seen as attacks
+                $allowedTags = null;
+            } else {
+                // Allow only basic tags
+                $allowedTags = '<a><abbr><address><area><article><aside><audio><b><base><bdi><bdo><blockquote><body><br><button><canvas><caption><cite><code><col><colgroup><data><datalist><dd><del><details><dfn><dialog><div><dl><dt><em><embed><fieldset><figcaption><figure><footer><form><h1><h2><h3><h4><h5><h6><head><header><hr><html><i><iframe><img><input><ins><kbd><label><legend><li><link><main><map><mark><meta><meter><nav><noscript><object><ol><optgroup><option><output><p><param><picture><pre><progress><q><rp><rt><ruby><s><samp><script><section><select><small><source><span><strong><style><sub><summary><sup><svg><table><tbody><td><template><textarea><tfoot><th><thead><time><title><tr><track><u><ul><var><video><wbr>';
+            }
             
-            // Allow only letters, digits, spaces, and common punctuation marks
-            $filteredInput = preg_replace('/[^\w\s.,!?():;\'"`-]/u', '', $filteredInput);
+            // Use HTMLPurifier to remove any other potential XSS attacks
+            $config = \HTMLPurifier_Config::createDefault();
+            $config->set('HTML.Allowed', $allowedTags);
             
-            // Remove any extra whitespace
-            $filteredInput = trim(preg_replace('/\s+/u', ' ', $filteredInput));
-            
-            return $filteredInput;
+            // purify html
+            $purifier   = new HTMLPurifier($config);
+            $cleanHtml  = $purifier->purify($html);
+            return $cleanHtml;
         }
         
         return $input;

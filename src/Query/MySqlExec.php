@@ -367,13 +367,19 @@ class MySqlExec  extends Constants{
 
     /**
      * Remove Tags Found as an XSS-Attack
+     * @param bool $tag\Default true
+     * - If set to true, then this will allow all possible tags 
+     * - If false, it will allow few supported HTML5 tags
+     * Apart from tags seen as an attack
      *
      * @return object\builder\Database\removeTags
      */
-    public function removeTags()
+    public function removeTags(?bool $tag = true)
     {
         $this->removeTags = true;
-
+        if(!$tag){
+            $this->allowAllTags = false;
+        }
         return $this;
     }
 
@@ -567,6 +573,7 @@ class MySqlExec  extends Constants{
         $this->countQuery           = false;
         $this->modelQuery           = false;
         $this->removeTags           = false;
+        $this->allowAllTags         = true;
         $this->runtime              = 0.00;
         $this->timer                = [
             'start'   => 0.00,
@@ -575,7 +582,7 @@ class MySqlExec  extends Constants{
         ];
     }
 
-     /**
+    /**
      * Get last insert ID
      * @param bool $type true or false
      * If true then it return an OBJECT data

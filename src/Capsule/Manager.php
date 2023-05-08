@@ -353,7 +353,7 @@ class Manager extends Constants{
             $sign = '-'; //decrement
         }
 
-        $tempIncrementQuery = "{$data['column']}={$data['column']}{$sign}:{$data['count']}";
+        $tempIncrementQuery = "{$data['column']}={$data['column']} {$sign} :{$data['column']}";
         if(count($data['param']) > self::COUNT){
             $tempIncrementQuery .= ",";
         }

@@ -117,7 +117,7 @@ trait InsertionTrait{
         $this->query($this->query);
 
         // bind increment data
-        $this->bind(":{$temp['count']}", $temp['count']);
+        $this->bind(":{$temp['column']}", $temp['count']);
 
         // bind query for param
         foreach($temp['param'] as $key => $value){

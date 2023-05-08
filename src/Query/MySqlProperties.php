@@ -154,6 +154,11 @@ trait MySqlProperties{
     protected $removeTags = false;
 
     /**
+     * @var bool
+     */
+    protected $allowAllTags = true;
+
+    /**
      * @var array
      */
     protected $timer = [
