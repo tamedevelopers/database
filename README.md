@@ -122,7 +122,7 @@ composer require peterson/php-orm-database
 
 ## Instantiate
 
-**Step 1** — Composer  `Instantiate class using`:
+**Step 1** — `Instantiate class using`:
 ```
 require_once __DIR__ . '/vendor/autoload.php';
 
