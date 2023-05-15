@@ -26,7 +26,7 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
     {
         $this->attributes  = $this->convertOnInit($items);
         $this->getQuery     = get_query();
-        $this->key          = ($key + 1);
+        $this->key          = ((int) $key + 1);
 
         // if pagination request is `true`
         if($check_paginate){
