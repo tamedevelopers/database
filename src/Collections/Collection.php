@@ -148,6 +148,23 @@ class Collection implements IteratorAggregate, ArrayAccess
     }
 
     /**
+     * Get Pagination Numbers
+     * @param mixed $key
+     *
+     * @return string
+     */
+    public function numbers(mixed $key = 0)
+    {
+        $key = (int) $key + 1;
+        if(self::$check_paginate){
+            $pagination = $this->getPagination();
+            return ($pagination->offset + $key);
+        }
+
+        return $key;
+    }
+
+    /**
      * Check if an item exists in the collection.
      *
      * @param  string  $key

@@ -6,7 +6,7 @@ namespace builder\Database\Collections\Traits;
 
 use Exception;
 use builder\Database\Collections\CollectionMapper;
-
+use stdClass;
 
 trait CollectionTrait{
 
@@ -134,9 +134,9 @@ trait CollectionTrait{
                     : $items;
 
         if (is_array($items) && count($items) > 0) {
-            return array_map(function ($item){
-                return new CollectionMapper($item);
-            }, $items);
+            return array_map(function ($item, $key){
+                return new CollectionMapper($item, $key, self::$check_paginate, self::$pagination);
+            }, $items, array_keys($items));
         }
 
         return $items;
@@ -153,10 +153,30 @@ trait CollectionTrait{
     {
         // first or insert request
         if ($this->unescapeIsObjectWithoutArray) {
-            return  self::convertOnInit($items);
+            return  $this->convertOnInit($items);
         }
 
         return $items;
+    }
+
+    /**
+     * Get Pagination Object
+     * 
+     * @return mixed
+     */
+    public function getPagination()
+    {
+        if(self::$check_paginate){
+            $pagination = self::$pagination->pagination;
+            return (object) [
+                'limit'         => (int) $pagination->limit,
+                'offset'        => (int) $pagination->offset,
+                'page'          => (int) $pagination->page,
+                'pageCount'     => (int) $pagination->pageCount,
+                'perPage'       => (int) $pagination->perPage,
+                'totalCount'    => (int) $pagination->totalCount,
+            ];
+        }
     }
 
     /**
@@ -214,7 +234,7 @@ trait CollectionTrait{
             return  1;
         } 
 
-        return is_array($this->items) ? count($this->items): 0;
+        return $this->isArray() ? count($this->items): 0;
     }
 
     /**
@@ -224,7 +244,7 @@ trait CollectionTrait{
      */ 
     public function toArray()
     {
-        return json_decode( json_encode(self::$check_paginate ? self::$pagination_data : $this->items), true);
+        return json_decode( json_encode($this->getItemsData()), true);
     }
     
     /**
@@ -234,7 +254,7 @@ trait CollectionTrait{
      */ 
     public function toObject()
     {
-        return json_decode( json_encode(self::$check_paginate ? self::$pagination_data : $this->items), false);
+        return json_decode( json_encode($this->getItemsData()), false);
     }
     
     /**
@@ -244,7 +264,7 @@ trait CollectionTrait{
      */ 
     public function toJson()
     {
-        return json_encode(self::$check_paginate ? self::$pagination_data : $this->items);
+        return json_encode($this->getItemsData());
     }
 
     /**
@@ -258,12 +278,32 @@ trait CollectionTrait{
     }
     
     /**
+     * Check if items is an array
+     * 
+     * @return bool
+     */ 
+    private function isArray()
+    {
+        return is_array($this->items) ? true : false;
+    }
+    
+    /**
+     * Determine if pagination Data is to be returned or Items Data
+     * 
+     * @return mixed
+     */ 
+    private function getItemsData()
+    {
+        return self::$check_paginate ? self::$pagination_data : $this->items;
+    }
+    
+    /**
      * Convert data to an array on Initializaiton
      * @param mixed $items
      * 
      * @return array
      */ 
-    static private function convertOnInit(mixed $items = null)
+    private function convertOnInit(mixed $items = null)
     {
         return json_decode( json_encode($items), true);
     }

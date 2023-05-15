@@ -76,7 +76,6 @@ trait PaginateTrait{
                 'prev'      => $options['prev']     ?? $this->text('prev'),
                 'span'      => $options['span']     ?? $this->text('span'),
                 'showing'   => $options['showing']  ?? $this->text('showing'),
-                'to'        => $options['to']       ?? $this->text('to'),
                 'of'        => $options['of']       ?? $this->text('of'),
                 'results'   => $options['results']  ?? $this->text('results'),
             ];
@@ -136,6 +135,9 @@ trait PaginateTrait{
 
         // get showing data
         $data = $this->getShowingData();
+
+        // convert to lowercase
+        $settings['of'] =  mb_strtolower($settings['of'], 'UTF-8');
         
         // only display full text formatting when total count is more than 0
         if($data['total'] > 0){
@@ -143,10 +145,7 @@ trait PaginateTrait{
             if($data['total'] >= $this->pagination->limit){
                 $formatDisplayText = "
                     {$settings['showing']} 
-                    {$data['showing']} 
-
-                    {$settings['to']} 
-                    {$data['to']}
+                    {$data['showing']}-{$data['to']}
 
                     {$settings['of']} 
 
@@ -156,11 +155,8 @@ trait PaginateTrait{
             }else{
                 $formatDisplayText = "
                     {$settings['showing']} 
-                    {$data['showing']} 
+                    {$data['showing']}-{$data['to']}
 
-                    {$settings['to']} 
-                    {$data['to']}
-                    
                     {$settings['results']}
                 ";
             }
@@ -208,16 +204,21 @@ trait PaginateTrait{
      */
     private function getShowingData()
     {
-        $to         = $this->pagination->limit;
-        $offset     = $this->pagination->offset;
-        $limit      = $this->pagination->limit;
-        $total      = $this->pagination->totalCount;
+        $to         = (int) $this->pagination->limit;
+        $offset     = (int) $this->pagination->offset;
+        $limit      = (int) $this->pagination->limit;
+        $total      = (int) $this->pagination->totalCount;
         $showing    = 0;
+
+        // calculate showing if data is greater than 1
+        if($total > 1){
+            $showing = 1;
+        }
 
         // calculate data if not first page
         if($this->pagination->page !=  1){
             $to         = ($this->pagination->page * $limit);
-            $showing    = $offset;
+            $showing    = $offset + 1;
         }
 
         // calculate data for last page
@@ -245,7 +246,6 @@ trait PaginateTrait{
         if($links){
             // unset disallowed keys
             unset($options['of']);
-            unset($options['to']);
             unset($options['span']);
             unset($options['results']);
             unset($options['showing']);
@@ -253,7 +253,6 @@ trait PaginateTrait{
             // unset disallowed keys
             $options = [
                 'of'        => $options['of']       ?? $this->text('of'),
-                'to'        => $options['to']       ?? $this->text('to'),
                 'span'      => $options['span']     ?? $this->text('span'),
                 'results'   => $options['results']  ?? $this->text('results'),
                 'showing'   => $options['showing']  ?? $this->text('showing'),

@@ -166,7 +166,6 @@ class AutoloadEnv{
             'prev'      => $options['prev']             ?? $text['prev'],
             'span'      => $options['span']             ?? $text['span'],
             'showing'   => $options['showing']          ?? $text['showing'],
-            'to'        => $options['to']               ?? $text['to'],
             'of'        => $options['of']               ?? $text['of'],
             'results'   => $options['results']          ?? $text['results'],
         ];

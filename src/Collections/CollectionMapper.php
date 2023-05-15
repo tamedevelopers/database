@@ -13,16 +13,26 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
 {
     private $attributes;
     private $getQuery;
+    private $key;
+    static private $check_paginate = false;
+    static private $pagination;
 
     /**
      * Create a new collection.
      *
      * @param  mixed $items
      */
-    public function __construct($items = [])
+    public function __construct($items = [], mixed $key = 0, ?bool $check_paginate = false, mixed $pagination = null)
     {
-        $this->attributes = self::convertOnInit($items);
-        $this->getQuery   = get_query();
+        $this->attributes  = $this->convertOnInit($items);
+        $this->getQuery     = get_query();
+        $this->key          = ($key + 1);
+
+        // if pagination request is `true`
+        if($check_paginate){
+            self::$check_paginate  = $check_paginate;
+            self::$pagination      = $pagination->pagination ?? null;
+        }
     }
 
     /**
@@ -92,6 +102,41 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
     }
 
     /**
+     * Get Pagination Object
+     * 
+     * @return mixed
+     */
+    public function getPagination()
+    {
+        if(self::$check_paginate){
+            $pagination = self::$pagination;
+            return (object) [
+                'limit'         => (int) $pagination->limit,
+                'offset'        => (int) $pagination->offset,
+                'page'          => (int) $pagination->page,
+                'pageCount'     => (int) $pagination->pageCount,
+                'perPage'       => (int) $pagination->perPage,
+                'totalCount'    => (int) $pagination->totalCount,
+            ];
+        }
+    }
+
+    /**
+     * Get Pagination Numbers
+     *
+     * @return string
+     */
+    public function numbers()
+    {
+        if(self::$check_paginate){
+            $pagination = $this->getPagination();
+            return ($pagination->offset + $this->key);
+        }
+
+        return $this->key;
+    }
+
+    /**
      * return items collection as an array
      *
      * @return array
@@ -128,9 +173,7 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      */
     public function isEmpty()
     {
-        return $this->count() === 0 
-                    ? true 
-                    : false;
+        return empty($this->attributes);
     }
 
     /**
@@ -191,7 +234,7 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      * 
      * @return array
      */ 
-    static private function convertOnInit(mixed $items = null)
+    private function convertOnInit(mixed $items = null)
     {
         return json_decode( json_encode($items), true);
     }

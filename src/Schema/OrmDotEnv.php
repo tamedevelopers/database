@@ -137,7 +137,7 @@ class OrmDotEnv extends Constants{
      * 
      * @return void
      */
-    static public function error_logger() 
+    static public function errorLogger() 
     {
         // Directory path
         $dir = self::$path . "storage/logs/";
@@ -145,21 +145,7 @@ class OrmDotEnv extends Constants{
         // create custom file name
         $filename = "{$dir}orm.log";
 
-        // if \storage folder not found
-        if(!is_dir(self::$path. "storage")){
-            @mkdir(self::$path. "storage", 0777);
-        }
-
-        // if \storage\logs\ folder not found
-        if(!is_dir($dir)){
-            @mkdir($dir, 0777);
-        }
-
-        // If the log file doesn't exist, create it
-        if(!file_exists($filename)) {
-            touch($filename);
-            chmod($filename, 0777);
-        }
+        self::createDir_AndFiles($dir, $filename);
 
         // Determine the log message format
         $log_format = "[%s] %s in %s on line %d\n";
@@ -168,53 +154,39 @@ class OrmDotEnv extends Constants{
         $max_size   = 1024*1024;
 
         // Define the error level mapping
-        $error_levels = array(
-            E_ERROR             => 'Fatal Error',
-            E_USER_ERROR        => 'User Error',
-            E_PARSE             => 'Parse Error',
-            E_WARNING           => 'Warning',
-            E_USER_WARNING      => 'User Warning',
-            E_NOTICE            => 'Notice',
-            E_USER_NOTICE       => 'User Notice',
-            E_STRICT            => 'Strict Standards',
-            E_DEPRECATED        => 'Deprecated',
-            E_USER_DEPRECATED   => 'User Deprecated',
-        );
+        $error_levels = self::error_levels();
 
         // If APP_DEBUG = false
-        // Turn off error reporsting for the application
+        // Turn off error reporting for the application
         if(!self::is_debug()){
             error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
             ini_set('display_errors', 0);
         }
 
-        // if true
-        if(self::is_local()){
-            // Define the error handler function
-            $error_handler = function($errno, $errstr, $errfile, $errline) use ($filename, $append, $max_size, $log_format, $error_levels) {
-                // Construct the log message
-                $error_level = isset($error_levels[$errno]) ? $error_levels[$errno] : 'Unknown Error';
-                $log_message = sprintf($log_format, date('Y-m-d H:i:s'), $error_level . ': ' . $errstr, $errfile, $errline);
-    
-                // Write the log message to the file
-                if ($append && file_exists($filename)) {
-                    $current_size = filesize($filename);
-                    if ($current_size > $max_size) {
-                        file_put_contents($filename, "{$log_message}");
-                    } else {
-                        file_put_contents($filename, "{$log_message}", FILE_APPEND);
-                    }
+        // Define the error handler function
+        $error_handler = function($errno, $errstr, $errfile, $errline) use ($filename, $append, $max_size, $log_format, $error_levels) {
+            // Construct the log message
+            $error_level = isset($error_levels[$errno]) ? $error_levels[$errno] : 'Unknown Error';
+            $log_message = sprintf($log_format, date('Y-m-d H:i:s'), $error_level . ': ' . $errstr, $errfile, $errline);
+
+            // Write the log message to the file
+            if ($append && file_exists($filename)) {
+                $current_size = filesize($filename);
+                if ($current_size > $max_size) {
+                    file_put_contents($filename, "{$log_message}");
                 } else {
-                    file_put_contents($filename, $log_message);
+                    file_put_contents($filename, "{$log_message}", FILE_APPEND);
                 }
-    
-                // Let PHP handle the error in the normal way
-                return false;
-            };
-    
-            // Set the error handler function
-            set_error_handler($error_handler);
-        }
+            } else {
+                file_put_contents($filename, $log_message);
+            }
+
+            // Let PHP handle the error in the normal way
+            return false;
+        };
+
+        // Set the error handler function
+        set_error_handler($error_handler);
     }
 
     /**
@@ -274,6 +246,54 @@ class OrmDotEnv extends Constants{
     }
 
     /**
+     * Create needed directory and files
+     *
+     *  @param string $directory
+     *  @param string $filename
+     *  
+     * @return void
+     */
+    static private function createDir_AndFiles(?string $directory = null, ?string  $filename = null)
+    {
+        // if \storage folder not found
+        if(!is_dir(self::$path. "storage")){
+            @mkdir(self::$path. "storage", 0777);
+        }
+
+        // if \storage\logs\ folder not found
+        if(!is_dir($directory)){
+            @mkdir($directory, 0777);
+        }
+
+        // If the log file doesn't exist, create it
+        if(!file_exists($filename)) {
+            touch($filename);
+            chmod($filename, 0777);
+        }
+    }    
+
+    /**
+     * GET Error Levels
+     *
+     * @return array 
+     */
+    static private function error_levels()
+    {
+        return array(
+            E_ERROR             => 'Fatal Error',
+            E_USER_ERROR        => 'User Error',
+            E_PARSE             => 'Parse Error',
+            E_WARNING           => 'Warning',
+            E_USER_WARNING      => 'User Warning',
+            E_NOTICE            => 'Notice',
+            E_USER_NOTICE       => 'User Notice',
+            E_STRICT            => 'Strict Standards',
+            E_DEPRECATED        => 'Deprecated',
+            E_USER_DEPRECATED   => 'User Deprecated',
+        );
+    }    
+
+    /**
      * GET Application debug
      *
      * @return bool 
@@ -291,11 +311,12 @@ class OrmDotEnv extends Constants{
     static private function is_local()
     {
         // check using default setting
-        if(self::is_debug() && app_config('APP_ENV') == 'local'){
+        if(app_config('APP_ENV') == 'local'){
             return true;
         }
         
-        return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' && $_SERVER['SERVER_ADDR'] !== '127.0.0.1';
+        // check if running on localhost
+        return !(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' && $_SERVER['SERVER_ADDR'] !== '127.0.0.1');
     }    
 
     /**

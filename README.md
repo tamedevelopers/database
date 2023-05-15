@@ -50,6 +50,8 @@ was pretty tough. So i decided to create a much more easier way of communicating
     * [Pagination Links Config](#pagination-links-config)
     * [Pagination Showing](#pagination-showing)
     * [Pagination Showing Config](#pagination-showing-config)
+    * [Pagination Numbers](#pagination-numbers)
+    * [Get Pagination](#get-pagination)
 * [Clause](#clause)
   * [Raw](#raw)
   * [select](#select)
@@ -106,7 +108,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^3.1.5" 
+    "peterson/php-orm-database": "^3.1.6" 
 }
 ```
 
@@ -529,19 +531,16 @@ if($users->isNotEmpty()){
 | class     | string                  | Css `selector` For pagination ul tag in the browser |
 | span      | string                  | Default `.pagination-highlight` Css `selector` For pagination Showing Span tags in the browser |
 | view      | `bootstrap` \| `simple` | Default `simple` - For pagination design |
-| first     | string                  | Change the letter of `First` |
-| last      | string                  | Change the letter of `Last` |
-| next      | string                  | Change the letter of `Next` |
-| prev      | string                  | Change the letter of `Prev` |
-| showing   | string                  | Change the letter of `Showing` |
-| of        | string                  | Change the letter `of` |
-| to        | string                  | Change the letter `to` |
+| first     | string                  | Change the letter `First` |
+| last      | string                  | Change the letter `Last` |
+| next      | string                  | Change the letter `Next` |
+| prev      | string                  | Change the letter `Prev` |
+| showing   | string                  | Change the letter `Showing` |
+| of        | string                  | Change the letter `of`      |
 | results   | string                  | Change the letter `results` |
 
 
 ### Global Configuration 
-<details><summary>Read more...</summary>
-
 - 1 Setup global pagination on ENV autostart `most preferred` method
 ```
 AutoloadEnv::configurePagination([
@@ -552,20 +551,21 @@ AutoloadEnv::configurePagination([
     'view'  => 'bootstrap',
     'class' => 'Custom-Class-Css-Selector', 
 ]);
+```
 
-or Helpers Function
-
+- or Helpers Function
+```
 configure_pagination([
-
+    'allow' => true,
 ]);
 ```
 
+<details><summary>Read more...</summary>
 - 2 Can also be called using the `$db->configurePagination` method
 ```
 $db->configurePagination([
     'allow' => true, 
     'view'  => 'bootstrap',
-    'class' => 'Custom-Class-Css-Selector', 
 ]);
 ```
 
@@ -580,8 +580,7 @@ $db = new DB([
 
 ### Pagination Query
 ```
-$users = $db->table('users')
-            ->paginate(40);
+$users = $db->table('users')->paginate(40);
 
 -- Query
 SELECT * 
@@ -623,7 +622,7 @@ $users->showing();
 
 // This will create a span html element with text
 <span class='pagination-highlight'>
-    Showing 0 to 40 of 500 results
+    Showing 0-40 of 500 results
 </span>
 ```
 
@@ -634,13 +633,43 @@ $users->showing();
 ```
 $users->showing([
     'showing'  => 'Showing',
-    'to'       => 'To',
     'of'       => 'out of',
     'results'  => 'Results',
     'span'     => 'css-selector',
 ])
 ```
 </details>
+
+### Pagination Numbers
+- Page numbering `starts counting from 1`
+    - This will format each numbers of data according to it's possition
+
+```
+$users = $db->table('users')->paginate(20);
+
+foreach($users as $user){
+
+    echo $users->numbers();
+}
+```
+
+### Get Pagination
+- Returns pagination informations
+
+| key           |  Description              |
+|---------------|---------------------------|
+| limit         | Pagination limit `int`    |
+| offset        | Pagination offset `int`   |
+| page          | Pagination Current page `int`     |
+| pageCount     | Pagination Total page count `int` |
+| perPage       | Pagination per page count `int`   |
+| totalCount    | Pagination total items count `int`|
+
+```
+$users = $db->table('users')->paginate(20);
+
+$users->getPagination();
+```
 
 ## Clause
 - Multiple clause

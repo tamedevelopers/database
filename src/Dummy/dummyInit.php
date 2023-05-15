@@ -72,7 +72,6 @@ $db = DATABASE_CONNECTION;
 | prev      | string             | Change the letter of `Prev`
 | showing   | string             | Change the letter of `Showing`
 | of        | string             | Change the letter `of`
-| to        | string             | Change the letter `to`
 | results   | string             | Change the letter `results`
 |--------------------------------------------------------------------------
 */
@@ -84,15 +83,11 @@ $db->configurePagination([
 
 /*
 |--------------------------------------------------------------------------
-| ERROR HANDLER WHEN APP_DEBUG is set to FALSE
-| Disable error on server and log to a file
+| To Disable/Enable Error Resporting
+| Update the .env and set `APP_DEBUG` to TRUE|FALSE
+| 
+| Error report is saved into the below path to file
 | path => \storage\logs\orm.log
-|
-| To enable error logs ?
-| Set the below information, As the custom logger only works on production environment
-| APP_ENV=local
-| APP_DEBUG = true 
-|
 |--------------------------------------------------------------------------
 */
-$dotEnv['self']::error_logger();
+$dotEnv['self']->errorLogger();
