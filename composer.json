@@ -38,7 +38,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.1.6-dev"
+            "dev-main": "3.1.7-dev"
         }
     },
     "minimum-stability": "stable",
