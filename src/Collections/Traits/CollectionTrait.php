@@ -135,13 +135,6 @@ trait CollectionTrait{
 
         if (is_array($items) && count($items) > 0) {
             return array_map(function ($item, $key){
-                
-                // dd(
-                //     self::$pagination_data,
-                //     $this->items,
-                //     self::$pagination
-                // );
-
                 return new CollectionMapper($item, $key, self::$check_paginate, self::$pagination);
             }, $items, array_keys($items));
         }
