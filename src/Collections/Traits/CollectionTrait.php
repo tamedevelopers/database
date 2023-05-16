@@ -135,6 +135,13 @@ trait CollectionTrait{
 
         if (is_array($items) && count($items) > 0) {
             return array_map(function ($item, $key){
+                
+                // dd(
+                //     self::$pagination_data,
+                //     $this->items,
+                //     self::$pagination
+                // );
+
                 return new CollectionMapper($item, $key, self::$check_paginate, self::$pagination);
             }, $items, array_keys($items));
         }
@@ -265,16 +272,6 @@ trait CollectionTrait{
     public function toJson()
     {
         return json_encode($this->getItemsData());
-    }
-
-    /**
-     * Get database query
-     *
-     * @return array
-     */
-    public function getQuery()
-    {
-        return get_query();
     }
     
     /**

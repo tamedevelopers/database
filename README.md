@@ -108,7 +108,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^3.1.7" 
+    "peterson/php-orm-database": "^3.1.8"
 }
 ```
 
@@ -483,7 +483,6 @@ $db->tableExist('users');
 |  toArray()        |  `array` Convert items to array           |
 |  toObject()       |  `object` Convert items to object         |
 |  toJson()         |  `string` Convert items to json           |
-|  getQuery()       |  `object` Get Query information           |
 |  toSql()          |  `string` Sql Query String without execution |
  
 

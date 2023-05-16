@@ -125,10 +125,8 @@ class Collection implements IteratorAggregate, ArrayAccess
      */
     public function links(?array $options = [])
     {
-        if(self::$check_paginate){
-            if(self::$pagination){
-                self::$pagination->links($options);
-            }
+        if(self::$pagination){
+            self::$pagination->links($options);
         }
     }
 
@@ -140,10 +138,8 @@ class Collection implements IteratorAggregate, ArrayAccess
      */
     public function showing(?array $options = [])
     {
-        if(self::$check_paginate){
-            if(self::$pagination){
-                self::$pagination->showing($options);
-            }
+        if(self::$pagination){
+            self::$pagination->showing($options);
         }
     }
 
@@ -155,8 +151,8 @@ class Collection implements IteratorAggregate, ArrayAccess
      */
     public function numbers(mixed $key = 0)
     {
-        $key = (int) $key + 1;
         if(self::$check_paginate){
+            $key        = (int) $key + 1;
             $pagination = $this->getPagination();
             return ($pagination->offset + $key);
         }

@@ -11,10 +11,28 @@ use IteratorAggregate;
 
 class CollectionMapper implements IteratorAggregate, ArrayAccess
 {
+    /**
+     * Items attributes
+     * @var  mixed
+     */
     private $attributes;
-    private $getQuery;
+
+    /**
+     * Array index key
+     * @var  mixed
+     */
     private $key;
-    static private $check_paginate = false;
+
+    /**
+     * If pagination is true
+     * @var  bool
+     */
+    static private $is_paginate = false;
+
+    /**
+     * Pagination Instance
+     * @var  mixed
+     */
     static private $pagination;
 
     /**
@@ -24,14 +42,13 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      */
     public function __construct($items = [], mixed $key = 0, ?bool $check_paginate = false, mixed $pagination = null)
     {
-        $this->attributes  = $this->convertOnInit($items);
-        $this->getQuery     = get_query();
+        $this->attributes   = $this->convertOnInit($items);
         $this->key          = ((int) $key + 1);
 
         // if pagination request is `true`
         if($check_paginate){
-            self::$check_paginate  = $check_paginate;
-            self::$pagination      = $pagination->pagination ?? null;
+            self::$is_paginate  = $check_paginate;
+            self::$pagination   = $pagination->pagination ?? null;
         }
     }
 
@@ -108,7 +125,7 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      */
     public function getPagination()
     {
-        if(self::$check_paginate){
+        if(self::$is_paginate){
             $pagination = self::$pagination;
             return (object) [
                 'limit'         => (int) $pagination->limit,
@@ -128,7 +145,7 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      */
     public function numbers()
     {
-        if(self::$check_paginate){
+        if(self::$is_paginate){
             $pagination = $this->getPagination();
             return ($pagination->offset + $this->key);
         }
@@ -216,16 +233,6 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
     public function toJson()
     {
         return json_encode( $this->attributes );
-    }
-
-    /**
-     * Get database query
-     *
-     * @return array
-     */
-    public function getQuery()
-    {
-        return $this->getQuery;
     }
 
     /**
