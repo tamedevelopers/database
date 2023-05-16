@@ -81,7 +81,7 @@ trait CollectionTrait{
     {
         // get Trace
         self::getTrace();
-
+        
         // if in first or insert proxies
         if(in_array(self::$instance, self::$proxies['first']) || in_array(self::$instance, self::$proxies['insert'])){
             return true;
