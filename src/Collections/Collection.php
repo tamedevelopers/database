@@ -43,8 +43,9 @@ class Collection implements IteratorAggregate, ArrayAccess
 
         // if pagination request is `true`
         if(self::$is_paginate){
-            $this->items        = $this->items['data'] ?? [];
-            self::$pagination   = $this->items['pagination'] ?? false;
+            $tempItems          = $this->items;
+            $this->items        = $tempItems['data'] ?? [];
+            self::$pagination   = $tempItems['pagination'] ?? false;
         }
     }
     
