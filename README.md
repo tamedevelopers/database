@@ -648,7 +648,7 @@ $users = $db->table('users')->paginate(20);
 
 foreach($users as $user){
 
-    echo $users->numbers();
+    echo $user->numbers();
 }
 ```
 

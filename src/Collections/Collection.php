@@ -42,9 +42,9 @@ class Collection implements IteratorAggregate, ArrayAccess
         $this->items = $this->getArrayItems($items);
 
         // if pagination request is `true`
-        if(self::$check_paginate){
-            self::$pagination_data  = $this->items['data'] ?? [];
-            self::$pagination       = $this->items['pagination'] ?? false;
+        if(self::$is_paginate){
+            $this->items        = $this->items['data'] ?? [];
+            self::$pagination   = $this->items['pagination'] ?? false;
         }
     }
     
@@ -151,7 +151,7 @@ class Collection implements IteratorAggregate, ArrayAccess
      */
     public function numbers(mixed $key = 0)
     {
-        if(self::$check_paginate){
+        if(self::$is_paginate){
             $key        = (int) $key + 1;
             $pagination = $this->getPagination();
             return ($pagination->offset + $key);
@@ -181,15 +181,9 @@ class Collection implements IteratorAggregate, ArrayAccess
     {
         // Convert data to array
         $unasignedItems = $this->toArray();
-
-        // check if `unescapeIsObjectWithoutArray` is true - Then return the data or null
-        if($this->unescapeIsObjectWithoutArray){
-            return $unasignedItems[$key] ?? null;
-        } 
-        // Then check if data count is === 1, Then return its's data or null
-        elseif($this->count() === 1){
-            return $unasignedItems[0][$key] ?? null;
-        }
+        return  $unasignedItems[$key] 
+                ?? $unasignedItems[0][$key] 
+                ?? null;
     }
 
     /**

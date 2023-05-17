@@ -25,18 +25,11 @@ trait CollectionTrait{
     static protected $pagination;
 
     /**
-     * Get pagination data
+     * Instance of Database Paginate Method
      *
      * @var mixed
      */
-    static protected $pagination_data = [];
-
-    /**
-     * Instance of Database Paginate request method
-     *
-     * @var mixed
-     */
-    static protected $check_paginate;
+    static protected $is_paginate;
 
     /**
      * The methods that can be proxied.
@@ -115,7 +108,7 @@ trait CollectionTrait{
         self::$instance = $interest[0] ?? null;
 
         // instance of DB Paginate request
-        self::$check_paginate = in_array(self::$instance, self::$proxies['paginate']);
+        self::$is_paginate = in_array(self::$instance, self::$proxies['paginate']);
     }
 
     /**
@@ -127,15 +120,10 @@ trait CollectionTrait{
      */
     protected function wrapArrayIntoCollectionMappers(mixed $items)
     {
-        // if pagination request is true\ The collect the Pagination `data`
-        // Otherwise, get the `items` passed as param
-        $items = self::$check_paginate
-                    ? self::$pagination_data
-                    : $items;
-
+        // check if valid array data
         if (is_array($items) && count($items) > 0) {
             return array_map(function ($item, $key){
-                return new CollectionMapper($item, $key, self::$check_paginate, self::$pagination);
+                return new CollectionMapper($item, $key, self::$is_paginate, self::$pagination);
             }, $items, array_keys($items));
         }
 
@@ -166,7 +154,7 @@ trait CollectionTrait{
      */
     public function getPagination()
     {
-        if(self::$check_paginate){
+        if(self::$is_paginate){
             $pagination = self::$pagination->pagination;
             return (object) [
                 'limit'         => (int) $pagination->limit,
@@ -228,13 +216,13 @@ trait CollectionTrait{
      */
     public function count(): int
     {
-        if(self::$check_paginate){
-            return count(self::$pagination_data);
-        } elseif($this->unescapeIsObjectWithoutArray){
-            return  1;
+        if($this->unescapeIsObjectWithoutArray){
+            return 0;
         } 
 
-        return $this->isArray() ? count($this->items): 0;
+        return  $this->isArray() 
+                ? count($this->items) 
+                : 0;
     }
 
     /**
@@ -244,7 +232,7 @@ trait CollectionTrait{
      */ 
     public function toArray()
     {
-        return json_decode( json_encode($this->getItemsData()), true);
+        return json_decode( json_encode($this->items), true);
     }
     
     /**
@@ -254,7 +242,7 @@ trait CollectionTrait{
      */ 
     public function toObject()
     {
-        return json_decode( json_encode($this->getItemsData()), false);
+        return json_decode( json_encode($this->items), false);
     }
     
     /**
@@ -264,7 +252,7 @@ trait CollectionTrait{
      */ 
     public function toJson()
     {
-        return json_encode($this->getItemsData());
+        return json_encode($this->items);
     }
     
     /**
@@ -275,16 +263,6 @@ trait CollectionTrait{
     private function isArray()
     {
         return is_array($this->items) ? true : false;
-    }
-    
-    /**
-     * Determine if pagination Data is to be returned or Items Data
-     * 
-     * @return mixed
-     */ 
-    private function getItemsData()
-    {
-        return self::$check_paginate ? self::$pagination_data : $this->items;
     }
     
     /**
