@@ -57,9 +57,9 @@ class Collection implements IteratorAggregate, ArrayAccess
     public function getIterator() : Traversable
     {
         // Automatically wrap Mappers into an array
-        $this->items = $this->wrapArrayIntoCollectionMappers($this->items);
+        $items = $this->wrapArrayIntoCollectionMappers($this->items);
 
-        return new ArrayIterator($this->items);
+        return new ArrayIterator($items);
     }
 
     /**
