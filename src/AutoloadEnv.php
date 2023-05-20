@@ -192,7 +192,7 @@ class AutoloadEnv{
         // only create when files are not present
         if(self::isDummyNotPresent()){
             // create for init 
-            if(!file_exists($paths['init']['path']) && !is_dir($paths['init']['path'])){
+            if(!file_exists($paths['init']['path'])){
                 // Read the contents of the dummy file
                 $dummyContent = file_get_contents($paths['init']['dummy']);
     
@@ -201,7 +201,7 @@ class AutoloadEnv{
             }
     
             // create for gitignore
-            if(!file_exists($paths['gitignore']['path']) && !is_dir($paths['gitignore']['path'])){
+            if(!file_exists($paths['gitignore']['path'])){
                 // Read the contents of the dummy file
                 $dummyContent = file_get_contents($paths['gitignore']['dummy']);
     
@@ -210,7 +210,7 @@ class AutoloadEnv{
             }
     
             // create for htaccess
-            if(!file_exists($paths['htaccess']['path']) && !is_dir($paths['htaccess']['path'])){
+            if(!file_exists($paths['htaccess']['path'])){
                 // Read the contents of the dummy file
                 $dummyContent = file_get_contents($paths['htaccess']['dummy']);
     
@@ -219,7 +219,7 @@ class AutoloadEnv{
             }
     
             // create for phpini
-            if(!file_exists($paths['phpini']['path']) && !is_dir($paths['phpini']['path'])){
+            if(!file_exists($paths['phpini']['path'])){
                 // Read the contents of the dummy file
                 $dummyContent = file_get_contents($paths['phpini']['dummy']);
     
@@ -228,7 +228,7 @@ class AutoloadEnv{
             }
     
             // create for userini
-            if(!file_exists($paths['userini']['path']) && !is_dir($paths['userini']['path'])){
+            if(!file_exists($paths['userini']['path'])){
                 // Read the contents of the dummy file
                 $dummyContent = file_get_contents($paths['userini']['dummy']);
     
@@ -249,33 +249,33 @@ class AutoloadEnv{
         $present = [false];
 
         // create for init 
-        if(file_exists($paths['init']['path']) && !is_dir($paths['init']['path'])){
+        if(!file_exists($paths['init']['path'])){
             $present[] = true;
         }
 
         // create for gitignore
-        if(file_exists($paths['gitignore']['path']) && !is_dir($paths['gitignore']['path'])){
+        if(!file_exists($paths['gitignore']['path'])){
             $present[] = true;
         }
 
         // create for htaccess
-        if(file_exists($paths['htaccess']['path']) && !is_dir($paths['htaccess']['path'])){
+        if(!file_exists($paths['htaccess']['path'])){
             $present[] = true;
         }
 
         // create for phpini
-        if(file_exists($paths['phpini']['path']) && !is_dir($paths['phpini']['path'])){
+        if(!file_exists($paths['phpini']['path'])){
             $present[] = true;
         }
 
         // create for userini
-        if(file_exists($paths['userini']['path']) && !is_dir($paths['userini']['path'])){
+        if(!file_exists($paths['userini']['path'])){
             $present[] = true;
         }
 
         // Check if all elements in $present are false
         $allFalse = empty(array_filter($present));
-
+        
         // All elements in $present are false
         if ($allFalse) {
             return false;
