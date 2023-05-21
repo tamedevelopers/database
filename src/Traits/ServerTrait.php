@@ -78,19 +78,31 @@ trait ServerTrait{
         // Get the server name (hostname)
         $serverName = $_SERVER['SERVER_NAME'];
 
-        // get Base directory path
-        $basePath = self::getMatchedData('init.php');
+        // Only create Base path when `DOT_ENV_CONNECTION` is not defined
+        // DOT_ENV_CONNECTION holds the path setup information
+        if(!defined('DOT_ENV_CONNECTION')){
+            // get Base directory path
+            $basePath = self::getMatchedData('init.php');
+    
+            // if false, then get absolute path
+            if($basePath === false){
+                $basePath = self::getRootPathToProject(realpath('.'));
+            }
 
-        // if false, then get absolute path
-        if($basePath === false){
-            $basePath = self::getRootPathToProject(realpath('.'));
+            // Construct the server root URL
+            $serverPath = rtrim("{$docRoot}{$basePath}", '/');
+
+            // Construct the domain
+            $domainPath = rtrim("{$protocol}{$serverName}{$basePath}", '/');
+        } else{
+            $basePath = self::getRootPathToProject(@DOT_ENV_CONNECTION['self']->getDirectory());
+
+            // Construct the server root URL
+            $serverPath = rtrim("{$docRoot}{$basePath}", '/');
+
+            // Construct the domain
+            $domainPath = rtrim("{$protocol}{$serverName}{$basePath}", '/');
         }
-
-        // Construct the server root URL
-        $serverPath = rtrim("{$docRoot}{$basePath}", '/');
-
-        // Construct the domain
-        $domainPath = rtrim("{$protocol}{$serverName}{$basePath}", '/');
 
         // Data
         $data = [

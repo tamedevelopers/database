@@ -110,7 +110,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.1.1"
+    "peterson/php-orm-database": "^4.1.2"
 }
 ```
 

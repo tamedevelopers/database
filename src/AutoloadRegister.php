@@ -42,6 +42,10 @@ class AutoloadRegister{
         // directory full path
         $directory = self::convertPath($path_to_folder);
 
+        if (!is_dir($directory)) {
+            return;
+        }
+
         // Create a recursive iterator to iterate through the directory
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator(
