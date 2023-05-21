@@ -4,9 +4,10 @@ use builder\Database\DB;
 use builder\Database\DBImport;
 use builder\Database\AutoloadEnv;
 use builder\Database\Query\MySqlExec;
+use builder\Database\AutoloadRegister;
 use builder\Database\Schema\OrmDotEnv;
-use builder\Database\Migrations\Migration;
 use builder\Database\Migrations\Schema;
+use builder\Database\Migrations\Migration;
 
 if (! function_exists('db')) {
     /**
@@ -29,7 +30,7 @@ if (! function_exists('import')) {
      */
     function import()
     {
-        return (new DBImport);
+        return new DBImport();
     }
 }
 
@@ -41,7 +42,7 @@ if (! function_exists('dot_env')) {
      */
     function dot_env()
     {
-        return (new OrmDotEnv);
+        return new OrmDotEnv();
     }
 }
 
@@ -53,7 +54,7 @@ if (! function_exists('migration')) {
      */
     function migration()
     {
-        return (new Migration);
+        return new Migration();
     }
 }
 
@@ -65,7 +66,24 @@ if (! function_exists('schema')) {
      */
     function schema()
     {
-        return (new Schema);
+        return new Schema();
+    }
+}
+
+if (! function_exists('autoload_register')) {
+    /**
+     * Autoload All Folder and Sub-Folder files
+     * 
+     * @param string $path_to_folder
+     * - Specify the folder to autoload
+     * - Do not include the root path, as The Application already have a copy of your path
+     * - e.g [classes] or [app/main]
+     * 
+     * @return void\builder\Database\AutoloadRegister
+     */
+    function autoload_register()
+    {
+        return new AutoloadRegister();
     }
 }
 
@@ -77,7 +95,7 @@ if (! function_exists('autoload_env')) {
      */
     function autoload_env()
     {
-        return (new AutoloadEnv);
+        return new AutoloadEnv();
     }
 }
 
@@ -89,7 +107,7 @@ if (! function_exists('db_exec')) {
      */
     function db_exec()
     {
-        return (new MySqlExec);
+        return new MySqlExec();
     }
 }
 

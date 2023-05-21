@@ -89,6 +89,8 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Get Database Connection](#get-database-connection)
 * [Database Import](#database-import)
 * [Update Env Variable](#update-env-variable)
+* [OrmDotEnv Servers](#OrmDotEnv-servers)
+* [Autoload Register](#autoload-register)
 * [Collation And Charset](#collation-and-charset)
 * [Extend DB Class](#extend-db-class)
 * [Helpers](#helpers)
@@ -108,7 +110,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.0.1"
+    "peterson/php-orm-database": "^4.1.1"
 }
 ```
 
@@ -1241,6 +1243,34 @@ Returns - Boolean
 true|false
 ```
 
+## OrmDotEnv Servers
+- Returns assoc arrays of Server
+    - `server/|domain/|protocol`
+
+```
+use builder\Database\OrmDotEnv;
+
+OrmDotEnv::getServers();
+
+or
+dot_env()::getServers('server');
+dot_env()->getServers('domain');
+```
+
+## Autoload Register
+- You can use register collection of all folder files
+    - This automatically includes all file in that folder and sub-folders
+
+```
+use builder\Database\AutoloadRegister;
+
+AutoloadRegister::load('folder');
+
+or
+autoload_register()::load('folder');
+autoload_register()->load('folder');
+```
+
 ## Collation And Charset
 - Collation and Charset Data `listing`
 
@@ -1295,6 +1325,7 @@ class PostClass extends DB{
 | migration()               | Return instance of `(new Migration)` class    |
 | schema()                  | Return instance of `(new Schema)` class       |
 | dot_env()                 | Return instance of `(new OrmDotEnv)` class    |
+| autoload_register()       | Return instance of `(new AutoloadRegister)` class  |
 | autoload_env()            | Return instance of `(new AutoloadEnv)` class  |
 | env_start()               | Same as `AutoloadEnv::start()`    |
 | config_database()         | Same as `Direct DB Connection` get access to `DATABASE_CONNECTION` Constant   |

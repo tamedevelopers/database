@@ -28,9 +28,11 @@ class OrmDotEnv extends Constants{
     public function __construct(?string $path = null) 
     {
         // if base path was presented
-        if(!is_null($path) && !empty($path)){
+        if(!empty($path)){
             $this->base_dir = $path;
         }
+
+        // auto set the base dir property
         $this->getDirectory($this->base_dir);
 
         // add to global property
