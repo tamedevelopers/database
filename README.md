@@ -554,7 +554,7 @@ AutoloadEnv::configurePagination([
 ]);
 ```
 
-- or Helpers Function
+- or -- `Helpers Function`
 ```
 configure_pagination([
     'allow' => true,
@@ -1215,8 +1215,6 @@ $db->repair('tb_wallet');
 | $db->getConnection()  | get_connection() |
 
 ## Database Import
-<details><summary>Read more...</summary>
-
 - You can use this class to import .sql into a database programatically
 
 ```
@@ -1232,7 +1230,12 @@ $response = $import->DatabaseImport('orm.sql');
 ->response == 400 (Query to database error
 ->response == 200 (Success importing to database
 ```
-</details>
+
+- or -- `Helpers Function`
+
+```
+import()->DatabaseImport('orm.sql');
+```
 
 ## Update Env Variable
 - You can use this class to import .sql into a database programatically

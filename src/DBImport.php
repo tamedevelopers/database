@@ -61,6 +61,33 @@ class DBImport extends DB{
                         // get content
                         $sql = file_get_contents($this->realpath);
 
+                        // Replace Creation of tables
+                        $sql = str_replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS", $sql);
+
+                        // Replace Insert into
+                        $sql = str_replace("INSERT INTO", "INSERT IGNORE INTO", $sql);
+
+                        // Replace Creation of triggers
+                        $sql = str_replace("CREATE TRIGGER", "CREATE TRIGGER IF NOT EXISTS", $sql);
+
+                        // Replace delimiter
+                        $sql = str_replace(['DELIMITER', '$$'], "", $sql);
+
+                        // Check if table exists and remove ALTER TABLE queries
+                        $matches = [];
+                        preg_match_all('/ALTER TABLE `(\w+)`/i', $sql, $matches);
+                        $tableNames = $matches[1];
+
+                        // loop through to check if table exist already and ignore ALTER queries
+                        foreach ($tableNames as $tableName) {
+                            $tableExistsQuery = "SHOW TABLES LIKE '{$tableName}'";
+                            $tableExists = $Driver->query($tableExistsQuery)->rowCount() > 0;
+                        
+                            if ($tableExists) {
+                                $sql = preg_replace("/ALTER TABLE `{$tableName}`.*?;/is", "", $sql);
+                            }
+                        }
+
                         // execute query
                         $Driver->exec($sql);
 
