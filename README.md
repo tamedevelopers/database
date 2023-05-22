@@ -110,7 +110,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.1.2"
+    "peterson/php-orm-database": "^4.1.3"
 }
 ```
 
@@ -853,14 +853,14 @@ SELECT *
 </details>
 
 ### join
-<details><summary>Read more...</summary>
 
 | Params        |  Description      |
 |---------------|-------------------|
 | table         |  table            |
 | foreignColumn |  table.column     |
 | operator      |  operator sign    |
-| localColumn   | local_table.column |
+| localColumn   | local_table.column|
+
 ```
 $db->table('wallet')
     ->join('users', 'users.user_id', '=', 'wallet.user_id')
@@ -871,22 +871,33 @@ SELECT *
     FROM `wallet`
     INNER JOIN `users` ON users.user_id = wallet.user_id
 ```
-</details>
+
+- or
+    - When using clauses, Make sure `join`|`leftJoin` comes first, Before the clauses
+```
+$db->table('wallet')
+    ->join('users', 'users.user_id', '=', 'wallet.user_id')
+    ->where('wallet.email', 'example.com')
+    ->orWhere('wallet.user_id', 10000001)
+    ->paginate(10);
+
+-- Query
+SELECT * 
+    FROM `wallet`
+    INNER JOIN `users` ON users.user_id = wallet.user_id
+    WHERE wallet.email =:email OR wallet.user_id =:user_id 
+    LIMIT 0, 10
+```
 
 ### leftJoin
-<details><summary>Read more...</summary>
-
 - Same as `join`
+
 ```
 $db->table('wallet')
     ->leftJoin('users', 'users.user_id', '=', 'wallet.user_id')
+    ->where('wallet.email', 'example.com')
     ->get();
-
-SELECT * 
-    FROM `wallet`
-    LEFT JOIN `users` ON users.user_id = wallet.user_id
 ```
-</details>
 
 ### where
 - Takes three parameter

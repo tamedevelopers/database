@@ -233,13 +233,14 @@ class Builder extends MySqlExec{
         $temp       = $this->console::configWhereClauseOperator($operator, $value);
         $value      = $temp['value'];
         $operator   = $temp['operator'];
+        $query      = $this->whereAndOrWhereQuery($column, $operator);
 
         // if query already exists
         if($this->isWhereExist()){
             $this->where[] = [
-                'query' => " AND {$column}{$operator}:{$column}",
+                'query' => " AND {$query['query']}",
                 'data'  => [
-                    'column'    => $column,
+                    'column'    => $query['column'],
                     'operator'  => $operator,
                     'value'     => $value,
                 ]
@@ -247,9 +248,9 @@ class Builder extends MySqlExec{
         }else{
             // first query
             $this->where[] = [
-                'query' => " WHERE {$column}{$operator}:{$column}",
+                'query' => " WHERE {$query['query']}",
                 'data'  => [
-                    'column'    => $column,
+                    'column'    => $query['column'],
                     'operator'  => $operator,
                     'value'     => $value,
                 ]
@@ -279,12 +280,13 @@ class Builder extends MySqlExec{
         $temp       = $this->console::configWhereClauseOperator($operator, $value);
         $value      = $temp['value'];
         $operator   = $temp['operator'];
+        $query      = $this->whereAndOrWhereQuery($column, $operator);
 
         // or Where query add
         $this->where[] = [
-            'query' => " OR {$column}{$operator}:{$column}",
+            'query' => " OR {$query['query']}",
             'data'  => [
-                'column'    => $column,
+                'column'    => $query['column'],
                 'operator'  => $operator,
                 'value'     => $value,
             ]
@@ -610,6 +612,40 @@ class Builder extends MySqlExec{
         $this->selectColumns = $columns;
 
         return $this;
+    }
+
+    /**
+     * Create Where|orWhere Query
+     * @param string $column
+     * @param string $operator
+     * 
+     * @return array
+     * - query|column
+     */ 
+    private function whereAndOrWhereQuery($column, $operator = null)
+    {
+        $columnString = $column;
+        if($this->isJoinExist()){
+            $columnString = substr($column, strpos($column, ".") + 1);
+            $query = "{$column}{$operator}:{$columnString}";
+        } else{
+            $query = "{$column}{$operator}:{$column}";
+        }
+
+        return [
+            'query'     => $query,
+            'column'    => $columnString,
+        ];
+    }
+
+    /**
+     * Check if join exist
+     * 
+     * @return bool
+     */ 
+    private function isJoinExist()
+    {
+        return is_array($this->joins) && count($this->joins) > 0;
     }
 
     /**
