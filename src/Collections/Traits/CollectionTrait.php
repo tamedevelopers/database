@@ -155,15 +155,17 @@ trait CollectionTrait{
     public function getPagination()
     {
         if(self::$is_paginate){
-            $pagination = self::$pagination->pagination;
-            return (object) [
-                'limit'         => (int) $pagination->limit,
-                'offset'        => (int) $pagination->offset,
-                'page'          => (int) $pagination->page,
-                'pageCount'     => (int) $pagination->pageCount,
-                'perPage'       => (int) $pagination->perPage,
-                'totalCount'    => (int) $pagination->totalCount,
-            ];
+            if(self::$pagination){
+                $pagination = self::$pagination->pagination;
+                return (object) [
+                    'limit'         => (int) $pagination->limit,
+                    'offset'        => (int) $pagination->offset,
+                    'page'          => (int) $pagination->page,
+                    'pageCount'     => (int) $pagination->pageCount,
+                    'perPage'       => (int) $pagination->perPage,
+                    'totalCount'    => (int) $pagination->totalCount,
+                ];
+            }
         }
     }
 
