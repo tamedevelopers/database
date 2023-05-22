@@ -82,7 +82,7 @@ class Schema extends Constants{
         self::initSchemaDatabase();
 
         // handle error
-        $handle = self::checkDBConnect($tableName);
+        $handle = self::checkDBConnect();
         if(is_array($handle)){
             return $handle;
         } 
@@ -122,7 +122,7 @@ class Schema extends Constants{
         self::initSchemaDatabase();
 
         // handle error
-        $handle = self::checkDBConnect($tableName);
+        $handle = self::checkDBConnect();
         if(is_array($handle)){
             return $handle;
         } 
@@ -166,11 +166,10 @@ class Schema extends Constants{
 
     /**
      * Check database connection error
-     * @param string $tableName 
      * 
      * @return mixed
      */
-    static private function checkDBConnect(?string $tableName = null)
+    static private function checkDBConnect()
     {
         $style = self::getStyle();
 
@@ -182,7 +181,7 @@ class Schema extends Constants{
                 'message'   => "Connection Error 
                                     <span style='background: #ee0707; {$style}'>
                                         Database Connection Error
-                                    </span> on `{$tableName}`
+                                    </span>
                                     `{$dbConnection['message']}` <br>\n",
             ];
         }

@@ -82,14 +82,14 @@ class OrmDotEnv extends Constants{
             $dotenv->load();
 
             return [
-                'response'  => self::ERROR_200,
-                'message'    => ".env File Loaded Successfully",
+                'status'    => self::ERROR_200,
+                'message'   => ".env File Loaded Successfully",
                 'path'      => self::$immutable,
             ];
         }catch(Exception $e){
             return [
-                'response'  => self::ERROR_404,
-                'message'    => $e->getMessage(),
+                'status'    => self::ERROR_404,
+                'message'   => $e->getMessage(),
                 'path'      => self::$immutable,
             ];
         }
@@ -105,7 +105,7 @@ class OrmDotEnv extends Constants{
     static public function loadOrFail(?string $path = null)
     {
         $getStatus = self::load($path);
-        if($getStatus['response'] != self::ERROR_200){
+        if($getStatus['status'] != self::ERROR_200){
             self::$object->dump(
                 "{$getStatus['message']} \n" . 
                 (new Exception)->getTraceAsString()

@@ -95,7 +95,7 @@ class AutoloadEnv{
         | Error on using the Database model
         |
         */
-        if($loader['response'] != 200){
+        if($loader['status'] != 200){
             /**
              * Setting application to use the dump error handling
              */

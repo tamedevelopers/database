@@ -105,16 +105,16 @@ class DBImport extends DB{
         
         /*
         | ----------------------------------------------------------------------------
-        | Database importation use. Below are the response code
+        | Database importation use. Below are the status code
         | ----------------------------------------------------------------------------
-        |   if ->response === 404 (Failed to read file or File does'nt exists
-        |   if ->response === 400 (Query to database error
-        |   if ->response === 200 (Success importing to database
+        |   if ->status === 404 (Failed to read file or File does'nt exists
+        |   if ->status === 400 (Query to database error
+        |   if ->status === 200 (Success importing to database
         */ 
         
         return (object) [
-            'response' => $this->error, 
-            'message'  => is_array($this->message) 
+            'status'    => $this->error, 
+            'message'   => is_array($this->message) 
                             ? implode('\n<br>', $this->message)
                             : $this->message
         ];

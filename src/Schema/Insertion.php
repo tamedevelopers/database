@@ -69,18 +69,18 @@ abstract class Insertion extends Builder {
 
         // analize
         $analize = $this->analizeTable();
-        if($analize['response'] !== self::ERROR_200){
+        if($analize['status'] !== self::ERROR_200){
             return $analize;
         }
 
         // repair
         $repair = $this->repairTable();
-        if($repair['response'] !== self::ERROR_200){
+        if($repair['status'] !== self::ERROR_200){
             return $repair;
         }
 
         return (object) [
-            'response'  => self::ERROR_200,
+            'status'    => self::ERROR_200,
             'analize'   => $analize,
             'repair'    => $repair,
         ];

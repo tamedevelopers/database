@@ -1223,12 +1223,12 @@ use builder\Database\DBImport;
 $import = new DBImport();
 
 // needs absolute path to database file
-$response = $import->DatabaseImport('orm.sql');
+$status = $import->DatabaseImport('orm.sql');
 
 - Status code
-->response == 404 (Failed to read file or File does'nt exists
-->response == 400 (Query to database error
-->response == 200 (Success importing to database
+->status == 404 (Failed to read file or File does'nt exists
+->status == 400 (Query to database error
+->status == 200 (Success importing to database
 ```
 
 - or -- `Helpers Function`

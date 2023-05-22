@@ -64,13 +64,13 @@ class Blueprint extends Constants{
         $checkPrimary = array_column($this->columns, 'primary');
         if(count($checkPrimary) > 1){
             return [
-                'response'  => self::ERROR_404,
+                'status'    => self::ERROR_404,
                 'message'   => sprintf("Primary Key can not be more than one in `%s` @table", $this->tableName),
             ];
         }
         
         return [
-            'response'  => self::ERROR_200,
+            'status'    => self::ERROR_200,
             'message'   => $this->toMySQLQuery()
         ];
     }
@@ -86,14 +86,14 @@ class Blueprint extends Constants{
         $traceTable = $this->traceable($this->tableName);
 
         // handle error
-        $handle = self::checkDBConnect($traceTable);
+        $handle = self::checkDBConnect();
         if(is_array($handle)){
             return $handle;
         } 
 
         // primary key error
         $mysqlHandle = $this->MySQLTemplate();
-        if($mysqlHandle['response'] != self::ERROR_200){
+        if($mysqlHandle['status'] != self::ERROR_200){
             return $mysqlHandle;
         } 
 
@@ -120,11 +120,11 @@ class Blueprint extends Constants{
             }
 
             return [
-                'response'  => self::ERROR_200,
+                'status'    => self::ERROR_200,
                 'message'   => $message,
             ];
         } catch (PDOException $e){
-            return ['response' => self::ERROR_404, 'message' => $e->getMessage()];
+            return ['status' => self::ERROR_404, 'message' => $e->getMessage()];
         }
     }
 
@@ -140,11 +140,10 @@ class Blueprint extends Constants{
 
     /**
      * Check database connection error
-     * @param string $tableName 
      * 
      * @return mixed
      */
-    private function checkDBConnect(?string $tableName = null)
+    private function checkDBConnect()
     {
         // if database connection is okay
         $dbConnection = $this->db->getConnection();
@@ -154,7 +153,7 @@ class Blueprint extends Constants{
                 'message'   => "Connection Error 
                                     <span style='background: #ee0707; {$this->style}'>
                                         Database Connection Error
-                                    </span> on `{$tableName}`
+                                    </span>
                                     `{$dbConnection['message']}` <br>\n",
             ];
         }

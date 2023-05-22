@@ -227,8 +227,8 @@ class MySqlExec  extends Constants{
         }
 
         return [
-            'response' => self::ERROR_404, 
-            'message' => preg_replace(
+            'status'    => self::ERROR_404, 
+            'message'   => preg_replace(
                 '/^[ \t]+|[ \t]+$/m', '', 
                 "   $dbError
                     {$exception->getTraceAsString()}
@@ -261,14 +261,14 @@ class MySqlExec  extends Constants{
             // if an error
             if($result['error']){
                 return [
-                    'response'  => self::ERROR_404, 
+                    'status'    => self::ERROR_404, 
                     'message'   => $this->console::replaceLeadEndSpace($result['message']),
                     'time'      => $this->timer,
                 ];
             }
 
             return [
-                'response'  => self::ERROR_200, 
+                'status'    => self::ERROR_200, 
                 'message'   => $this->console::replaceLeadEndSpace($result['message']),
                 'time'      => $this->timer,
             ];
@@ -299,14 +299,14 @@ class MySqlExec  extends Constants{
             // if an error
             if($result['error']){
                 return [
-                    'response'  => self::ERROR_404, 
+                    'status'    => self::ERROR_404, 
                     'message'   => $this->console::replaceLeadEndSpace($result['message']),
                     'time'      => $this->timer,
                 ];
             }
 
             return [
-                'response'  => self::ERROR_200, 
+                'status'    => self::ERROR_200, 
                 'message'   => $this->console::replaceLeadEndSpace($result['message']),
                 'time'      => $this->timer,
             ];

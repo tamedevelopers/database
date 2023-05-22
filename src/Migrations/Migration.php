@@ -121,7 +121,7 @@ class Migration extends Constants{
         // Check if method exist
         if(!in_array(strtolower($type), ['up', 'drop', 'column'])  || !method_exists(__CLASS__, strtolower($type))){
             return [
-                'response'  => self::ERROR_404,
+                'status'    => self::ERROR_404,
                 'message'   => sprintf("The method or type `%s` you're trying to call doesn't exist", $type)
             ];
         }
@@ -140,9 +140,9 @@ class Migration extends Constants{
 
             // store all messages
             $errorMessage[] = $handle['message'];
-
+            
             // error occured stop code execution
-            if($handle['response'] != self::ERROR_200){
+            if($handle['status'] != self::ERROR_200){
                 $errorstatus = self::ERROR_404;
                 break;
             }
@@ -152,7 +152,7 @@ class Migration extends Constants{
         unset($_SESSION[self::getSession()]);
 
         return [
-            'response'  => $errorstatus, 
+            'status'    => $errorstatus, 
             'message'   => implode("\n", $errorMessage)
         ];
     }
