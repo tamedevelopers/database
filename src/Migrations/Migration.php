@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace builder\Database\Migrations;
 
+use builder\Database\Constants;
 use builder\Database\Schema\OrmDotEnv;
 use builder\Database\Migrations\Traits\ManagerTrait;
 use builder\Database\Migrations\Traits\FilePathTrait;
 
-class Migration{
+class Migration extends Constants{
 
     use FilePathTrait,
         ManagerTrait;
@@ -17,6 +18,19 @@ class Migration{
     static private $migrations;
     static private $seeders;
     
+
+    /**
+     * Returns Session String
+     * 
+     * @return string
+     */
+    public static function getSession()
+    {
+        $instance = new self();
+        
+        return $instance->session;
+    }
+
     /**
      * Creating Managers
      * @param string $tableName 
@@ -97,7 +111,7 @@ class Migration{
     static public function run(?string $type = null, ?string $column = null)
     {
         // read file inside folders
-        $readDir = self::initBaseDirectory();
+        $files = self::initBaseDirectory();
 
         // use default
         if(empty($type)){
@@ -106,17 +120,41 @@ class Migration{
 
         // Check if method exist
         if(!in_array(strtolower($type), ['up', 'drop', 'column'])  || !method_exists(__CLASS__, strtolower($type))){
-            throw new \Exception( 
-                sprintf("The method or type `%s` you're trying to call doesn't exist", $type)
-            );
+            return [
+                'response'  => self::ERROR_404,
+                'message'   => sprintf("The method or type `%s` you're trying to call doesn't exist", $type)
+            ];
         }
 
         // run migration methods of included file
-        foreach($readDir as $dir){
-            $migration = include_once "{$dir}";
+        $errorMessage   = [];
+        $errorstatus    = self::ERROR_200;
+        foreach($files as $file){
+            $migration = include_once "{$file}";
 
+            // error
             $migration->{$type}($column);
+            
+            // handle migration query data
+            $handle = json_decode($_SESSION[self::getSession()] ?? [], true);
+
+            // store all messages
+            $errorMessage[] = $handle['message'];
+
+            // error occured stop code execution
+            if($handle['response'] != self::ERROR_200){
+                $errorstatus = self::ERROR_404;
+                break;
+            }
         }
+
+        // unset session
+        unset($_SESSION[self::getSession()]);
+
+        return [
+            'response'  => $errorstatus, 
+            'message'   => implode("\n", $errorMessage)
+        ];
     }
     
     /**
@@ -189,20 +227,18 @@ class Migration{
      */
     public function up(){}
     
-
     /**
      * Drop database table
      *
-     * @return void
+     * @return mixed
      */
     public function drop(){}
-    
 
     /**
      * drop database column
      * @param string $column
      *
-     * @return void
+     * @return mixed
      */
     public function column(?string $column){}
 
@@ -241,7 +277,7 @@ class Migration{
 
         // change value to absolute path to file
         array_walk($readDir, function(&$value, $index) use($directory) {
-            $value = "{$directory}/{$value}";
+            $value = rtrim($directory, '/') . "/{$value}";
         });
         
         return $readDir;

@@ -9,12 +9,27 @@ use PDOException;
 use builder\Database\DB;
 use builder\Database\Constants;
 use builder\Database\Migrations\Blueprint;
+use builder\Database\Migrations\Traits\ManagerTrait;
 
 class Schema extends Constants{
+    
+    use ManagerTrait;
     
     static private $db;
     static protected $tableName;
     static protected $object;
+
+    /**
+     * Returns the style info
+     * 
+     * @return string
+     */
+    public static function getStyle()
+    {
+        $instance = new self();
+        
+        return $instance->style;
+    }
 
     /**
      * Creating Instance of Database
@@ -49,12 +64,10 @@ class Schema extends Constants{
      * @param string $tableName 
      * @param callable $callback
      * 
-     * @return void
+     * @return mixed
      */
     static public function create(?string $tableName, callable $callback) 
     {
-        self::$object = new self;
-
         $callback(new Blueprint($tableName));
     }
 
@@ -68,21 +81,32 @@ class Schema extends Constants{
     {
         self::initSchemaDatabase();
 
+        // handle error
+        $handle = self::checkDBConnect($tableName);
+        if(is_array($handle)){
+            return $handle;
+        } 
+
         // Handle query
         try{
             // DROP TABLE IF EXISTS
             self::$db->query( "DROP TABLE {$tableName};" )->execute();
 
-            echo "Table `{$tableName}` dropped successfully <br> \n";
+            return [
+                'status'    => self::ERROR_200,
+                'message'   => "Table `{$tableName}` dropped successfully <br> \n",
+            ];
         } catch (PDOException $e){
-            echo preg_replace(
-                '/^[ \t]+|[ \t]+$/m', '', 
-                sprintf("<<\\Error code>> %s
-                    <br><br>
-                    <<\\PDO::ERROR>> %s <br> \n
-                ", self::ERROR_404, $e->getMessage())
-            );
-            exit();
+            return [
+                'status'    => self::ERROR_404,
+                'message'   => preg_replace(
+                    '/^[ \t]+|[ \t]+$/m', '', 
+                    sprintf("<<\\Error code>> %s
+                        <br><br>
+                        <<\\PDO::ERROR>> %s <br> \n
+                    ", self::ERROR_404, $e->getMessage())
+                ),
+            ];
         }
     }
 
@@ -97,10 +121,18 @@ class Schema extends Constants{
     {
         self::initSchemaDatabase();
 
-        // if null
-        if(is_null($columnName)){
-            throw new \Exception('Table column name cannot be empty. Please pass a value.');
-            return;
+        // handle error
+        $handle = self::checkDBConnect($tableName);
+        if(is_array($handle)){
+            return $handle;
+        } 
+
+        // if empty
+        if(empty($columnName)){
+            return [
+                'status'    => self::ERROR_404,
+                'message'   => "Table column name cannot be empty. Please pass a value.<br>\n",
+            ];
         }
 
         // Handle query
@@ -113,17 +145,46 @@ class Schema extends Constants{
 
             // DROP COLUMN TRIGGERS 
             self::$db->query( "DROP TRIGGER IF EXISTS {$columnName}_updated_at;" )->execute();
-
-            echo "Column `{$columnName}` on `{$tableName}` dropped successfully <br> \n";
+            
+            return [
+                'status'    => self::ERROR_200,
+                'message'   => "Column `{$columnName}` on `{$tableName}` dropped successfully <br> \n",
+            ];
         } catch (PDOException $e){
-            echo preg_replace(
-                '/^[ \t]+|[ \t]+$/m', '', 
-                sprintf("<<\\Error code>> %s
-                    <br><br>
-                    <<\\PDO::ERROR>> %s <br> \n
-                ", self::ERROR_404, $e->getMessage())
-            );
-            exit();
+            return [
+                'status'    => self::ERROR_404,
+                'message'   => preg_replace(
+                    '/^[ \t]+|[ \t]+$/m', '', 
+                    sprintf("<<\\Error code>> %s
+                        <br><br>
+                        <<\\PDO::ERROR>> %s <br> \n
+                    ", self::ERROR_404, $e->getMessage())
+                ),
+            ];
+        }
+    }
+
+    /**
+     * Check database connection error
+     * @param string $tableName 
+     * 
+     * @return mixed
+     */
+    static private function checkDBConnect(?string $tableName = null)
+    {
+        $style = self::getStyle();
+
+        // if database connection is okay
+        $dbConnection = self::$db->getConnection();
+        if($dbConnection['status'] !== self::ERROR_200){
+            return [
+                'status'    => self::ERROR_404,
+                'message'   => "Connection Error 
+                                    <span style='background: #ee0707; {$style}'>
+                                        Database Connection Error
+                                    </span> on `{$tableName}`
+                                    `{$dbConnection['message']}` <br>\n",
+            ];
         }
     }
     

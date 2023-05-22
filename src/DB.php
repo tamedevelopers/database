@@ -35,6 +35,5 @@ class DB extends Insertion{
                 $this->configurePagination($options);
             }
         }
-        
     }
 }

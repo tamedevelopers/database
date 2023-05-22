@@ -30,26 +30,49 @@ class Blueprint extends Constants{
      */
     public function __construct(?string $tableName = null) 
     {
-        $this->db = new DB();
-        $this->tableName = $tableName;
-        $this->charSet   = $_ENV['DB_CHARSET'] ?? '';
-        $this->collation = $_ENV['DB_COLLATION'] ?? '';
+        $this->db           = new DB();
+        $this->tableName    = $tableName;
+        $this->charSet      = $_ENV['DB_CHARSET'] ?? '';
+        $this->collation    = $_ENV['DB_COLLATION'] ?? '';
+    }
+
+    /**
+     * Creating Session Query
+     * - To hold each Migration Request
+     * @param mixed $query
+     * 
+     * @return void
+     */
+    private function tempMigrationQuery(mixed $query = null)
+    {
+        // Start the session has not already been started
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $_SESSION[$this->session] = json_encode($query);
     }
 
     /**
      * Creating Table Structure
      * Indexs|Primary|Constraints 
      * 
-     * @return string\MySQLTemplate
+     * @return array\MySQLTemplate
      */
     private function MySQLTemplate()
     {
         $checkPrimary = array_column($this->columns, 'primary');
         if(count($checkPrimary) > 1){
-            throw new \Exception('Primary Key can not be more than one in a table');
+            return [
+                'response'  => self::ERROR_404,
+                'message'   => sprintf("Primary Key can not be more than one in `%s` @table", $this->tableName),
+            ];
         }
-
-        return $this->toMySQLQuery();
+        
+        return [
+            'response'  => self::ERROR_200,
+            'message'   => $this->toMySQLQuery()
+        ];
     }
 
     /**
@@ -57,28 +80,43 @@ class Blueprint extends Constants{
      * 
      * @return array\handle
      */
-    private function handle() 
+    public function handle() 
     {
+        // create traceable table
+        $traceTable = $this->traceable($this->tableName);
+
+        // handle error
+        $handle = self::checkDBConnect($traceTable);
+        if(is_array($handle)){
+            return $handle;
+        } 
+
+        // primary key error
+        $mysqlHandle = $this->MySQLTemplate();
+        if($mysqlHandle['response'] != self::ERROR_200){
+            return $mysqlHandle;
+        } 
+
         // Handle query
         try{
             // check if table already exist
             if($this->db->tableExist($this->tableName)){
-                $message = "Migration runned 
-                <span style='background: #ee0707; {$this->style}'>
-                Failed
-                </span> Table already exist on `{$this->traceable($this->tableName)}` <br>\n";
+                $message = "Migration 
+                                <span style='background: #ee0707; {$this->style}'>
+                                    Failed
+                                </span> Table exist on `{$traceTable}` <br>\n";
             }else{
                 $this->status_runned = true;
                 $message = "Migration runned 
                                 <span style='background: #027b02; {$this->style}'>
                                     Successfully
-                                </span> on 
-                                `{$this->traceable($this->tableName)}` <br>\n";
+                                </span> on
+                                `{$traceTable}` <br>\n";
             }
 
             // execute query
             if($this->status_runned){
-                $this->db->query( $this->MySQLTemplate() )->execute();
+                $this->db->query( $mysqlHandle['message'] )->execute();
             }
 
             return [
@@ -87,26 +125,39 @@ class Blueprint extends Constants{
             ];
         } catch (PDOException $e){
             return ['response' => self::ERROR_404, 'message' => $e->getMessage()];
-            exit();
         }
     }
 
-    public function __destruct()
+    /**
+     * Save query data into sessions
+     * 
+     * @return void
+     */
+    public function __destruct() 
     {
-        // Blueprint handle
-        $handle = $this->handle();
+        $this->tempMigrationQuery($this->handle());
+    }
 
-        if($handle['response'] !== self::ERROR_200){
-            echo preg_replace(
-                '/^[ \t]+|[ \t]+$/m', '', 
-                sprintf("<<\\Error code>> %s
-                    <br><br>
-                    <<\\PDO::ERROR>> %s <br>\n
-                ", $handle['response'], $handle['message'])
-            );
-            return;
+    /**
+     * Check database connection error
+     * @param string $tableName 
+     * 
+     * @return mixed
+     */
+    private function checkDBConnect(?string $tableName = null)
+    {
+        // if database connection is okay
+        $dbConnection = $this->db->getConnection();
+        if($dbConnection['status'] !== self::ERROR_200){
+            return [
+                'status'    => self::ERROR_404,
+                'message'   => "Connection Error 
+                                    <span style='background: #ee0707; {$this->style}'>
+                                        Database Connection Error
+                                    </span> on `{$tableName}`
+                                    `{$dbConnection['message']}` <br>\n",
+            ];
         }
-        echo "{$handle['message']}";
     }
 
 }

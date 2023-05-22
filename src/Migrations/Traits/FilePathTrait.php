@@ -9,6 +9,8 @@ use Exception;
 
 trait FilePathTrait{
 
+    private $session = 'orm_temp_migration_query';
+
     /**
      * Get Traceable File name
      * @param string $name 
@@ -24,9 +26,7 @@ trait FilePathTrait{
         $fileName = $exception[3]['file'] ?? null;
         
         if(!is_null($fileName)){
-
             $fileName = basename($fileName, '.php');
-
             $table = $fileName;
         }else{
             // add table name to end of string

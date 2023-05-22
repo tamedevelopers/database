@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function drop()
     {
-        Schema::dropTable('dummy_table');
+        return Schema::dropTable('dummy_table');
     }
 
     /**
@@ -38,7 +38,7 @@ return new class extends Migration
      */
     public function column(?string $column)
     {
-        Schema::dropColumn('dummy_table', $column);
+        return Schema::dropColumn('dummy_table', $column);
     }
 
 };

@@ -110,7 +110,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.1.3"
+    "peterson/php-orm-database": "^4.1.4"
 }
 ```
 
@@ -1113,6 +1113,8 @@ Migration::create('users_wallet');
 Migration::create('tb_jobs', 'jobs');
 Migration::create('tb_sessions', 'sessions'); 
 
+or
+migration()->create('users');
 
 Table `2023_04_19_1681860618_user` has been created successfully
 Table `2023_04_19_1681860618_user_wallet` has been created successfully
@@ -1129,6 +1131,8 @@ Table `2023_04_19_1681860618_tb_sessions` has been created successfully
 ```
 Migration::run('up');
 
+or
+migration()->run('up');
 
 Migration runned successfully on `2023_04_19_1681860618_user` 
 Migration runned successfully on `2023_04_19_1681860618_user_wallet` 
