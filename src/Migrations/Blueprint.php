@@ -47,7 +47,7 @@ class Blueprint extends Constants{
     {
         // Start the session has not already been started
         if (session_status() == PHP_SESSION_NONE) {
-            session_start();
+            @session_start();
         }
 
         $_SESSION[$this->session] = json_encode($query);

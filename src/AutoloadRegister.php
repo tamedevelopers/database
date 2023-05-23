@@ -11,57 +11,186 @@ use builder\Database\Schema\OrmDotEnv;
 class AutoloadRegister{
     
     /**
-     * Autoload All Folder and Sub-Folder files
-     * 
-     * @param string $path_to_folder
-     * - Specify the folder to autoload
+     * The base directory to scan for classes and files.
+     * @var string
+     */
+    static private $baseDirectory;
+
+    /**
+     * The class map that stores the class names and their corresponding file paths.
+     * @var array
+     */
+    private static $classMap = [];
+
+    /**
+     * The file map that stores the file paths and their corresponding relative paths.
+     * @var array
+     */
+    private static $fileMap = [];
+
+    /**
+     * Autoload function to load class and files in a given folder
+     *
+     * @param string|array $baseDirectory 
+     * - The directory path to load
      * - Do not include the root path, as The Application already have a copy of your path
      * - e.g [classes] or [app/main]
      * 
      * @return void
      */
-    static public function load(?string $path_to_folder = null)
+    static public function load(string|array $baseDirectory)
     {
-        // If path is not null
-        if(!empty($path_to_folder)){
-            spl_autoload_register(function ($className) use($path_to_folder) {
-                self::register($path_to_folder);
-            });
+        if(is_array($baseDirectory)){
+            foreach($baseDirectory as $directory){
+                self::$baseDirectory = self::getBasePath($directory);
+                // only allow is an existing directory
+                if(is_dir(self::$baseDirectory)){
+                    self::boot();
+                }
+            }
+        } else{
+            self::$baseDirectory = self::getBasePath($baseDirectory);
+            // only allow is an existing directory
+            if(is_dir(self::$baseDirectory)){
+                self::boot();
+            }
         }
     }
 
     /**
-     * Register method
-     * 
-     * @param string  $path_to_folder
-     * 
+     * Boot the autoloader by setting the base directory, 
+     * - Scanning the directory, and registering the autoload method.
      * @return void
      */
-    static private function register($path_to_folder)
+    private static function boot()
     {
-        // directory full path
-        $directory = self::convertPath($path_to_folder);
+        self::generateClassMap();
+        self::generateFileMap();
+        self::loadFiles();
+        spl_autoload_register([__CLASS__, 'loadClass']);
+    }
 
-        if (!is_dir($directory)) {
-            return;
+    /**
+     * Autoload function to load the class file based on the class name.
+     *
+     * @param string $className The name of the class to load.
+     * @return void
+     */
+    private static function loadClass($className)
+    {
+        $filePath = self::$classMap[$className] ?? null;
+        if ($filePath && file_exists($filePath)) {
+            require_once $filePath;
         }
+    }
 
-        // Create a recursive iterator to iterate through the directory
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
-                $directory, 
-                RecursiveDirectoryIterator::SKIP_DOTS
-            ),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        // Loop through the iterator
-        foreach ($iterator as $file) {
-            // Check if the item is a file and has a PHP extension
-            if ($file->isFile() && $file->getExtension() === 'php') {
-                include_once $file->getPathname();
+    /**
+     * Load the files from the file map.
+     *
+     * @return void
+     */
+    private static function loadFiles()
+    {
+        foreach (self::$fileMap as $fileName => $filePath) {
+            if (file_exists($filePath)) {
+                require_once $filePath;
             }
         }
+    }
+
+    /**
+     * Generate the class map by scanning the base directory and its subdirectories.
+     *
+     * @return void
+     */
+    private static function generateClassMap()
+    {
+        $fileIterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(self::$baseDirectory)
+        );
+
+        foreach ($fileIterator as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                $filePath   = $file->getPathname();
+                $className  = self::getClassName($filePath);
+                if (!is_null($className)) {
+                    self::$classMap[ltrim($className, '\\')] = self::pathReplacer($filePath);
+                }
+            }
+        }
+    }
+
+    /**
+     * Generate the file map by scanning the base directory and its subdirectories.
+     *
+     * @return void
+     */
+    private static function generateFileMap()
+    {
+        $fileIterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(self::$baseDirectory)
+        );
+
+        foreach ($fileIterator as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                $filePath = $file->getPathname();
+                $className = self::getClassName($filePath);
+
+                if ($className === null) {
+                    $relativePath = self::getRelativePath($filePath);
+                    self::$fileMap[$relativePath] = self::pathReplacer($filePath);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the relative path from the file path.
+     *
+     * @param string $filePath The file path.
+     * @return string The relative path.
+     */
+    private static function getRelativePath($filePath)
+    {
+        $relativePath = substr($filePath, strlen(self::$baseDirectory));
+        return ltrim($relativePath, '/\\');
+    }
+
+    /**
+     * Get the class name from the file path.
+     *
+     * @param string $filePath The file path.
+     * @return string|null The class name, or null if not found.
+     */
+    private static function getClassName($filePath)
+    {
+        $namespace  = '';
+        $content    = file_get_contents($filePath);
+        $tokens     = token_get_all($content);
+        $count      = count($tokens);
+
+        for ($i = 0; $i < $count; $i++) {
+            if ($tokens[$i][0] === T_NAMESPACE) {
+                for ($j = $i + 1; $j < $count; $j++) {
+                    if ($tokens[$j][0] === T_STRING || $tokens[$j][0] === T_NS_SEPARATOR) {
+                        $namespace .= $tokens[$j][1];
+                    } elseif ($tokens[$j] === '{' || $tokens[$j] === ';') {
+                        break;
+                    }
+                }
+            }
+
+            if ($tokens[$i][0] === T_CLASS || $tokens[$i][0] === T_TRAIT) {
+                for ($j = $i + 1; $j < $count; $j++) {
+                    if ($tokens[$j] === '{' || $tokens[$j] === 'extends' || $tokens[$j] === 'implements' || $tokens[$j] === 'use') {
+                        break;
+                    } elseif ($tokens[$j][0] === T_STRING) {
+                        return $namespace . '\\' . $tokens[$j][1];
+                    }
+                }
+            }
+        }
+        return;
     }
 
     /**
@@ -71,13 +200,27 @@ class AutoloadRegister{
      * 
      * @return string
      */
-    static private function convertPath($path_to_folder)
+    private static function getBasePath($path_to_folder)
     {
         $ormDotEnv = new OrmDotEnv();
+        return self::pathReplacer($ormDotEnv->getDirectory() . "/{$path_to_folder}");
+    }
+
+    /**
+     * Replace path with given string
+     * \ or /
+     * 
+     * @param string  $path
+     * @param string  $replacer
+     * 
+     * @return string
+     */
+    static private function pathReplacer($path, $replacer = '/')
+    {
         return str_replace(
-            '/', 
-            '\\', 
-            $ormDotEnv->getDirectory() . "/{$path_to_folder}" 
+            ['\\', '/'], 
+            $replacer, 
+            $path
         );
     }
     

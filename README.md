@@ -110,7 +110,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.1.4"
+    "peterson/php-orm-database": "^4.1.5"
 }
 ```
 
@@ -1263,7 +1263,7 @@ true|false
 
 ## OrmDotEnv Servers
 - Returns assoc arrays of Server
-    - `server/|domain/|protocol`
+    - `server\|domain\|protocol`
 
 ```
 use builder\Database\OrmDotEnv;
@@ -1276,8 +1276,9 @@ dot_env()->getServers('domain');
 ```
 
 ## Autoload Register
-- You can use register collection of all folder files
-    - This automatically includes all file in that folder and sub-folders
+- Takes an `string\|array` as param
+    - You can use register a folder containing all needed files
+        - This automatically register `Files\|Classes` in the folder and sub-folders.
 
 ```
 use builder\Database\AutoloadRegister;
@@ -1285,8 +1286,7 @@ use builder\Database\AutoloadRegister;
 AutoloadRegister::load('folder');
 
 or
-autoload_register()::load('folder');
-autoload_register()->load('folder');
+autoload_register(['folder', 'folder2]);
 ```
 
 ## Collation And Charset
@@ -1343,18 +1343,18 @@ class PostClass extends DB{
 | migration()               | Return instance of `(new Migration)` class    |
 | schema()                  | Return instance of `(new Schema)` class       |
 | dot_env()                 | Return instance of `(new OrmDotEnv)` class    |
-| autoload_register()       | Return instance of `(new AutoloadRegister)` class  |
 | autoload_env()            | Return instance of `(new AutoloadEnv)` class  |
-| env_start()               | Same as `AutoloadEnv::start()`    |
+| autoload_register()       | Same as `AutoloadRegister::load()`        |
+| env_start()               | Same as `AutoloadEnv::start()`            |
 | config_database()         | Same as `Direct DB Connection` get access to `DATABASE_CONNECTION` Constant   |
 | configure_pagination()    | Same as `$db->configurePagination()` or `AutoloadEnv::configurePagination`    |
-| app_config()              | Same as `$db->AppConfig()`        |
-| get_connection()          | Same as `$db->getConnection()`    |
-| get_app_data()            | Get `path` `database` & `pagination` info |
-| get_query()               | Same as `$db->getQuery()`         |
-| to_array()                | `array` Convert items to array    |
-| to_object()               | `object` Convert items to object  |
-| to_json()                 | `string` Convert items to json    |
+| app_config()              | Same as `$db->AppConfig()`                |
+| get_connection()          | Same as `$db->getConnection()`            |
+| get_query()               | Same as `$db->getQuery()`                 |
+| get_app_data()            | Get `path\|database\|pagination` info     |
+| to_array()                | `array` Convert items to array            |
+| to_object()               | `object` Convert items to object          |
+| to_json()                 | `string` Convert items to json            |
 
 ## Error Dump
 

@@ -72,18 +72,18 @@ if (! function_exists('schema')) {
 
 if (! function_exists('autoload_register')) {
     /**
-     * Autoload All Folder and Sub-Folder files
-     * 
-     * @param string $path_to_folder
-     * - Specify the folder to autoload
+     * Autoload function to load class and files in a given folder
+     *
+     * @param string|array $baseDirectory 
+     * - The directory path to load
      * - Do not include the root path, as The Application already have a copy of your path
-     * - e.g [classes] or [app/main]
+     * - e.g 'classes' or ['app/main', 'includes']
      * 
      * @return void\builder\Database\AutoloadRegister
      */
-    function autoload_register()
+    function autoload_register(string|array $directory)
     {
-        return new AutoloadRegister();
+        return (new AutoloadRegister)::load($directory);
     }
 }
 
