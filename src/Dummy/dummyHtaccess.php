@@ -1,10 +1,5 @@
 <IfModule mod_rewrite.c>
     
-    # Mod security
-    <IfModule mod_security.c>
-        SecFilterScanPOST Off
-    </IfModule>
-
     # page speed
     <IfModule pagespeed_module>
         ModPagespeed on
@@ -114,6 +109,17 @@
         </filesMatch>
     </IfModule>
 
+    # Mod security
+    <IfModule mod_security.c>
+        SecFilterScanPOST Off
+    </IfModule>
+
+    # Mod Speling
+    <IfModule mod_speling.c>
+        CheckCaseOnly On
+        CheckSpelling On
+    </IfModule>
+    
     # Start Engine
     RewriteEngine On
 
