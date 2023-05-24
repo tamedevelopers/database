@@ -38,7 +38,7 @@ trait CollectionTrait{
      */
     static protected $proxies = [
         'get'       => ['get'],
-        'first'     => ['first', 'firstorfail'],
+        'first'     => ['first', 'firstorcreate', 'firstorfail'],
         'insert'    => ['insert', 'insertorignore'],
         'paginate'  => ['paginate'],
     ];
@@ -51,6 +51,7 @@ trait CollectionTrait{
     static protected $proxies_compact = [
         'get',
         'first',
+        'firstorcreate',
         'firstorfail',
         'insert',
         'insertorignore',

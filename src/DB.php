@@ -26,13 +26,13 @@ class DB extends Insertion{
 
         // configuring pagination settings 
         if ( ! defined('PAGINATION_CONFIG') ) {
-            $this->configurePagination($options);
+            $this->configPagination($options);
         } else{
             // if set to allow global use of ENV Autoloader Settings
             if(is_bool(PAGINATION_CONFIG['allow']) && PAGINATION_CONFIG['allow'] === true){
-                $this->configurePagination(PAGINATION_CONFIG);
+                $this->configPagination(PAGINATION_CONFIG);
             }else{
-                $this->configurePagination($options);
+                $this->configPagination($options);
             }
         }
     }

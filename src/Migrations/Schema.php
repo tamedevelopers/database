@@ -49,9 +49,14 @@ class Schema extends Constants{
      */
     static public function defaultStringLength($length = 255) 
     {
+        // MySQL 5.0.3 and later: 65,535 characters (bytes)
+        // MySQL 5.0.3 to 5.0.22: 65,532 characters (bytes)
+        // MySQL 5.0.0 to 5.0.3: 4,096 characters (bytes)
+        // MySQL 3.23.0 to 4.1.x: 255 characters (bytes)
         // Check if the provided length is greater than the maximum allowed by MySQL.
-        if ($length > 15950) {
-            $length = 15950;
+        // We're going to set max legnth to `4096` Char as v:5.0.0
+        if ($length > 4096) {
+            $length = 4096;
         }
 
         if( ! defined('ORM_MAX_STRING_LENGTH') ){
@@ -174,7 +179,7 @@ class Schema extends Constants{
         $style = self::getStyle();
 
         // if database connection is okay
-        $dbConnection = self::$db->getConnection();
+        $dbConnection = self::$db->dbConnection();
         if($dbConnection['status'] !== self::ERROR_200){
             return [
                 'status'    => self::ERROR_404,

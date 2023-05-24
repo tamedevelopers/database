@@ -6,7 +6,6 @@ namespace builder\Database\Traits;
 
 use builder\Database\Capsule\Manager;
 
-
 trait InsertionTrait{
     
     /**
@@ -19,7 +18,13 @@ trait InsertionTrait{
      */ 
     protected function insertInsertionQuery(?array $param = [], ?bool $tryOrFail = false)
     {
-        $this->query = "INSERT INTO `{$this->table}` ({$this->tempInsertQuery['columns']}) values({$this->tempInsertQuery['values']})";
+        // for insert
+        $tempQuery = "INSERT INTO";
+        if($tryOrFail){
+            $tempQuery = "INSERT IGNORE INTO";
+        }
+
+        $this->query = "{$tempQuery} `{$this->table}` ({$this->tempInsertQuery['columns']}) values({$this->tempInsertQuery['values']})";
 
         // set query
         $this->query($this->query);
@@ -163,6 +168,63 @@ trait InsertionTrait{
         } catch (\PDOException $e) {
             return $this->errorTemp($e, true);
         }
+    }
+    
+    /**
+     * First or Create
+     * 
+     * @param array $conditions
+     * - Mandatory conditions options
+     * - Must be assoc array with key and value types.
+     * - Uses the ->where() clause to check if data matched
+     * - If data not given and conditions failed, then it'll attempt to create a new records 
+     * Using the conditional data merged with data if given
+     * 
+     * @param array $data
+     * - [optional] Data to create with if condition not meant
+     * 
+     * @return mixed
+     */ 
+    protected function firstOrCreateCollectionQuery(array $conditions, ?array $data = [])
+    {
+        // if array is empty
+        if(empty($conditions)){
+            // return;
+        }
+
+        // create where clause conditions
+        foreach($conditions as $key => $condition){
+            $key = trim((string) $key);
+            $this->where($key, $condition);
+        }
+
+        // get data
+        $record = $this->limit(1)
+                        ->compileQuery()
+                        ->execute()
+                        ->tryFetchAll()[0] ?? null;
+
+        // Return the existing record if found
+        if ($record) {
+            // close query after execution
+            $this->getQueryResult( $record );
+            return $record;
+        }
+
+        // merge conditions and data
+        $create = $this->insertOrIgnore(
+            array_merge($data, $conditions)
+        );
+        
+        // if creation of records is okay
+        if($create){
+            $create = $create->toObject();
+        }
+
+        // close query after execution
+        $this->getQueryResult( $create );
+
+        return $create;
     }
     
     /**

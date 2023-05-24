@@ -10,7 +10,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      *
-     * @return void
+     * @return mixed
      */
     public function up()
     {
@@ -23,7 +23,7 @@ return new class extends Migration
     /**
      * Drop database table
      *
-     * @return void
+     * @return mixed
      */
     public function drop()
     {
@@ -34,7 +34,7 @@ return new class extends Migration
      * drop database column
      * @param string $column 
      *
-     * @return void
+     * @return mixed
      */
     public function column(?string $column)
     {

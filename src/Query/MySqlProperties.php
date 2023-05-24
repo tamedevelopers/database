@@ -175,7 +175,7 @@ trait MySqlProperties{
     /**
      * @var mixed
      */
-    protected $getQuery;
+    protected $dbQuery;
 }
 
 

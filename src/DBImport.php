@@ -6,12 +6,14 @@ namespace builder\Database;
 
 use PDOException;
 use builder\Database\DB;
+use builder\Database\Traits\ServerTrait;
 use builder\Database\Traits\DBImportTrait;
 
 
 class DBImport extends DB{
 
-    use DBImportTrait;
+    use DBImportTrait, 
+        ServerTrait;
     
     private $db_connection;
     private $realpath;
@@ -24,7 +26,7 @@ class DBImport extends DB{
     public function __construct() {
         parent::__construct();
         $this->error = self::ERROR_404;
-        $this->db_connection = $this->getConnection();
+        $this->db_connection = $this->dbConnection();
     }
 
     /**
@@ -35,13 +37,13 @@ class DBImport extends DB{
      */
     public function DatabaseImport($path_to_sql = NULL)
     {
-        $this->realpath = (string) $path_to_sql;
+        $this->realpath = self::formatWithBaseDirectory($path_to_sql);
         
         /**
          * If SQL file does'nt exists
          */
         if(!file_exists($this->realpath) || is_dir($this->realpath)){
-            $this->message  = "Failed to open stream: `{$path_to_sql}` does'nt exist.";
+            $this->message = sprintf("Failed to open stream: `%s` does'nt exist.", $this->realpath);
         } else{
 
             // read a file into an array
@@ -49,7 +51,7 @@ class DBImport extends DB{
 
             // is readable
             if(!$this->isReadable($readFile)){
-                $this->message  = "Failed to read file or empty data.";
+                $this->message = sprintf("Failed to read file or empty data. `%s`", $path_to_sql);
             } else{
 
                 // check if connection test is okay

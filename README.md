@@ -34,11 +34,15 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Fetching Data](#fetching-data)
     * [Get](#get)
     * [First](#first)
+    * [First or Create](#first-or-create)
     * [First or Fail](#first-or-fail)
     * [Count](#count)
     * [Paginate](#paginate)
     * [Exist](#exists)
     * [Table Exist](#table-exist)
+* [Asset](#Asset)
+    * [Asset config](#asset-config)
+        * [Asset Cache](#asset-cache)
 * [Collections](#collections)
     * [Collection Methods](#collection-methods)
     * [Collection Usage](#collection-usage)
@@ -77,6 +81,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
   * [groupBy](#groupby)
 * [Database Migration](#database-migration)
   * [Create Table Schema](#create-table-schema)
+  * [Default String Length](#default-string-length)
   * [Run Migration](#run-migration)
   * [Drop Table](#drop-table)
   * [Drop Column](#drop-column)
@@ -89,11 +94,11 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Get Database Connection](#get-database-connection)
 * [Database Import](#database-import)
 * [Update Env Variable](#update-env-variable)
-* [OrmDotEnv Servers](#OrmDotEnv-servers)
+* [EnvOrm Servers](#EnvOrm-servers)
 * [Autoload Register](#autoload-register)
 * [Collation And Charset](#collation-and-charset)
 * [Extend DB Class](#extend-db-class)
-* [Helpers](#helpers)
+* [Helpers Functions](#helpers-functions)
 * [Error Dump](#error-dump)
 * [Error Status](#error-status)
 * [Useful links](#useful-links)
@@ -110,7 +115,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.1.5"
+    "peterson/php-orm-database": "^4.1.6"
 }
 ```
 
@@ -138,18 +143,27 @@ $db = new DB();
 ## Database Connection
 
 ### Env Auto Loader  - `Most preferred`
-- This will auto setup your entire application on a go! `.env auto setup`
-    - By default you don't need to provide any path, since the Model use your project root [dir]
-        - The below code should be called before using the database model
+- This will auto setup your entire application on a `go!`
+
+|  Description                                                                                  | 
+|-----------------------------------------------------------------------------------------------|
+| It's important to install vendor in your project root. We use this to get your root  [dir]    | 
+| By default you don't need to define any path again                                            |
+| Files you'll see `.env` `.gitignore` `.htaccess` `.user.ini` `php.ini` `init.php`             |
+| The below code should be called before using the database model                               | 
+| It's important to install vendor in your project root [dir]                                   | 
+| When done running the code first time, Then remove code and include `init.php` file           | 
 
 ```
-use builder\Database\AutoloadEnv;
+use builder\Database\EnvAutoLoad;
 
-AutoloadEnv::start([
+EnvAutoLoad::start([
     'path' => 'define root path or ignore'
 ]);
+```
 
-or - helpers function
+- or -- `Helpers Function`
+```
 env_start([
     'path' => 'define root path or ignore'
 ]);
@@ -161,7 +175,7 @@ env_start([
 - When initializing the class
     - Pass an array as a param to the class
         - Why not recommended? Because you must use thesame varaible name `$db` everywhere in your app
-            - Working but not supported, use `ENV autoloader` recommended
+        - Working but not supported, use `ENV autoloader` recommended
 ```
 $db = new DB([
     'DB_USERNAME' => '',
@@ -170,17 +184,16 @@ $db = new DB([
 ]);
 ```
 
-- Or Better still `If you consider using it that way`
+- or -- `Helpers Function`
+    - You'll then have access to annonymous constant `DATABASE_CONNECTION`
 ```
-define("DATABASE_CONNECT", new DB([
+db_config([
     'DB_USERNAME' => 'root',
     'DB_PASSWORD' => '',
     'DB_DATABASE' => '',
-]));
+]);
 
-Now you have access to the CONSTANT anywhere in your app.
-
-$db = DATABASE_CONNECT;
+$db = DATABASE_CONNECTION;
 
 $db->table('users')
     ->limit(10),
@@ -191,7 +204,7 @@ $db->table('users')
 ## More Database Connection Keys
 - All available connection keys
     - The DRIVER_NAME uses only `mysql`
-        - No other connection type is supported for now.
+    - No other connection type is supported for now.
 
 | key               |  Type     |  Default Value        |
 |-------------------|-----------|-----------------------|
@@ -366,8 +379,8 @@ SELECT count(*) FROM users WHERE status=:status
 ### Remove Tags
 - Takes one param as `bool` Default is `false`
     - Helps against `XSS attacks` 
-        - By default we did not handle `XSS attacks`. As we assume this should be done by `Forms Validation` before sending to Database
-            -> Applies to `insert` `update` `increment` `decrement` methods.
+    - By default we did not handle `XSS attacks`. As we assume this should be done by `Forms Validation` before sending to Database
+    - Applies to `insert` `update` `increment` `decrement` methods.
 
 - 1 usage
 ```
@@ -412,6 +425,33 @@ SELECT *
     FROM `users` LIMIT 1
 ```
 
+### First or Create
+- Take two param as an `array`
+    -  Mandatory `$conditions` param as `array`
+    - [optional] `$data` param as `array`
+
+- First it checks if codition to retrieve data.
+    If fails, then it merge the `$conditions` to `$data` value to create new records
+
+
+```
+$db->table('users')->firstOrCreate(
+    ['email' => 'example.com']
+);
+```
+- or -- `Example 2`
+
+```
+$db->table('users')->firstOrCreate(
+    ['email' => 'example.com'],
+    [
+        'country'   => 'Nigeria',
+        'age'       => 18,
+        'dob'       => 2001,
+    ]
+);
+```
+
 ### First or Fail
 - Same as `first()` method but exit with error code 404, if data not found
 
@@ -447,14 +487,13 @@ SELECT * FROM `users`
 ```
 
 ### Exists
+- Returns boolean `true \| false`
+
 ```
 $db->table('users')
     ->where('email', 'email@gmail.com')
     ->orWhere('name', 'Mandison')
     ->exists();
-
--- Query
-SELECT EXISTS(SELECT 1 FROM `users` WHERE email=:email OR name=:name) as `exists`
 ```
 
 ### Table Exist
@@ -463,15 +502,71 @@ SELECT EXISTS(SELECT 1 FROM `users` WHERE email=:email OR name=:name) as `exists
 $db->tableExist('users');
 ```
 
+## Asset
+- Takes a param as `string` path to asset file
+    - Default [dir] is set to `assets`
+
+```
+use builder\Database\Asset;
+
+Asset::asset('css/style.css');
+
+- Returns
+http://domain.com/assets/css/style.css
+```
+
+- or -- `Helpers Function`
+```
+asset('css/style.css');
+```
+
+## Asset Config
+- Takes two param as `string` 
+    - `$base_path` path base directory
+    - `$cache` Tells method to return `cache` of assets.
+        - You'll see a link representation as `http://domain.com/[path_to_asset_file]?v=111111111`
+
+```
+use builder\Database\Asset;
+
+Asset::config('public/storage');
+
+- Returns
+http://domain.com/public/storage/[asset_file]
+```
+
+- or -- `Helpers Function`
+```
+asset_config('public');
+```
+
+### Asset Cache
+- By Default, `$cache` is set to `true`
+
+```
+Asset::config('storage', false);
+
+- Returns
+http://domain.com/storage/[asset_file]
+```
+
+- or -- `Helpers Function`
+```
+asset_config('storage');
+
+http://domain.com/storage/[asset_file]?v=111111111
+```
+
+
 ## Collections
 - You can directly use `methods` of `Collections Instance` on any of the below
     - All the below `methods` are received by Collection `class`
     1. get()
     2. first()
-    3. firstOrFail()
-    4. insert()
-    5. insertOrIgnore()
-
+    3. firstOrCreate()
+    4. firstOrFail()
+    5. insert()
+    6. insertOrIgnore()
 
 
 ### Collection Methods
@@ -489,28 +584,30 @@ $db->tableExist('users');
  
 
 ### Collection Usage
-<details><summary>Read more...</summary>
-
-- Takes one param as `mixed` data
-    - Convert data into an array or arrays
+- Colections are called automatically on all Database Fetch Request
+    - With this you can access data as an `object\|array` key property
+    - If no data found then it returns null on `->first()` method only
 
 ```
 $user = $db->tableExist('users')
             ->first();
 
-$user->first_name
-$user['first_name']
+if($user){
+    $user->first_name
+    $user['first_name']
+}
 
 $user->toArray()
 $user->getAttributes()
 ```
+
+- Example two(2) `->get() \| ->paginate()` Request
 
 ```
 $users = $db->tableExist('users')
             ->where('is_active', 1),
             ->random(),
             ->get();
-
 
 if($users->isNotEmpty()){
     foreach($users as $user){
@@ -521,7 +618,6 @@ if($users->isNotEmpty()){
     }
 }
 ```
-</details>
 
 ## Pagination
 - Configuring Pagination
@@ -544,7 +640,7 @@ if($users->isNotEmpty()){
 ### Global Configuration 
 - 1 Setup global pagination on ENV autostart `most preferred` method
 ```
-AutoloadEnv::configurePagination([
+EnvAutoLoad::configPagination([
     'allow' => true, 
     'prev'  => 'Prev Page', 
     'last'  => 'Last Page', 
@@ -556,15 +652,15 @@ AutoloadEnv::configurePagination([
 
 - or -- `Helpers Function`
 ```
-configure_pagination([
+config_pagination([
     'allow' => true,
 ]);
 ```
 
 <details><summary>Read more...</summary>
-- 2 Can also be called using the `$db->configurePagination` method
+- 2 Can also be called using the `$db->configPagination` method
 ```
-$db->configurePagination([
+$db->configPagination([
     'allow' => true, 
     'view'  => 'bootstrap',
 ]);
@@ -605,8 +701,8 @@ $users->links();
 <details><summary>Read more...</summary>
 
 - You can directly configure pagination links
-    - Note: If `configurePagination()` `allow` is set to `true`
-        - It'll override every other settings
+    - Note: If `configPagination()` `allow` is set to `true`
+    - It'll override every other settings
 ```
 $users->links([
     'first' => 'First Page',
@@ -649,7 +745,6 @@ $users->showing([
 $users = $db->table('users')->paginate(20);
 
 foreach($users as $user){
-
     echo $user->numbers();
 }
 ```
@@ -680,7 +775,6 @@ $users->getPagination();
 
 ```
 $date = strtotime('next week');
-
 
 $db->table("tb_wallet")
     ->raw("date >= $date")
@@ -717,9 +811,7 @@ SELECT first_name, email
     LIMIT 1
 ```
 
-
 ### orderBy
-<details><summary>Read more...</summary>
 - Takes two param `$column` and `$direction`
     - By default  `$direction` param is set to `ASC`
 
@@ -733,11 +825,8 @@ SELECT *
     FROM `wallet`
     ORDER By date DESC
 ```
-</details>
-
 
 ### orderByRaw
-<details><summary>Read more...</summary>
 - Takes one param `$query`
 
 ```
@@ -750,12 +839,9 @@ SELECT *
     FROM `wallet`
     ORDER By CAST(`amount` AS UNSIGNED) DESC
 ```
-</details>
 
 
 ### Latest
-<details><summary>Read more...</summary>
-
 - Takes one param `$column` by default the column used is `id`
 ```
 $db->table('wallet')
@@ -767,12 +853,8 @@ SELECT *
     FROM `wallet`
     ORDER By date DESC
 ```
-</details>
-
 
 ### Oldest
-<details><summary>Read more...</summary>
-
 - Takes one param `$column` by default the column used is `id`
 ```
 $db->table('wallet')
@@ -784,7 +866,6 @@ SELECT *
     FROM `wallet`
     ORDER By id ASC
 ```
-</details>
 
 ### inRandomOrder
 ```
@@ -838,7 +919,6 @@ SELECT *
     LIMIT 2, 3
 ```
 
-
 - Example 2 (Providing only offset will return as LIMIT without error)
 ```
 $db->table('wallet')
@@ -853,6 +933,7 @@ SELECT *
 </details>
 
 ### join
+- When using clauses, Make sure `join`|`leftJoin` comes first, Before the clauses
 
 | Params        |  Description      |
 |---------------|-------------------|
@@ -865,15 +946,9 @@ SELECT *
 $db->table('wallet')
     ->join('users', 'users.user_id', '=', 'wallet.user_id')
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    INNER JOIN `users` ON users.user_id = wallet.user_id
 ```
 
 - or
-    - When using clauses, Make sure `join`|`leftJoin` comes first, Before the clauses
 ```
 $db->table('wallet')
     ->join('users', 'users.user_id', '=', 'wallet.user_id')
@@ -942,8 +1017,6 @@ SELECT *
 </details>
 
 ### whereColumn
-<details><summary>Read more...</summary>
-
 - Takes three parameter `column` `operator` `column2`
 ```
 $db->table('wallet')
@@ -958,11 +1031,8 @@ SELECT *
     WHERE user_id=:user_id AND amount=tax
     AND amount <= balance
 ```
-</details>
 
 ### whereNull
-<details><summary>Read more...</summary>
-
 - Takes one parameter `column`
 ```
 $db->table('wallet')
@@ -975,7 +1045,6 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND email_status IS NULL
 ```
-</details>
 
 ### whereNotNull
 <details><summary>Read more...</summary>
@@ -995,8 +1064,6 @@ SELECT *
 </details>
 
 ### whereBetween
-<details><summary>Read more...</summary>
-
 - Takes two parameter `column` as string `param` as array
     - Doesn't support float value
 
@@ -1016,7 +1083,6 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND amount BETWEEN :0 AND :100
 ```
-</details>
 
 ### whereNotBetween
 <details><summary>Read more...</summary>
@@ -1037,8 +1103,6 @@ SELECT *
 </details>
 
 ### whereIn
-<details><summary>Read more...</summary>
-
 - Takes two parameter `column` as string `param` as array
     - Doesn't support float value
 
@@ -1058,7 +1122,6 @@ SELECT *
     FROM `wallet`
     WHERE user_id=:user_id AND amount IN (:10, :20, :40, :100)
 ```
-</details>
 
 ### whereNotIn
 <details><summary>Read more...</summary>
@@ -1094,10 +1157,10 @@ SELECT *
 ## Database Migration
 - Similar to Laravel DB Migration `Just to make database table creation more easier`
 
-| object name   |  Returns           |
-|---------------|--------------------|
-| create()      |  Create table schema  |
-| run()         |  Begin migration `up` \| `drop` \| `column` |
+| object name   |  Returns                                      |
+|---------------|-----------------------------------------------|
+| create()      |  Create table schema                          |
+| run()         |  Begin migration `up` \| `drop` \| `column`   |
 
 ```
 use builder\Database\Migrations\Migration;
@@ -1113,20 +1176,44 @@ Migration::create('users_wallet');
 Migration::create('tb_jobs', 'jobs');
 Migration::create('tb_sessions', 'sessions'); 
 
-or
-migration()->create('users');
-
 Table `2023_04_19_1681860618_user` has been created successfully
 Table `2023_04_19_1681860618_user_wallet` has been created successfully
 Table `2023_04_19_1681860618_tb_jobs` has been created successfully
 Table `2023_04_19_1681860618_tb_sessions` has been created successfully
 ```
+
+- or -- `Helpers Function`
+```
+migration()->create('users');
+```
 ![Sample Session Schema](https://raw.githubusercontent.com/tamedevelopers/UltimateOrmDatabase/main/sessions.png)
+
+### Default String Length
+- In some cases you may want to setup default string legnth to all Migration Tables
+
+|  Description                                                                          | 
+|---------------------------------------------------------------------------------------|
+| The Default Set is `255` But you can override by setting custom value                 |
+| According to MySql v:5.0.0 Maximum allowed legnth is  `4096` chars                    |
+| If provided length is more than that, then we'll revert to default as the above       |
+| This affects only `VACHAR`                                                            |
+| You must define this before start using the migrations                                |
+
+```
+use builder\Database\Migrations\Schema;
+
+Schema::defaultStringLength(200);
+```
+
+- or -- `Helpers Function`
+```
+schema()->defaultStringLength(2000);
+```
 
 ### Run Migration
 - You need to pass in `up` as a param
     - This auto create folders/subfolder with read permission
-        - The code above execute all files located in [root/database/migrations]
+    - The code above execute all files located in [root/database/migrations]
 
 ```
 Migration::run('up');
@@ -1197,25 +1284,26 @@ $db->repair('tb_wallet');
 
 ## Get Database Query
 
-| object            | Helpers      |
-|-------------------|--------------|
-| $db->getQuery()   | get_query()  |
+| object            | Helpers       |
+|-------------------|---------------|
+| $db->dbQuery()    | db_query()    |
 
 
 ## Get Database Config Data
 
-| object            | Helpers      |
-|-------------------|--------------|
-| $db->AppConfig()  | app_config() |
+| object            | Helpers       |
+|-------------------|---------------|
+| $db->env()        | env()         |
 
 
 ## Get Database Connection
-| object                | Helpers      |
-|-----------------------|--------------|
-| $db->getConnection()  | get_connection() |
+| object                | Helpers           |
+|-----------------------|-------------------|
+| $db->dbConnection()   | db_connection()   |
 
 ## Database Import
 - You can use this class to import .sql into a database programatically
+    - Remember the system already have absolute path to your project.
 
 ```
 use builder\Database\DBImport;
@@ -1232,7 +1320,6 @@ $status = $import->DatabaseImport('orm.sql');
 ```
 
 - or -- `Helpers Function`
-
 ```
 import()->DatabaseImport('orm.sql');
 ```
@@ -1248,37 +1335,42 @@ import()->DatabaseImport('orm.sql');
 | allow_space   | `true` \| `false`  - Default is false (Allow space between key and value)|
 
 ```
-use builder\Database\Methods\OrmDotEnv;
+use builder\Database\Methods\EnvOrm;
 
-OrmDotEnv::updateENV('DB_PASSWORD', 'newPassword');
-OrmDotEnv::updateENV('APP_DEBUG', false);
-OrmDotEnv::updateENV('DB_CHARSET', 'utf8', false);
-
-or
-dot_env()->updateENV('DB_CHARSET', 'utf8', false);
+EnvOrm::updateENV('DB_PASSWORD', 'newPassword');
+EnvOrm::updateENV('APP_DEBUG', false);
+EnvOrm::updateENV('DB_CHARSET', 'utf8', false);
 
 Returns - Boolean
 true|false
 ```
 
-## OrmDotEnv Servers
+- or -- `Helpers Function`
+```
+env_orm()->updateENV('DB_CHARSET', 'utf8', false);
+```
+
+
+## EnvOrm Servers
 - Returns assoc arrays of Server
     - `server\|domain\|protocol`
 
 ```
-use builder\Database\OrmDotEnv;
+use builder\Database\EnvOrm;
 
-OrmDotEnv::getServers();
+EnvOrm::getServers();
+```
 
-or
-dot_env()::getServers('server');
-dot_env()->getServers('domain');
+- or -- `Helpers Function`
+```
+env_orm()::getServers('server');
+env_orm()->getServers('domain');
 ```
 
 ## Autoload Register
 - Takes an `string\|array` as param
     - You can use register a folder containing all needed files
-        - This automatically register `Files\|Classes` in the folder and sub-folders.
+    - This automatically register `Files\|Classes` in the folder and sub-folders.
 
 ```
 use builder\Database\AutoloadRegister;
@@ -1332,29 +1424,30 @@ class PostClass extends DB{
 ```
 </details>
 
-## Helpers
+## Helpers Functions
 
-| function                  | Description                       |
-|---------------------------|-----------------------------------|
-| base_dir()                | Return `server` base directory    |
+| function name             | Description                                   |
+|---------------------------|-----------------------------------------------|
 | db()                      | Return instance of `new DB($options)` class   |
-| db_exec()                 | Return instance of `(new MySqlExec)` class    |
+| db_config()               | Same as `Direct DB Connection` get access to `DATABASE_CONNECTION` Constant after you call function   |
+| db_connection()           | Same as `$db->dbConnection()`                 |
+| db_query()                | Same as `$db->dbQuery()`                      |
+| config_pagination()       | Same as `$db->configPagination()` or `EnvAutoLoad::configPagination`  |
+| autoload_register()       | Same as `AutoloadRegister::load()`            |
+| app_data()                | Get `path\|database\|pagination` info         |
+| env()                     | Same as `$db->AppConfig()`                    |
+| env_orm()                 | Return instance of `(new EnvOrm)` class       |
+| env_start()               | Same as `EnvAutoLoad::start()`                |
 | import()                  | Return instance of `(new DBImport)` class     |
 | migration()               | Return instance of `(new Migration)` class    |
 | schema()                  | Return instance of `(new Schema)` class       |
-| dot_env()                 | Return instance of `(new OrmDotEnv)` class    |
-| autoload_env()            | Return instance of `(new AutoloadEnv)` class  |
-| autoload_register()       | Same as `AutoloadRegister::load()`        |
-| env_start()               | Same as `AutoloadEnv::start()`            |
-| config_database()         | Same as `Direct DB Connection` get access to `DATABASE_CONNECTION` Constant   |
-| configure_pagination()    | Same as `$db->configurePagination()` or `AutoloadEnv::configurePagination`    |
-| app_config()              | Same as `$db->AppConfig()`                |
-| get_connection()          | Same as `$db->getConnection()`            |
-| get_query()               | Same as `$db->getQuery()`                 |
-| get_app_data()            | Get `path\|database\|pagination` info     |
-| to_array()                | `array` Convert items to array            |
-| to_object()               | `object` Convert items to object          |
-| to_json()                 | `string` Convert items to json            |
+| asset()                   | Return Absolute path of asset. Same as `Asset::asset()`   |
+| asset_config()            | Same as `Asset::config()`. Configure Asset root directory |
+| base_path()               | Return `server` base directory                |
+| directory()               | Return `server` base directory                |
+| to_array()                | `array` Convert items to array                |
+| to_object()               | `object` Convert items to object              |
+| to_json()                 | `string` Convert items to json                |
 
 ## Error Dump
 

@@ -4,28 +4,33 @@ declare(strict_types=1);
 
 namespace builder\Database\Traits;
 
+use ReflectionClass;
+
 
 trait ServerTrait{
     
     /**
-    * server base dir
-    */
-    protected $base_dir;
+     * server base dir
+     * @var mixed
+     */
+    static protected $base_dir;
+
 
     /**
-     * Call not existing method
-     * @param string $key ->setDir() | ->setDirectory()
-     * @param string $value 
+     * Define custom Server root path
      * 
-     * @return void
+     * @param string $path
+     * 
+     * @return string
      */
-    public function __call( $key, $value )
+    static public function setDirectory(?string $path = null)
     {
-        /**
-        * base root directory path setting
-        */
-        if(in_array(strtolower($key), ['setdir', 'setdirectory'])){
-            $this->base_dir = $value[0] ?? null;
+        // if base path was presented
+        if(!empty($path)){
+            self::$base_dir = $path;
+        } else{
+            // auto set the base dir property
+            self::$base_dir = self::getDirectory(self::$base_dir);
         }
     }
     
@@ -33,18 +38,22 @@ trait ServerTrait{
      * get Directory
      * @param  string base directory path.
      * 
-     * @return string|void|null 
+     * @return mixed
      */
-    public function getDirectory()
+    static public function getDirectory()
     {
-        if(empty($this->base_dir)){
+        if(empty(self::$base_dir)){
             // get default project root path
-            $this->base_dir = $this->clean_path( $this->server_root() );
+            self::$base_dir = self::clean_path( 
+                self::serverRoot() 
+            );
         }else{
-            $this->base_dir = $this->clean_path($this->base_dir);
+            self::$base_dir = self::clean_path(
+                self::$base_dir
+            );
         }
         
-        return $this->base_dir;
+        return self::$base_dir;
     }
 
     /**
@@ -52,9 +61,29 @@ trait ServerTrait{
      * 
      * @return string
      */
-    private function server_root()
+    static private function serverRoot()
     {
-        return $this->getServers('server');
+        return self::getServers('server');
+    }
+
+    /**
+     * Format path with Base Directory
+     * 
+     * @param string $path
+     * - [optional] You can pass a path to include with the base directory
+     * - Final result: i.e C:/server_path/path
+     * 
+     * @return string
+     */
+    static public function formatWithBaseDirectory(?string $path = null)
+    {
+        $server = rtrim(
+            self::getDirectory(),
+            '/'
+        );
+        return self::pathReplacer(
+            "{$server}/{$path}"
+        );
     }
 
     /**
@@ -69,115 +98,159 @@ trait ServerTrait{
      */
     static public function getServers(?string $mode = null)
     {
-        // Determine the protocol (http or https)
-        $protocol   = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' ? 'https://' : 'http://';
-
-        // Construct the server root path
-        $docRoot = $_SERVER['DOCUMENT_ROOT'];
-
-        // Get the server name (hostname)
-        $serverName = $_SERVER['SERVER_NAME'];
-
         // Only create Base path when `DOT_ENV_CONNECTION` is not defined
-        // DOT_ENV_CONNECTION holds the path setup information
+        // - The Constant holds the path setup information
         if(!defined('DOT_ENV_CONNECTION')){
-            // get Base directory path
-            $basePath = self::getMatchedData('init.php');
-    
-            // if false, then get absolute path
-            if($basePath === false){
-                $basePath = self::getRootPathToProject(realpath('.'));
-            }
+            // create server path
+            $serverPath = self::clean_path(
+                self::createAbsolutePath()
+            );
 
-            // Construct the server root URL
-            $serverPath = rtrim("{$docRoot}{$basePath}", '/');
+            // Replace Document root inside server path
+            $domainPath = self::createAbsoluteDomain($serverPath);
 
-            // Construct the domain
-            $domainPath = rtrim("{$protocol}{$serverName}{$basePath}", '/');
+            // Data
+            $data = [
+                'server'    => $serverPath,
+                'domain'    => $domainPath['domain'],
+                'protocol'  => $domainPath['protocol'],
+            ];
         } else{
-            $basePath = self::getRootPathToProject(@DOT_ENV_CONNECTION['self']->getDirectory());
-
-            // Construct the server root URL
-            $serverPath = rtrim("{$docRoot}{$basePath}", '/');
-
-            // Construct the domain
-            $domainPath = rtrim("{$protocol}{$serverName}{$basePath}", '/');
+            // Data
+            $envConnection = DOT_ENV_CONNECTION;
+            $data   = [
+                'server'    => $envConnection['server'],
+                'domain'    => $envConnection['domain'],
+                'protocol'  => $envConnection['protocol'],
+            ];
         }
-
-        // Data
-        $data = [
-            'server'    => $serverPath,
-            'domain'    => $domainPath,
-            'protocol'  => $protocol,
-        ];
 
         return $data[$mode] ?? $data;
     }
 
     /**
-     * Get the data of the string that matches the search string in the given backtrace.
-     *
-     * @param string $searchString The string to search for.
+     * Create Server Absolute Path
      * 
-     * @return string|false 
-     * -The matched data or null if no match is found.
+     * @return string
      */
-    static private function getMatchedData(?string $searchString)
+    static private function createAbsolutePath()
     {
-        // backtrace file column data
-        $backtrace = array_column(debug_backtrace(), 'file');
+        // get direct root path
+        $projectRootPath = self::getDirectRootPath();
 
-        if(is_array($backtrace)){
-            foreach ($backtrace as $trace) {
-                if (strpos($trace, $searchString) !== false) {
-                    return self::getRootPathToProject($trace, $searchString);
-                }
-            }
+        // if vendor is not present in the root directory, 
+        // - Then we get path using `Vendor Autoload`
+        if(!is_dir("{$projectRootPath}vendor")){
+            $projectRootPath = self::getVendorRootPath();
         }
-        
-        return false;
+
+        return $projectRootPath;
     }
 
     /**
-     * Clean and get Root Path to Project
-     *
-     * @param string $path
-     * @param string $string
+     * Create Server Absolute Path
+     * @param string $serverPath 
      * 
-     * @return string|null
+     * @return array
      */
-    static private function getRootPathToProject(?string $path = null, ?string $string = null)
+    static private function createAbsoluteDomain(?string $serverPath = null)
     {
-        // Construct the server root path
+        // Determine the protocol (http or https)
+        $protocol = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' 
+                    ? 'https://' 
+                    : 'http://';
+
+        // The Document root path
         $docRoot = $_SERVER['DOCUMENT_ROOT'];
 
-        $traceData  = str_replace('\\', '/', (string) $path);
-        $traceData  = str_replace([$docRoot, (string) $string], '', $traceData);
+        // Get the server name (hostname)
+        $serverName = $_SERVER['SERVER_NAME'];
 
-        return $traceData;
+        // Replace Document root inside server path
+        $domainPath = str_replace($docRoot, '', $serverPath);
+
+        // trim(string, '/) - Trim forward slash from left and right
+        // we using right trim only
+        $domainPath = rtrim((string) $domainPath, '/');
+
+        return [
+            'domain'    => "{$protocol}{$serverName}{$domainPath}",
+            'protocol'  => $protocol,
+        ];
     }
 
+    /**
+     * Get Root path with vendor helper
+     * 
+     * @return string
+     */
+    static private function getVendorRootPath()
+    {
+        $reflection = new ReflectionClass(\Composer\Autoload\ClassLoader::class);
+        $vendorPath = dirname($reflection->getFileName(), 2);
+
+        return dirname($vendorPath);
+    }
+
+    /**
+     * Get root path with no helper
+     * 
+     * @return string
+     */
+    static private function getDirectRootPath()
+    {
+        $documentRoot   = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
+        $currentScript  = str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']);
+
+        // setting default path to doc root
+        $projectRootPath = $documentRoot;
+        if (strpos($currentScript, $documentRoot) === 0) {
+            $projectRootPath = substr($currentScript, strlen($documentRoot));
+            $projectRootPath = trim($projectRootPath, '/');
+            $projectRootPath = substr($projectRootPath, 0, strpos($projectRootPath, '/'));
+            $projectRootPath = $documentRoot . '/' . $projectRootPath;
+            
+            // if not directory then get the directory of the path link
+            if (!is_dir($projectRootPath)) {
+                $projectRootPath = dirname($projectRootPath);
+            }
+        }
+
+        return $projectRootPath;
+    }
+    
     /**
      * Clean server url path
      * @param string $path 
      * 
-     * @return string|null\clean_path
+     * @return string|null
      */
-    private function clean_path(?string $path = null)
+    static private function clean_path(?string $path = null)
     {
-        $path   = str_replace('\\', '/', "{$path}/");
-        $length = strlen($path);
+        $path = str_replace(
+            '\\', 
+            '/', trim((string) $path)
+        );
 
-        // Check if the string ends with two forward slashes
-        if ($length >= 2 && substr($path, $length - 2) == '//') {
-            // Remove one of the trailing forward slashes
-            $cleanLink = rtrim($path, '/');
-        } else {
-            // No double forward slashes, use the original link
-            $cleanLink = $path;
-        }
+        return rtrim($path, '/') . '/';
+    }
 
-        return $cleanLink;
+    /**
+     * Replace path with given string
+     * \ or /
+     * 
+     * @param string  $path
+     * @param string  $replacer
+     * 
+     * @return string
+     */
+    static public function pathReplacer(?string $path, $replacer = '/')
+    {
+        return str_replace(
+            ['\\', '/'], 
+            $replacer, 
+            $path
+        );
     }
 
 }

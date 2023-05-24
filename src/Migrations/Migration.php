@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace builder\Database\Migrations;
 
 use builder\Database\Constants;
-use builder\Database\Schema\OrmDotEnv;
+use builder\Database\Schema\EnvOrm;
 use builder\Database\Migrations\Traits\ManagerTrait;
 use builder\Database\Migrations\Traits\FilePathTrait;
 
@@ -41,11 +41,11 @@ class Migration extends Constants{
     {
         // if not defined
         if ( ! defined('DOT_ENV_CONNECTION') ) {
-            self::$database = (new OrmDotEnv)::$path;
+            self::$database = (new EnvOrm)->getDirectory();
         } else{
             // once we run env autoloader
             // we have access to global Constant DOT_ENV_CONNECTION
-            self::$database = DOT_ENV_CONNECTION['self_path']['path'];
+            self::$database = DOT_ENV_CONNECTION['server'];
         }
 
         self::$database     .= "database/";
@@ -223,7 +223,7 @@ class Migration extends Constants{
     /**
      * Run the migrations.
      *
-     * @return void
+     * @return mixed
      */
     public function up(){}
     

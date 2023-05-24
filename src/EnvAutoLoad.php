@@ -6,9 +6,9 @@ namespace builder\Database;
 
 use builder\Database\DB;
 use builder\Database\Capsule\Manager;
-use builder\Database\Schema\OrmDotEnv;
+use builder\Database\Schema\EnvOrm;
 
-class AutoloadEnv{
+class EnvAutoLoad{
 
     static protected $default;
 
@@ -39,7 +39,7 @@ class AutoloadEnv{
         | Instance of class
         |--------------------------------------------------------------------------
         */
-        $ormDotEnv = new OrmDotEnv($default['path']);
+        $EnvOrm = new EnvOrm($default['path']);
 
         
         /*
@@ -47,7 +47,7 @@ class AutoloadEnv{
         | Create a sample .env file if not exist in project
         |--------------------------------------------------------------------------
         */
-        $ormDotEnv::createOrIgnore();
+        $EnvOrm::createOrIgnore();
         
         
         /*
@@ -57,7 +57,7 @@ class AutoloadEnv{
         | This will automatically6 setup our database configuration if found 
         |
         */
-        $loader = $ormDotEnv::loadOrFail();
+        $loader = $EnvOrm::loadOrFail();
         
         
         /*
@@ -66,7 +66,7 @@ class AutoloadEnv{
         |--------------------------------------------------------------------------
         | default | main | dark | red | blue
         */
-        $ormDotEnv->{'bg'} = $default['bg'];
+        $EnvOrm->{'bg'} = $default['bg'];
         
         
         /*
@@ -81,7 +81,7 @@ class AutoloadEnv{
         */
         if(isset($_ENV['APP_DEBUG_BG'])){
             if(empty($_ENV['APP_DEBUG_BG'])){
-                $ormDotEnv::updateENV('APP_DEBUG_BG', $ormDotEnv->{'bg'}, false);
+                $EnvOrm::updateENV('APP_DEBUG_BG', $EnvOrm->{'bg'}, false);
             }
         }
         
@@ -99,12 +99,12 @@ class AutoloadEnv{
             /**
              * Setting application to use the dump error handling
              */
-            $ormDotEnv->dump_final = false;
+            $EnvOrm->dump_final = false;
 
             /**
              * Dump error message
              */
-            $ormDotEnv->dump( $loader['message'] );
+            $EnvOrm->dump( $loader['message'] );
             die(1);
         }
         
@@ -118,12 +118,13 @@ class AutoloadEnv{
         | DOT_ENV_CONNECTION['path'] -> return array of data containing .env path
         */
         if ( ! defined('DOT_ENV_CONNECTION') ) {
-            define('DOT_ENV_CONNECTION', [
-                'self'      => $ormDotEnv,
-                'self_path' => $loader,
-            ]);
+            define('DOT_ENV_CONNECTION', array_merge([
+                'status'    => $loader['status'],
+                'env_path'  => $loader['path'],
+                'message'   => $loader['message'],
+                'env'       => $EnvOrm,
+            ], $EnvOrm->getServers()));
         }
-        
         
         /*
         |--------------------------------------------------------------------------
@@ -188,7 +189,7 @@ class AutoloadEnv{
      * 
      * @return void
      */
-    static protected function createDummy()
+    static private function createDummy()
     {
         $paths = self::getPathsData();
 
@@ -294,7 +295,7 @@ class AutoloadEnv{
      */
     static private function getPathsData()
     {
-        $serverPath = str_replace('\\', '/', DOT_ENV_CONNECTION['self_path']['path']);
+        $serverPath = str_replace('\\', '/', DOT_ENV_CONNECTION['server']);
         $realPath   = str_replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
         return [
             'init' => [

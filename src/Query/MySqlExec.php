@@ -27,11 +27,13 @@ class MySqlExec  extends Constants{
 	}
 
     /**
-     * Get Application Config Settings
+     * Get Database Application Config
+     * - Returns all Database setup CONSTANTS as an arrays
+     * - or .env Information if present
      * 
-     * @return string|array\builder\Database\AppConfig
+     * @return mixed
      */
-    public function AppConfig()
+    public function env()
     {
         return $this->console::getConfig('all');
     }
@@ -39,22 +41,22 @@ class MySqlExec  extends Constants{
     /**
      * Get last Database query sample
      * 
-     * @return mixed\builder\Database\getQuery
+     * @return mixed\builder\Database\dbQuery
      */
-    public function getQuery()
+    public function dbQuery()
     {
-        return is_null($this->getQuery) 
+        return is_null($this->dbQuery) 
                 ? (object) $this->setQueryProperty()
-                : (object) $this->getQuery;
+                : (object) $this->dbQuery;
     }
 
     /**
      * Get Database connection status
      * @param string $type\reponse|message|driver
      * 
-     * @return mixed\builder\Database\getConnection
+     * @return mixed\builder\Database\dbConnection
      */
-    public function getConnection(?string $type = null)
+    public function dbConnection(?string $type = null)
     {
         return $this->connection[$type] ?? $this->connection;
     }
@@ -634,7 +636,7 @@ class MySqlExec  extends Constants{
     protected function setQueryProperty()
     {
         // save to temp queri data
-        $this->getQuery = [
+        $this->dbQuery = [
             'stmt'          => $this->stmt,
             'raw'           => $this->rawQuery,
             'where'         => $this->where,
@@ -646,7 +648,7 @@ class MySqlExec  extends Constants{
             'runtime'       => $this->runtime,
         ];
         
-        return $this->getQuery;
+        return $this->dbQuery;
     } 
 
     /**

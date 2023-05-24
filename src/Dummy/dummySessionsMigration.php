@@ -10,7 +10,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      *
-     * @return void
+     * @return mixed
      */
     public function up()
     {
@@ -27,22 +27,22 @@ return new class extends Migration
     /**
      * Drop database table
      *
-     * @return void
+     * @return mixed
      */
     public function drop()
     {
-        Schema::dropTable('dummy_table');
+        return Schema::dropTable('dummy_table');
     }
 
     /**
      * drop database column
      * @param string $column 
      *
-     * @return void
+     * @return mixed
      */
     public function column(?string $column)
     {
-        Schema::dropColumn('dummy_table', $column);
+        return Schema::dropColumn('dummy_table', $column);
     }
 
 };

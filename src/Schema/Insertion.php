@@ -155,7 +155,7 @@ abstract class Insertion extends Builder {
     {
         try{
             // check if DB connection has been established 
-            if($this->getConnection()['status'] != self::ERROR_200){
+            if($this->dbConnection()['status'] != self::ERROR_200){
                 return false;
             }
 
@@ -217,6 +217,17 @@ abstract class Insertion extends Builder {
     }
 
     /**
+     * Get result data as an arrays of objects
+     * @param int $per_page
+     *
+     * @return object\builder\Database\Collections\Collection
+     */
+    public function paginate($per_page = 10)
+    {
+        return new Collection($this->getPagination($per_page));
+    }
+
+    /**
      * Get first query
      *
      * @return object|null\builder\Database\Collections\Collection
@@ -230,9 +241,30 @@ abstract class Insertion extends Builder {
     }
 
     /**
+     * Get first query
+     * @param array $conditions
+     * - Mandatory conditions options
+     * - Must be assoc array with key and value types.
+     * - Uses the ->where() clause to check if data matched
+     * - If data not given and conditions failed, then it'll attempt to create a new records 
+     * Using the conditional data merged with data if given
+     * 
+     * @param array $data
+     * - [optional] Data to create with if condition not meant
+     *
+     * @return object\builder\Database\Collections\Collection
+     */
+    public function firstOrCreate(array $conditions, ?array $data = [])
+    {
+        return new Collection(
+            $this->firstOrCreateCollectionQuery($conditions, $data)
+        );
+    }
+
+    /**
      * Get first query or abort with response code
      *
-     * @return object|null\builder\Database\Collections\Collection
+     * @return mixed\builder\Database\Collections\Collection
      */
     public function firstOrFail()
     {
@@ -240,17 +272,6 @@ abstract class Insertion extends Builder {
         if(!is_null($data)){
             return new Collection($data);
         }
-    }
-    
-    /**
-     * Get result data as an arrays of objects
-     * @param int $per_page
-     *
-     * @return object\builder\Database\Collections\Collection
-     */
-    public function paginate($per_page = 10)
-    {
-        return new Collection($this->getPagination($per_page));
     }
 
     /**

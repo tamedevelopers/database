@@ -12,13 +12,26 @@ use builder\Database\Capsule\AppManager;
 use builder\Database\Traits\ServerTrait;
 use builder\Database\Traits\ReusableTrait;
 
-class OrmDotEnv extends Constants{
+class EnvOrm extends Constants{
     
     use ServerTrait, ReusableTrait;
 
-    static private $immutable;
+    /**
+     * Handler to hold Symbolic Path
+     * When we ->setDirectory
+     * - We copy the extended `$base_dir` untouched to this property 
+     * - Since Base Directory value should not be changed
+     * - So this is a symbolic link to $base_dir and can be changed at any time
+     * 
+     * @var mixed
+     */
+    static private $sym_path;
+
+    /**
+     * Instance of self class
+     * @var mixed
+     */
     static private $object;
-    static public $path;
 
     /**
      * Define custom Server root path
@@ -29,22 +42,14 @@ class OrmDotEnv extends Constants{
      */
     public function __construct(?string $path = null) 
     {
-        // if base path was presented
-        if(!empty($path)){
-            $this->base_dir = $path;
-        }
-
         // auto set the base dir property
-        $this->getDirectory($this->base_dir);
-
-        // add to global property
-        self::$immutable = $this->base_dir;
+        self::setDirectory($path);
 
         // add to global property
         self::$object = $this;
 
         // create public path
-        self::$path = self::$immutable;
+        self::$sym_path = self::$base_dir;
     }
 
     /**
@@ -53,20 +58,23 @@ class OrmDotEnv extends Constants{
      */
     static private function init() 
     {
-        self::$object = new OrmDotEnv;
+        self::$object = new self();
     }
 
     /**
      * Define custom Directory path to .env file
      * By default we use your server root folder
-     * @param string $path Path to .env Folder\Not needed exept called statically
+     * 
+     * @param string $path 
+     * - [optional] Path to .env Folder Location
+     * - Path to .env Folder\Not needed except called statically
      * 
      * @return array
      */
     static public function load(?string $path = null)
     {
-        // if immutable is null
-        if(is_null(self::$immutable) || !(empty($path) && is_null($path))){
+        // if sym_path is null
+        if(is_null(self::$sym_path) || !(empty($path) && is_null($path))){
             
             // init entire class object
             self::init();
@@ -75,23 +83,23 @@ class OrmDotEnv extends Constants{
                 self::$object->getDirectory($path);
     
                 // add to global property
-                self::$immutable = self::$object->clean_path($path);
+                self::$sym_path = self::$object->clean_path($path);
             }
         }
 
         try{
-            $dotenv = Dotenv::createImmutable(self::$immutable);
+            $dotenv = Dotenv::createImmutable(self::$sym_path);
             $dotenv->load();
             return [
                 'status'    => self::ERROR_200,
                 'message'   => ".env File Loaded Successfully",
-                'path'      => self::$immutable,
+                'path'      => self::$sym_path,
             ];
         }catch(Exception $e){
             return [
                 'status'    => self::ERROR_404,
-                'message'   => $e->getMessage(),
-                'path'      => self::$immutable,
+                'message'   => sprintf("<<Error>> Folder Seems not to be readable or not exists. \n%s", $e->getMessage()),
+                'path'      => self::$sym_path,
             ];
         }
     }
@@ -118,21 +126,22 @@ class OrmDotEnv extends Constants{
     }
 
     /**
-     * Create env file or Ignore
+     * Create .env file or Ignore
+     * 
      * @return void
      */
     static public function createOrIgnore()
     {
         // file to file
-        $path = self::$immutable . ".env";
-
+        $pathToFile = self::formatWithBaseDirectory('.env');
+        
         // only attempt to create file if direcotry if valid
-        if(is_dir(self::$immutable)){
+        if(is_dir(self::$sym_path)){
             // if file doesn't exist and not a directory
-            if(!file_exists($path) && !is_dir($path)){
+            if(!file_exists($pathToFile) && !is_dir($pathToFile)){
                 
                 // Write the contents to the new file
-                file_put_contents($path, self::envTxt());
+                file_put_contents($pathToFile, self::envTxt());
             }
         }
     }
@@ -147,7 +156,7 @@ class OrmDotEnv extends Constants{
     static public function errorLogger() 
     {
         // Directory path
-        $dir = self::$path . "storage/logs/";
+        $dir = self::formatWithBaseDirectory('storage/logs/');
 
         // create custom file name
         $filename = "{$dir}orm.log";
@@ -207,7 +216,8 @@ class OrmDotEnv extends Constants{
      */
     static public function updateENV(?string $key = null, string|bool $value = null, ?bool $allow_quote = true, ?bool $allow_space = false)
     {
-        $path = self::$immutable . '.env';
+        $path = self::formatWithBaseDirectory('.env');
+
         if (file_exists($path)) {
 
             // if isset
@@ -263,8 +273,8 @@ class OrmDotEnv extends Constants{
     static private function createDir_AndFiles(?string $directory = null, ?string  $filename = null)
     {
         // if \storage folder not found
-        if(!is_dir(self::$path. "storage")){
-            @mkdir(self::$path. "storage", 0777);
+        if(!is_dir(self::$sym_path. "storage")){
+            @mkdir(self::$sym_path. "storage", 0777);
         }
 
         // if \storage\logs\ folder not found

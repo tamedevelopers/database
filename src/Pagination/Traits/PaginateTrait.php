@@ -59,9 +59,9 @@ trait PaginateTrait{
      *
      * @return object
      */
-    public function configurePagination(?array $options = [])
+    public function configPagination(?array $options = [])
     {
-        // trying to us global AutoloadEnv::configurePagination data
+        // trying to us global EnvAutoLoad::configPagination data
         if(defined('PAGINATION_CONFIG') && is_bool(PAGINATION_CONFIG['allow']) && PAGINATION_CONFIG['allow'] === true){
             $this->pagination_settings = PAGINATION_CONFIG;
         }else{
@@ -185,13 +185,13 @@ trait PaginateTrait{
     {
         // pagination configurations
         if(count($this->pagination_settings) === 0){
-            $settings = $this->configurePagination($options)->pagination_settings;
+            $settings = $this->configPagination($options)->pagination_settings;
         }else{
             // If global is not allowed
             if($this->use_global){
                 $settings = $this->pagination_settings;
             }else{
-                $settings = $this->configurePagination($options)->pagination_settings;
+                $settings = $this->configPagination($options)->pagination_settings;
             }
         }
 

@@ -48,7 +48,7 @@ class AppManager extends Constants{
             MAIL_USERNAME=
             MAIL_PASSWORD=
             MAIL_ENCRYPTION=tls
-            MAIL_FROM_ADDRESS=
+            MAIL_FROM_ADDRESS="${MAIL_USERNAME}"
             MAIL_FROM_NAME="${APP_NAME}"
 
             AWS_ACCESS_KEY_ID=

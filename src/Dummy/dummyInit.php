@@ -1,6 +1,6 @@
 <?php
 
-use builder\Database\AutoloadEnv;
+use builder\Database\EnvAutoLoad;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +24,7 @@ include_once __DIR__ . "/vendor/autoload.php";
 | You can configura your pagination text data here if you like
 |--------------------------------------------------------------------------
 */
-AutoloadEnv::start();
+EnvAutoLoad::start();
 
 
 /*
@@ -53,11 +53,11 @@ $db = DATABASE_CONNECTION;
 | To override the Pagination settings below, use any of the Helper or Autoload methods
 |
 |   Helpers
-|   configure_pagination([])
+|   config_pagination([])
 |   or
-|   AutoloadEnv::configurePagination()
+|   EnvAutoLoad::configPagination()
 |
-|   When Helper function or AutoloadEnv is used, you'll have access to CONSTANT NAME
+|   When Helper function or EnvAutoLoad is used, you'll have access to CONSTANT NAME
 |   `PAGINATION_CONFIG`
 |
 | key       | Data Type          |  Description                                                                           |
@@ -75,7 +75,7 @@ $db = DATABASE_CONNECTION;
 | results   | string             | Change the letter `results`
 |--------------------------------------------------------------------------
 */
-$db->configurePagination([
+$db->configPagination([
    'allow'  => false,
    'view'   => 'simple',
 ]);
@@ -90,4 +90,4 @@ $db->configurePagination([
 | path => \storage\logs\orm.log
 |--------------------------------------------------------------------------
 */
-$dotEnv['self']->errorLogger();
+$dotEnv['env']->errorLogger();

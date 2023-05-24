@@ -1,24 +1,82 @@
 <?php 
 
 use builder\Database\DB;
+use builder\Database\Asset;
 use builder\Database\DBImport;
-use builder\Database\AutoloadEnv;
+use builder\Database\EnvAutoLoad;
 use builder\Database\Query\MySqlExec;
 use builder\Database\AutoloadRegister;
-use builder\Database\Schema\OrmDotEnv;
+use builder\Database\Schema\EnvOrm;
 use builder\Database\Migrations\Schema;
 use builder\Database\Migrations\Migration;
 
 if (! function_exists('db')) {
     /**
      * Get Database 
+     * 
      * @param array $options
+     * - [optional] Database configuration options
      * 
      * @return object\builder\Database\DB
      */
     function db(?array $options = [])
     {
         return new DB($options);
+    }
+}
+
+if (! function_exists('db_query')) {
+    /**
+     * Get Database Query
+     * 
+     * @return mixed
+     */
+    function db_query()
+    {
+        // get query
+        return defined('DATABASE_CONNECTION') 
+                    ? DATABASE_CONNECTION->dbQuery()
+                    : (new MySqlExec)->dbQuery();
+    }
+}
+
+if (! function_exists('db_config')) {
+    /**
+     * Database Configuration
+     * 
+     * @param array $options
+     * - [optional] Database configuration options
+     * - Same as `Direct DB Connection
+     * 
+     * @return void
+     * - You now have access to a new Constant created for you
+     * DATABASE_CONNECTION
+     */
+    function db_config(?array $options = [])
+    {
+        if ( ! defined('DATABASE_CONNECTION') ) {
+            define('DATABASE_CONNECTION', db($options));
+        }
+    }
+}
+
+if (! function_exists('db_connection')) {
+    /**
+     * Get Database Connection
+     * 
+     * @param string $type
+     * - [optional]  reponse|message|driver
+     * 
+     * @return mixed
+     */
+    function db_connection(?string $type = null)
+    {
+        // get database connection
+        $connection = defined('DATABASE_CONNECTION') 
+                    ? DATABASE_CONNECTION->dbConnection()
+                    : db()->dbConnection();
+        
+        return $connection[$type] ?? (object) $connection;
     }
 }
 
@@ -34,21 +92,65 @@ if (! function_exists('import')) {
     }
 }
 
-if (! function_exists('dot_env')) {
+if (! function_exists('env')) {
+    /**
+     * Get ENV (Enviroment) Data
+     * - If .env was not used, 
+     * - Then it will get all App Configuration Data as well
+     * 
+     * @param string $key
+     * - [optional] ENV KEY or APP Configuration Key
+     * 
+     * @return mixed
+     */
+    function env(?string $key = null)
+    {
+        // get Config data from ENV file
+        $AppConfig = (new MySqlExec)->env();
+
+        // Convert all keys to lowercase
+        $AppConfig = array_change_key_case($AppConfig, CASE_UPPER);
+
+        // convert to upper-case
+        $key = strtoupper(trim((string) $key));
+
+        return $AppConfig[$key] ?? $AppConfig;
+    }
+}
+
+if (! function_exists('env_orm')) {
     /**
      * Get Dot Env
      * 
-     * @return object\builder\Database\Schema\OrmDotEnv
+     * @return object\builder\Database\Schema\EnvOrm
      */
-    function dot_env()
+    function env_orm()
     {
-        return new OrmDotEnv();
+        return (new EnvOrm);
+    }
+}
+
+if (! function_exists('env_start')) {
+    /**
+     * Configure Instance of EnvAutoLoad `Environment`
+     * 
+     * @param array $options
+     * - [optional] path \You can specify custom project path
+     * - By default path, is your project directory root
+     * 
+     * - [optional] dump_bg_color \(default | main | dark | red | blue)
+     * 
+     * @return void
+     */
+    function env_start(?array $options = [])
+    {
+        (new EnvAutoLoad)->start($options);
     }
 }
 
 if (! function_exists('migration')) {
     /**
-     * Get Migration Helpers
+     * Get Instance of Migration
      * 
      * @return object\builder\Database\Migration
      */
@@ -60,13 +162,50 @@ if (! function_exists('migration')) {
 
 if (! function_exists('schema')) {
     /**
-     * Get Migration Helpers
+     * Get Instance of Migration Schema
      * 
-     * @return object\builder\Database\Migration
+     * @return object\builder\Database\Migration\Schema
      */
     function schema()
     {
         return new Schema();
+    }
+}
+
+if (! function_exists('asset')) {
+    /**
+     * Create assets Real path url
+     * 
+     * @param string $asset
+     * - asset file e.g (style.css | js/main.js)
+     * 
+     * @return string
+     */
+    function asset(?string $asset = null)
+    {
+        return Asset::asset($asset);
+    }
+}
+
+if (! function_exists('asset_config')) {
+    /**
+     * Configure Assets Default Directory
+     * 
+     * @param string $base_path
+     * - [optional] Default is `base_directory/assets`
+     * - If set and directory is not found, then we revert back to the default
+     * 
+     * @param string $cache
+     * - [optional] Default is true
+     * - End point of link `?v=xxxxxxxx` is with cache of file time change
+     * - This will automatically tells the broswer to fetch new file if the time change
+     * - Time will only change if you make changes or modify the request file
+     * 
+     * @return void
+     */
+    function asset_config(?string $base_path = null, ?bool $cache = true)
+    {
+        Asset::config($base_path, $cache);
     }
 }
 
@@ -87,147 +226,84 @@ if (! function_exists('autoload_register')) {
     }
 }
 
-if (! function_exists('autoload_env')) {
-    /**
-     * Get Autoload Env
-     * 
-     * @return object\builder\Database\AutoloadEnv
-     */
-    function autoload_env()
-    {
-        return new AutoloadEnv();
-    }
-}
-
-if (! function_exists('db_exec')) {
-    /**
-     * Get MySqlExec
-     * 
-     * @return object\builder\Database\Query\MySqlExec
-     */
-    function db_exec()
-    {
-        return new MySqlExec();
-    }
-}
-
-if (! function_exists('ddump')) {
-    /**
-     * Format query data to browser
-     * @param mixed ...$data
-     * 
-     * @return mixed
-     */
-    function ddump(...$data)
-    {
-        return db_exec()->dump($data);
-    }
-}
-
-if (! function_exists('env_start')) {
-    /**
-     * Configure Environment Start
-     * @param array $options
-     * 
-     * @return mixed
-     */
-    function env_start(?array $options = [])
-    {
-        autoload_env()->start($options);
-    }
-}
-
-if (! function_exists('config_database')) {
-    /**
-     * Configure Database
-     * 
-     * @return mixed
-     */
-    function config_database(?array $options = [])
-    {
-        if ( ! defined('DATABASE_CONNECTION') ) {
-            define('DATABASE_CONNECTION', db($options));
-        }
-    }
-}
-
-if (! function_exists('configure_pagination')) {
+if (! function_exists('config_pagination')) {
     /**
      * Configure Pagination
-     * @param array $options
      * 
-     * @return mixed
+     * @param array $options
+     * - [optional] keys
+     * 
+     * - allow     | true\false         | Default `false` Setting to true will allow the system use this settings across app 
+     * - class     | string             | Css `selector` For pagination ul tag in the browser 
+     * - span      | string             | Css `selector` For pagination Showing Span tags in the browser 
+     * - view      | bootstrap\simple   | Default `simple` - For pagination design 
+     * - first     | string             | Change the letter of `First`
+     * - last      | string             | Change the letter of `Last`
+     * - next      | string             | Change the letter of `Next`
+     * - prev      | string             | Change the letter of `Prev`
+     * - showing   | string             | Change the letter of `Showing`
+     * - of        | string             | Change the letter `of`
+     * - results   | string             | Change the letter `results`
+     * 
+     * @return void
      */
-    function configure_pagination(?array $options = [])
+    function config_pagination(?array $options = [])
     {
-        autoload_env()->configurePagination($options);
+        (new EnvAutoLoad)->configPagination($options);
     }
 }
 
-if (! function_exists('base_dir')) {
+if (! function_exists('directory')) {
     /**
-     * Get Base Directory
+     * Get Base Directory `Path`
      * 
      * @return string
      */
-    function base_dir()
+    function directory()
     {
-        return dot_env()->getDirectory();
+        return base_path();
     }
 }
 
-if (! function_exists('app_config')) {
+if (! function_exists('base_path')) {
     /**
-     * Get App Configuration
-     * @param string $key
+     * Get Base Directory `Path`
      * 
-     * @return mixed
+     * @return string
      */
-    function app_config(?string $key = null)
+    function base_path()
     {
-        // get Config data from ENV file
-        $AppConfig = db_exec()->AppConfig();
-
-        // Convert all keys to lowercase
-        $AppConfig = array_change_key_case($AppConfig, CASE_UPPER);
-
-        // convert to upper-case
-        $key = strtoupper(trim((string) $key));
-
-        return $AppConfig[$key] ?? $AppConfig;
+        return env_orm()->getDirectory();
     }
 }
 
-if (! function_exists('get_connection')) {
+if (! function_exists('domain')) {
     /**
-     * Get Database Connection
-     * @param string $type\reponse|message|driver
+     * Get Domain `URL` Link
      * 
-     * @return mixed
+     * @return string
      */
-    function get_connection(?string $type = null)
+    function domain()
     {
-        // get database connection
-        $connection = defined('DATABASE_CONNECTION') 
-                    ? DATABASE_CONNECTION->getConnection($type)
-                    : db()->getConnection($type);
-
-        return (object) $connection;
+        return env_orm()->getServers('domain');
     }
 }
 
-if (! function_exists('get_app_data')) {
+if (! function_exists('app_data')) {
     /**
      * Get All Application Data
      * 
+     * - Array of
+     * - [keys] path|database|pagination
+     * 
      * @return array
      */
-    function get_app_data()
+    function app_data()
     {
         // get base root path
         $getPath = defined('DOT_ENV_CONNECTION') 
-                    ? DOT_ENV_CONNECTION['self_path']['path'] 
-                    : dot_env()->getDirectory();
+                    ? DOT_ENV_CONNECTION['server']
+                    : env_orm()->getDirectory();
 
         // get database
         $database = defined('DATABASE_CONNECTION') 
@@ -245,21 +321,6 @@ if (! function_exists('get_app_data')) {
             'database'      => $database,
             'pagination'    => $pagination,
         ];
-    }
-}
-
-if (! function_exists('get_query')) {
-    /**
-     * Get Database Query
-     * 
-     * @return mixed
-     */
-    function get_query()
-    {
-        // get query
-        return defined('DATABASE_CONNECTION') 
-                    ? DATABASE_CONNECTION->getQuery()
-                    : db_exec()->getQuery();
     }
 }
 
@@ -299,5 +360,20 @@ if (! function_exists('to_json')) {
     function to_json(mixed $items)
     {
         return json_encode( $items );
+    }
+}
+
+if (! function_exists('ddump')) {
+    /**
+     * Die or Dump
+     * Only works when .env APP_DEBUG is set to true
+     * 
+     * @param mixed ...$data
+     * 
+     * @return mixed
+     */
+    function ddump(...$data)
+    {
+        return (new MySqlExec)->dump($data);
     }
 }

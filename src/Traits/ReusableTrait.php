@@ -5,21 +5,22 @@ declare(strict_types=1);
 namespace builder\Database\Traits;
 
 use builder\Database\Capsule\Manager;
+use builder\Database\Query\MySqlExec;
 use Symfony\Component\VarDumper\VarDumper;
 
 trait ReusableTrait{
-    
-    /**
-     * Exit script on dump
-     * @var bool
-    */
-    public $dump_final = true;
     
     /**
      * Define var_dump background color
      * @var string
     */
     public $bg = 'default';
+    
+    /**
+     * Exit script on dump
+     * @var bool
+    */
+    public $dump_final = true;
 
     /**
      * Background colors
@@ -42,7 +43,7 @@ trait ReusableTrait{
     public function dump(...$data)
     {
         // get App Config
-        $appConfig = $this->AppConfig();
+        $appConfig = (new MySqlExec)->env();
         
         // get bg
         $bg =   isset($_ENV['APP_DEBUG_BG']) 
@@ -66,6 +67,8 @@ trait ReusableTrait{
                 foreach ($dataArray as $var) {
                     VarDumper::dump($var);
                 }
+            }else{
+                VarDumper::dump($dataArray);
             }
             
             echo "<style>pre.sf-dump, pre.sf-dump .sf-dump-default{{$this->getBgColor( $bg )}}</style>";

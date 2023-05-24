@@ -146,7 +146,7 @@ class Blueprint extends Constants{
     private function checkDBConnect()
     {
         // if database connection is okay
-        $dbConnection = $this->db->getConnection();
+        $dbConnection = $this->db->dbConnection();
         if($dbConnection['status'] !== self::ERROR_200){
             return [
                 'status'    => self::ERROR_404,

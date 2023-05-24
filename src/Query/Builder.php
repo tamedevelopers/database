@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace builder\Database\Query;
 
-use Config;
-use Exception;
 use HTMLPurifier;
 
 class Builder extends MySqlExec{

@@ -10,7 +10,7 @@ class PostClass extends DB{
         parent::__construct();
 
         // configure pagination settings for entire application
-        $this->configurePagination([
+        $this->configPagination([
             'allow' => true, 
             'view'  => 'bootstrap', // default is (simple)
             'class' => 'Custom-Class', //can add a custom css and style
