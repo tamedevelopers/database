@@ -43,17 +43,17 @@ trait ReusableTrait{
     public function dump(...$data)
     {
         // get App Config
-        $appConfig = (new MySqlExec)->env();
+        $envData = (new MySqlExec)->env();
         
         // get bg
         $bg =   isset($_ENV['APP_DEBUG_BG']) 
                 ? $_ENV['APP_DEBUG_BG'] 
-                : isset($appConfig['APP_DEBUG_BG']) 
+                : isset($envData['APP_DEBUG_BG']) 
                 ?? $this->bg;
         
         // app data
-        $App =  is_array($appConfig) 
-                ? $appConfig['APP_DEBUG'] 
+        $App =  is_array($envData) 
+                ? $envData['APP_DEBUG'] 
                 : true;
         
         // if DEBUG MODE IS ON

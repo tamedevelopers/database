@@ -106,15 +106,15 @@ if (! function_exists('env')) {
     function env(?string $key = null)
     {
         // get Config data from ENV file
-        $AppConfig = (new MySqlExec)->env();
+        $envData = (new MySqlExec)->env();
 
         // Convert all keys to lowercase
-        $AppConfig = array_change_key_case($AppConfig, CASE_UPPER);
+        $envData = array_change_key_case($envData, CASE_UPPER);
 
         // convert to upper-case
         $key = strtoupper(trim((string) $key));
 
-        return $AppConfig[$key] ?? $AppConfig;
+        return $envData[$key] ?? $envData;
     }
 }
 

@@ -1435,7 +1435,7 @@ class PostClass extends DB{
 | config_pagination()       | Same as `$db->configPagination()` or `EnvAutoLoad::configPagination`  |
 | autoload_register()       | Same as `AutoloadRegister::load()`            |
 | app_data()                | Get `path\|database\|pagination` info         |
-| env()                     | Same as `$db->AppConfig()`                    |
+| env()                     | Same as `$db->env()`                          |
 | env_orm()                 | Return instance of `(new EnvOrm)` class       |
 | env_start()               | Same as `EnvAutoLoad::start()`                |
 | import()                  | Return instance of `(new DBImport)` class     |
