@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": ">=7.2",
         "vlucas/phpdotenv": "^5.3",
         "yidas/pagination": "^1.0",
         "symfony/var-dumper": "^4.0 || ^5.0 || ^6.0",
