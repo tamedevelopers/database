@@ -10,15 +10,18 @@ use builder\Database\Schema\EnvOrm;
 use builder\Database\Migrations\Schema;
 use builder\Database\Migrations\Migration;
 
-if (! function_exists('isConnection')) {
+if (! function_exists('isDatabaseConnectionDefined')) {
     /**
-     * Get Database Connection Status
+     * Get Database Connection Constant Status
+     * - When You connecto to Database using autoload or -- Direct connection
+     * A Global Constant is Instantly defined for us.
+     * This is to check if it has been defined or not
      * 
-     * @return bool\builder\Database\isConnection
+     * @return bool\builder\Database\isDatabaseConnectionDefined
      */
-    function isConnection()
+    function isDatabaseConnectionDefined()
     {
-        return (new MySqlExec)->isConnection();
+        return (new MySqlExec)->isDatabaseConnectionDefined();
     }
 }
 
@@ -46,7 +49,7 @@ if (! function_exists('db_query')) {
     function db_query()
     {
         // get query
-        return isConnection() 
+        return isDatabaseConnectionDefined() 
                 ? DATABASE_CONNECTION->dbQuery()
                 : (new MySqlExec)->dbQuery();
     }
@@ -66,7 +69,7 @@ if (! function_exists('db_config')) {
      */
     function db_config(?array $options = [])
     {
-        if ( ! isConnection() ) {
+        if ( ! isDatabaseConnectionDefined() ) {
             define('DATABASE_CONNECTION', db($options));
         }
     }
@@ -84,7 +87,7 @@ if (! function_exists('db_connection')) {
     function db_connection(?string $type = null)
     {
         // get database connection
-        $connection = isConnection() 
+        $connection = isDatabaseConnectionDefined() 
                     ? DATABASE_CONNECTION->dbConnection()
                     : db()->dbConnection();
         
@@ -98,10 +101,10 @@ if (! function_exists('db_driver')) {
      * 
      * @return mixed\builder\Database\getDriver
      */
-    function driver()
+    function db_driver()
     {
         // get database connection
-        return isConnection() 
+        return isDatabaseConnectionDefined() 
                 ? DATABASE_CONNECTION->dbConnection()['driver']
                 : db()->dbConnection()['driver'];
     }
@@ -333,7 +336,7 @@ if (! function_exists('app_data')) {
                     : env_orm()->getDirectory();
 
         // get database
-        $database = isConnection()  
+        $database = isDatabaseConnectionDefined()  
                     ? DATABASE_CONNECTION
                     : db();
 

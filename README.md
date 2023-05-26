@@ -1423,6 +1423,7 @@ class PostClass extends DB{
 | function name             | Description                                   |
 |---------------------------|-----------------------------------------------|
 | db()                      | Return instance of `new DB($options)` class   |
+| db_driver()               | Returns instance of Database `PDO` Driver     |
 | db_config()               | Same as `Direct DB Connection` get access to `DATABASE_CONNECTION` Constant after you call function   |
 | db_connection()           | Same as `$db->dbConnection()`                 |
 | db_query()                | Same as `$db->dbQuery()`                      |

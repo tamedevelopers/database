@@ -72,11 +72,14 @@ class MySqlExec  extends Constants{
     }
 
     /**
-     * Get Database Connection Status
+     * Get Database Connection Constant Status
+     * - When You connecto to Database using autoload or -- Direct connection
+     * A Global Constant is Instantly defined for us.
+     * This is to check if it has been defined or not
      * 
-     * @return bool\builder\Database\isConnection
+     * @return bool\builder\Database\isDatabaseConnectionDefined
      */
-    public function isConnection()
+    public function isDatabaseConnectionDefined()
     {
         return defined('DATABASE_CONNECTION');
     }
