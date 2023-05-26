@@ -8,48 +8,36 @@ use ArrayAccess;
 use Traversable;
 use ArrayIterator;
 use IteratorAggregate;
+use builder\Database\Collections\CollectionProperty;
+use builder\Database\Collections\Traits\RelatedTrait;
 
-class CollectionMapper implements IteratorAggregate, ArrayAccess
+class CollectionMapper extends CollectionProperty implements IteratorAggregate, ArrayAccess
 {
+    use RelatedTrait;
+    
     /**
-     * Items attributes
-     * @var  mixed
+     * The items contained in the collection.
+     *
+     * @var array
      */
-    private $attributes;
+    protected $items = [];
 
     /**
      * Array index key
      * @var  mixed
      */
-    private $key;
-
-    /**
-     * If pagination is true
-     * @var  bool
-     */
-    static private $is_paginate = false;
-
-    /**
-     * Pagination Instance
-     * @var  mixed
-     */
-    static private $pagination;
-
+    protected $key;
+    
     /**
      * Create a new collection.
      *
      * @param  mixed $items
+     * @param  mixed $key
      */
-    public function __construct($items = [], mixed $key = 0, ?bool $check_paginate = false, mixed $pagination = null)
+    public function __construct($items = [], mixed $key = 0)
     {
-        $this->attributes   = $this->convertOnInit($items);
-        $this->key          = ((int) $key + 1);
-
-        // if pagination request is `true`
-        if($check_paginate){
-            self::$is_paginate  = $check_paginate;
-            self::$pagination   = $pagination->pagination ?? null;
-        }
+        $this->key    = ((int) $key + 1);
+        $this->items  = $this->convertMapperOnInit($items);
     }
 
     /**
@@ -59,83 +47,7 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
      */
     public function getIterator() : Traversable
     {
-        return new ArrayIterator($this->attributes);
-    }
-
-    /**
-     * Determine if an item exists at an offset.
-     *
-     * @param  mixed  $offset
-     * @return bool
-     */
-    public function offsetExists($offset): bool
-    {
-        return isset($this->attributes[$offset]);
-    }
-
-    /**
-     * Get an item at a given offset.
-     *
-     * @param  mixed  $offset
-     * @return mixed
-     */
-    public function offsetGet($offset): mixed
-    {
-        return $this->__get($offset);
-    }
-
-    /**
-     * Set the item at a given offset.
-     *
-     * @param  mixed  $offset
-     * @param  mixed  $value
-     * @return void
-     */
-    public function offsetSet($offset, $value): void
-    {
-        $this->__set($offset, $value);
-    }
-
-    /**
-     * Unset the item at a given offset.
-     *
-     * @param  mixed  $offset
-     * @return void
-     */
-    public function offsetUnset($offset): void
-    {
-        unset($this->attributes[$offset]);
-    }
-
-     /**
-     * Check if an item exists in the collection.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function __isset($key)
-    {
-        return isset($this->attributes[$key]);
-    }
-
-    /**
-     * Get Pagination Object
-     * 
-     * @return mixed
-     */
-    public function getPagination()
-    {
-        if(self::$is_paginate){
-            $pagination = self::$pagination;
-            return (object) [
-                'limit'         => (int) $pagination->limit,
-                'offset'        => (int) $pagination->offset,
-                'page'          => (int) $pagination->page,
-                'pageCount'     => (int) $pagination->pageCount,
-                'perPage'       => (int) $pagination->perPage,
-                'totalCount'    => (int) $pagination->totalCount,
-            ];
-        }
+        return new ArrayIterator($this->items);
     }
 
     /**
@@ -151,124 +63,6 @@ class CollectionMapper implements IteratorAggregate, ArrayAccess
         }
 
         return $this->key;
-    }
-
-    /**
-     * return items collection as an array
-     *
-     * @return array
-     */
-    public function getAttributes()
-    {
-        return $this->toArray();
-    }
-
-    /**
-     * return items collection as an object
-     *
-     * @return object
-     */
-    public function getOriginal()
-    {
-        return $this->toObject();
-    }
-
-    /**
-     * Determine if the collection is not empty.
-     *
-     * @return bool
-     */
-    public function isNotEmpty()
-    {
-        return ! $this->isEmpty();
-    }
-
-    /**
-     * Determine if the collection is empty.
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return empty($this->attributes);
-    }
-
-    /**
-     * Count the number of items in the collection.
-     *
-     * @return int
-     */
-    public function count(): int
-    {
-        return  is_array($this->attributes) 
-                ? count($this->attributes)
-                : 0;
-    }
-
-    /**
-     * Convert data to array
-     * 
-     * @return array
-     */ 
-    public function toArray()
-    {
-        return json_decode( json_encode($this->attributes), true);
-    }
-    
-    /**
-     * Convert data to object
-     * 
-     * @return object
-     */ 
-    public function toObject()
-    {
-        return json_decode( json_encode($this->attributes), false);
-    }
-    
-    /**
-     * Convert data to json
-     * 
-     * @return string
-     */ 
-    public function toJson()
-    {
-        return json_encode( $this->attributes );
-    }
-
-    /**
-     * Convert data to an array on Initializaiton
-     * @param mixed $items
-     * 
-     * @return array
-     */ 
-    private function convertOnInit(mixed $items = null)
-    {
-        return json_decode( json_encode($items), true);
-    }
-
-    /**
-     * Dynamically access collection items.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        // convert to array
-        $unasignedItems = $this->toArray();
-        return $unasignedItems[$key] ?? null;
-    }
-
-    /**
-     * Dynamically set an item in the collection.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return void
-     */
-    public function __set($key, $value)
-    {
-        $this->attributes[$key] = $value;
     }
 
 }

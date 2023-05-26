@@ -33,14 +33,12 @@ class EnvAutoLoad{
             'bg'    => $options['bg']   ?? 'default',
         ];
         
-        
         /*
         |--------------------------------------------------------------------------
         | Instance of class
         |--------------------------------------------------------------------------
         */
         $EnvOrm = new EnvOrm($default['path']);
-
         
         /*
         |--------------------------------------------------------------------------
@@ -48,7 +46,6 @@ class EnvAutoLoad{
         |--------------------------------------------------------------------------
         */
         $EnvOrm::createOrIgnore();
-        
         
         /*
         |--------------------------------------------------------------------------
@@ -59,7 +56,6 @@ class EnvAutoLoad{
         */
         $loader = $EnvOrm::loadOrFail();
         
-        
         /*
         |--------------------------------------------------------------------------
         | Defining background color for var dump
@@ -67,7 +63,6 @@ class EnvAutoLoad{
         | default | main | dark | red | blue
         */
         $EnvOrm->{'bg'} = $default['bg'];
-        
         
         /*
         |--------------------------------------------------------------------------
@@ -84,7 +79,6 @@ class EnvAutoLoad{
                 $EnvOrm::updateENV('APP_DEBUG_BG', $EnvOrm->{'bg'}, false);
             }
         }
-        
         
         /*
         |--------------------------------------------------------------------------
@@ -115,7 +109,7 @@ class EnvAutoLoad{
         | We can now use on anywhere on our application 
         | Mostly to get our defined .env root Path
         |
-        | DOT_ENV_CONNECTION['path'] -> return array of data containing .env path
+        | DOT_ENV_CONNECTION['env_path'] -> return array of data containing .env path
         */
         if ( ! defined('DOT_ENV_CONNECTION') ) {
             define('DOT_ENV_CONNECTION', array_merge([
@@ -134,7 +128,6 @@ class EnvAutoLoad{
         if ( ! defined('DATABASE_CONNECTION') ) {
             define('DATABASE_CONNECTION', new DB());
         }
-        
         
         /*
         |--------------------------------------------------------------------------

@@ -33,7 +33,7 @@ class Asset{
         $assetPath = ASSET_BASE_DIRECTORY;
 
         // trim
-        $asset = trim($asset, '/');
+        $asset = trim((string) $asset, '/');
 
         $file_domain = "{$assetPath['domain']}/{$asset}";
 

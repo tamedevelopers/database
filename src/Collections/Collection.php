@@ -17,12 +17,14 @@ use ArrayAccess;
 use Traversable;
 use ArrayIterator;
 use IteratorAggregate;
+use builder\Database\Collections\CollectionProperty;
+use builder\Database\Collections\Traits\RelatedTrait;
 use builder\Database\Collections\Traits\CollectionTrait;
 
 
-class Collection implements IteratorAggregate, ArrayAccess
+class Collection extends CollectionProperty implements IteratorAggregate, ArrayAccess
 {
-    use CollectionTrait;
+    use CollectionTrait, RelatedTrait;
 
     /**
      * The items contained in the collection.
@@ -30,7 +32,8 @@ class Collection implements IteratorAggregate, ArrayAccess
      * @var array
      */
     protected $items = [];
-
+    
+    
     /**
      * Create a new collection.
      *
@@ -56,66 +59,11 @@ class Collection implements IteratorAggregate, ArrayAccess
      */
     public function getIterator() : Traversable
     {
-        // Automatically wrap Mappers into an array
-        $items = $this->wrapArrayIntoCollectionMappers($this->items);
-
-        return new ArrayIterator($items);
-    }
-
-    /**
-     * Determine if an item exists at an offset.
-     *
-     * @param  mixed  $offset
-     * @return bool
-     */
-    public function offsetExists($offset): bool
-    {
-        return isset($this->items[$offset]);
-    }
-
-    /**
-     * Get an item at a given offset.
-     *
-     * @param  mixed  $offset
-     * @return mixed
-     */
-    public function offsetGet($offset): mixed
-    {
-        return $this->__get($offset);
-    }
-
-    /**
-     * Set the item at a given offset.
-     *
-     * @param  mixed  $offset
-     * @param  mixed  $value
-     * @return void
-     */
-    public function offsetSet($offset, $value): void
-    {
-        $this->__set($offset, $value);
-    }
-
-    /**
-     * Unset the item at a given offset.
-     *
-     * @param  mixed  $offset
-     * @return void
-     */
-    public function offsetUnset($offset): void
-    {
-        unset($this->items[$offset]);
-    }
-
-    /**
-     * Determine if the collection has a given key.
-     *
-     * @param  mixed  $key
-     * @return bool
-     */
-    public function has($key)
-    {
-        return array_key_exists($key, $this->items);
+        // On interation (foreach) 
+        // Wrap items into instance of CollectionMapper
+        return new ArrayIterator(
+            $this->wrapArrayIntoCollectionMappers($this->items)
+        );
     }
 
     /**
@@ -159,44 +107,6 @@ class Collection implements IteratorAggregate, ArrayAccess
         }
 
         return $key;
-    }
-
-    /**
-     * Check if an item exists in the collection.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function __isset($key)
-    {
-        return isset($this->items[$key]);
-    }
-
-    /**
-     * Dynamically access collection items.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        // Convert data to array
-        $unasignedItems = $this->toArray();
-        return  $unasignedItems[$key] 
-                ?? $unasignedItems[0][$key] 
-                ?? null;
-    }
-
-    /**
-     * Dynamically set an item in the collection.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return void
-     */
-    public function __set($key, $value)
-    {
-        $this->items[$key] = $value;
     }
 
 }

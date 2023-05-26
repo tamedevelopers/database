@@ -145,13 +145,13 @@ abstract class Insertion extends Builder {
     }
 
     /**
-     * Check if table exist
+     * Check if table exists
      * 
      * @param string $table_name
      * 
-     * @return bool\builder\Database\tableExist
+     * @return bool\builder\Database\tableExists
      */
-    public function tableExist(?string $table_name = null)
+    public function tableExists(?string $table_name = null)
     {
         try{
             // check if DB connection has been established 
@@ -170,7 +170,7 @@ abstract class Insertion extends Builder {
     }
 
     /**
-     * Check if data exist in table
+     * Check if data exists in table
      *
      * @return bool\builder\Database\exists
      */
@@ -425,13 +425,14 @@ abstract class Insertion extends Builder {
     public function count(?bool $close = true)
     {
         try {
-            // convert query
-            $this->allowCount()
+            // get query data
+            $data = $this->allowCount()
                     ->compileQuery()
-                    ->execute();
+                    ->execute()
+                    ->tryFetchAll(false);
             
             // get data
-            $data = $this->tryFetchAll(false)[0] ?? [];
+            $data = $data[0] ?? [];
 
             // get data and close connection
             if($close){

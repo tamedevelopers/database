@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace builder\Database\Traits;
 
 use ReflectionClass;
+use builder\Database\Schema\EnvOrm;
 
 
 trait ServerTrait{
@@ -115,6 +116,20 @@ trait ServerTrait{
                 'domain'    => $domainPath['domain'],
                 'protocol'  => $domainPath['protocol'],
             ];
+
+            /*
+            |--------------------------------------------------------------------------
+            | Storing data into a Global Constant 
+            |--------------------------------------------------------------------------
+            | We can now use on anywhere on our application 
+            | Mostly to get our defined .env root Path
+            |
+            | DOT_ENV_CONNECTION['env_path'] -> return array of data containing .env path
+            */
+            define('DOT_ENV_CONNECTION', array_merge($data, [
+                'env_path'  => $data['server'],
+                'env'       => new EnvOrm($data['server']),
+            ]));
         } else{
             // Data
             $envConnection = DOT_ENV_CONNECTION;

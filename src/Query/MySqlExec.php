@@ -62,6 +62,26 @@ class MySqlExec  extends Constants{
     }
 
     /**
+     * Get Database `PDO` Driver
+     * 
+     * @return mixed\builder\Database\dbDriver
+     */
+    public function dbDriver()
+    {
+        return $this->connection['driver'] ?? false;
+    }
+
+    /**
+     * Get Database Connection Status
+     * 
+     * @return bool\builder\Database\isConnection
+     */
+    public function isConnection()
+    {
+        return defined('DATABASE_CONNECTION');
+    }
+
+    /**
      * Table name
      * This is being used on all instance of one query
      * 
@@ -326,13 +346,13 @@ class MySqlExec  extends Constants{
      */ 
     public function compileQuery()
     {
-        if($this->PaginateQuery){
+        if($this->paginateQuery){
 
             // reset count
             $this->countQuery = false;
 
             // query builder
-            $this->compileQueryBuilder();
+            $this->compileQueryBuilder(false);
         }
         // other query
         elseif($this->modelQuery){
@@ -350,7 +370,7 @@ class MySqlExec  extends Constants{
      */
     protected function allowPaginate()
     {
-        $this->PaginateQuery    = true;
+        $this->paginateQuery = true;
 
         return $this;
     }
@@ -401,18 +421,18 @@ class MySqlExec  extends Constants{
             $query = "SELECT 
                         {$this->formatSelectQuery()} 
                         FROM `{$this->table}`";
-        }else{
+        } else{
             $query = "SELECT * FROM `{$this->table}`";
         }
 
-        return $this->console::replaceWhiteSpace(
+        return trim($this->console::replaceWhiteSpace(
             "{$query}
             {$joins} 
             {$this->rawAndWherePositionBuilder()}
             {$this->groupBy} 
             {$this->orderBy} 
             {$limit}"
-        );
+        ));
     }
 
     /**
@@ -460,16 +480,33 @@ class MySqlExec  extends Constants{
      */ 
     protected function formatSelectQuery()
     {
-        if(is_array($this->selectColumns) && count($this->selectColumns) === 0){
+        if(empty($this->selectColumns)){
             if($this->countQuery){
                 return "count(*)";
             }
             return "*";
         }else{
-            // trim excess strings if any
-            $this->selectColumns = $this->console::arrayWalkerTrim($this->selectColumns);
+            $asCount        = ""; 
+            $formatColumn   = true;
 
-            return implode(', ', $this->selectColumns);
+            // when trying to count data
+            if($this->countQuery){
+                $asCount = ", count(*)";
+            }
+
+            // reset back when trying to paginate
+            if($this->paginateQuery){
+                $asCount        = "";
+                $formatColumn   = false;
+            }
+
+            // trim excess strings if any
+            $this->selectColumns = $this->console::arrayWalkerTrim($this->selectColumns, $formatColumn);
+
+            // get query string
+            $queryString = implode(', ', $this->selectColumns);
+
+            return "{$queryString}{$asCount}";
         }
     }
 
@@ -571,7 +608,7 @@ class MySqlExec  extends Constants{
         $this->selectColumns        = [];
         $this->paramValues          = [];
         $this->selectQuery          = false;
-        $this->PaginateQuery        = false;
+        $this->paginateQuery        = false;
         $this->countQuery           = false;
         $this->modelQuery           = false;
         $this->removeTags           = false;

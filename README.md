@@ -39,7 +39,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
     * [Count](#count)
     * [Paginate](#paginate)
     * [Exist](#exists)
-    * [Table Exist](#table-exist)
+    * [Table Exists](#table-exists)
 * [Asset](#Asset)
     * [Asset config](#asset-config)
         * [Asset Cache](#asset-cache)
@@ -151,8 +151,7 @@ $db = new DB();
 | By default you don't need to define any path again                                            |
 | Files you'll see `.env` `.gitignore` `.htaccess` `.user.ini` `php.ini` `init.php`             |
 | The below code should be called before using the database model                               | 
-| It's important to install vendor in your project root [dir]                                   | 
-| When done running the code first time, Then remove code and include `init.php` file           | 
+| When done running the code first time, Then remove code and include `init.php` file anywhere in your project | 
 
 ```
 use builder\Database\EnvAutoLoad;
@@ -245,8 +244,6 @@ $db->table('users')->insert([
 ```
 
 ### Insert Or Ignore
-<details><summary>Read more...</summary>
-
 - Same as `insert()` method
     - It returns an object of created data or `false` on error
 
@@ -256,7 +253,6 @@ $db->table('users')->insertOrIgnore([
     'first_name' => 'Alfred',
 ]);
 ```
-</details>
 
 ### Update
 - Takes one parameter as assoc array `column_name => value`
@@ -271,8 +267,6 @@ $db->table('users')
 ```
 
 ### Update Or Ignore
-<details><summary>Read more...</summary>
-
 - Same as `update()` method
     - Returns an `int` numbers of affected rows or `0` on error
 
@@ -283,7 +277,6 @@ $db->table('users')
         'first_name' => 'Alfred C.',
     ]);
 ```
-</details>
 
 ### Delete
 - Returns an `int`
@@ -405,7 +398,7 @@ $db->table('post')
 | count()       |  int               |
 | paginate()    |  array of objects  |
 | exists()      |  boolean `true` \| `false` |
-| tableExist()  |  boolean `true` \| `false` |
+| tableExists() |  boolean `true` \| `false` |
 
 ### GET
 ```
@@ -496,10 +489,10 @@ $db->table('users')
     ->exists();
 ```
 
-### Table Exist
+### Table Exists
 - Takes param as `string` `$table_name`
 ```
-$db->tableExist('users');
+$db->tableExists('users');
 ```
 
 ## Asset
@@ -658,6 +651,7 @@ config_pagination([
 ```
 
 <details><summary>Read more...</summary>
+
 - 2 Can also be called using the `$db->configPagination` method
 ```
 $db->configPagination([

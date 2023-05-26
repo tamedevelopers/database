@@ -10,6 +10,18 @@ use builder\Database\Schema\EnvOrm;
 use builder\Database\Migrations\Schema;
 use builder\Database\Migrations\Migration;
 
+if (! function_exists('isConnection')) {
+    /**
+     * Get Database Connection Status
+     * 
+     * @return bool\builder\Database\isConnection
+     */
+    function isConnection()
+    {
+        return (new MySqlExec)->isConnection();
+    }
+}
+
 if (! function_exists('db')) {
     /**
      * Get Database 
@@ -34,9 +46,9 @@ if (! function_exists('db_query')) {
     function db_query()
     {
         // get query
-        return defined('DATABASE_CONNECTION') 
-                    ? DATABASE_CONNECTION->dbQuery()
-                    : (new MySqlExec)->dbQuery();
+        return isConnection() 
+                ? DATABASE_CONNECTION->dbQuery()
+                : (new MySqlExec)->dbQuery();
     }
 }
 
@@ -54,7 +66,7 @@ if (! function_exists('db_config')) {
      */
     function db_config(?array $options = [])
     {
-        if ( ! defined('DATABASE_CONNECTION') ) {
+        if ( ! isConnection() ) {
             define('DATABASE_CONNECTION', db($options));
         }
     }
@@ -72,11 +84,26 @@ if (! function_exists('db_connection')) {
     function db_connection(?string $type = null)
     {
         // get database connection
-        $connection = defined('DATABASE_CONNECTION') 
+        $connection = isConnection() 
                     ? DATABASE_CONNECTION->dbConnection()
                     : db()->dbConnection();
         
         return $connection[$type] ?? (object) $connection;
+    }
+}
+
+if (! function_exists('db_driver')) {
+    /**
+     * Get Database `PDO` Driver
+     * 
+     * @return mixed\builder\Database\getDriver
+     */
+    function driver()
+    {
+        // get database connection
+        return isConnection() 
+                ? DATABASE_CONNECTION->dbConnection()['driver']
+                : db()->dbConnection()['driver'];
     }
 }
 
@@ -306,7 +333,7 @@ if (! function_exists('app_data')) {
                     : env_orm()->getDirectory();
 
         // get database
-        $database = defined('DATABASE_CONNECTION') 
+        $database = isConnection()  
                     ? DATABASE_CONNECTION
                     : db();
 

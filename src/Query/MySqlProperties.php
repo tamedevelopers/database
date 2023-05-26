@@ -136,7 +136,7 @@ trait MySqlProperties{
     /**
      * @var bool
      */
-    protected $PaginateQuery = false;
+    protected $paginateQuery = false;
 
     /**
      * @var bool

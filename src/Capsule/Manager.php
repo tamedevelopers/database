@@ -262,7 +262,11 @@ class Manager extends Constants{
      */ 
     static public function replaceWhiteSpace(?string $string = null)
     {
-        return preg_replace(self::$regex_whitespace, " ", $string);
+        return trim(preg_replace(
+            self::$regex_whitespace, 
+            " ", 
+            $string
+        ));
     }
 
     /**
@@ -533,15 +537,22 @@ class Manager extends Constants{
      * Trim empty strings from an array value
      * 
      * @param array $param
+     * @param bool $indent
      * 
      * @return array
      */ 
-    static public function arrayWalkerTrim(?array $param = [])
+    static public function arrayWalkerTrim(?array $param = [], ?bool $indent = false)
     {
-        array_walk($param, function(&$value, $index){
+        array_walk($param, function(&$value, $index) use($indent){
             if(!empty($value)){
                 if(is_string($value)){
+                    // trim
                     $value = trim($value);
+
+                    // if indentation of value is allowed
+                    if($indent){
+                        $value = "`$value`";
+                    }
                 }
             }
         });

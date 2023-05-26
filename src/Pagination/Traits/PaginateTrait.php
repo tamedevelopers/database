@@ -270,9 +270,12 @@ trait PaginateTrait{
     protected function getPagination($per_page = 10)
     {
         try {
+            // get Counted Data
+            $countData = $this->count(false);
+
             // Initialize a Data Pagination with previous count number
             $this->pagination = new Pagination([
-                'totalCount'    => $this->count(false),
+                'totalCount'    => $countData,
                 'perPage'       => $per_page
             ]);
 
