@@ -247,7 +247,8 @@ trait RelatedTrait{
     private function convertOnInit(mixed $items = null)
     {
         if ($this->unescapeIsObjectWithoutArray) {
-            return json_decode(json_encode($items), true);
+            if(!is_bool($items))
+                return json_decode(json_encode($items), true);
         } elseif ($this->isValidJson()) {
             return json_decode($items, true);
         } elseif (is_array($items) || is_string($items)) {
