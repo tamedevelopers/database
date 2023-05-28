@@ -116,7 +116,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.1.8"
+    "peterson/php-orm-database": "^4.1.9"
 }
 ```
 
@@ -1445,6 +1445,9 @@ class PostClass extends DB{
 | config_pagination()       | Same as `$db->configPagination()` or `EnvAutoLoad::configPagination`  |
 | autoload_register()       | Same as `AutoloadRegister::load()`            |
 | app_data()                | Get `path\|database\|pagination` info         |
+| base_dir()                | Get absolute base directory path. It accepts a param as `string` if given, will be appended to the path |
+| directory()               | Same as `base_dir()` just naming difference        |
+| domain()                  | Similar to `base_dir()` as it returns domain URI. Also accepts path given and this will append to the endpoint of URL. |
 | env()                     | Same as `$db->env()`                          |
 | env_orm()                 | Return instance of `(new EnvOrm)` class       |
 | env_start()               | Same as `EnvAutoLoad::start()`                |
