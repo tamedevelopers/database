@@ -200,6 +200,8 @@ class PaginationLoader
      */
     protected function _init()
     {
+        $this->convertToIntegers();
+        
         // Format
         $this->totalCount = ($this->totalCount > 0) ? floor($this->totalCount) : 0;
         $this->perPage = ($this->perPage >= 1) ? floor($this->perPage) : 20;
@@ -216,4 +218,20 @@ class PaginationLoader
         // Limit ignores (total - offset)
         $this->limit = $this->perPage;
     }
+
+    /**
+     * convert tp int
+     *
+     * @return void
+     */
+    protected function convertToIntegers()
+    {
+        // Format
+        $this->page         = (int) $this->page;
+        $this->perPage      = (int) $this->perPage;
+        $this->pageCount    = (int) $this->pageCount;
+        $this->totalCount   = (int) $this->totalCount;
+    }
+
+
 }

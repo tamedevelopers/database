@@ -326,8 +326,7 @@ class MySqlExec  extends Constants{
             }
         }
 
-        dd(
-            [
+        return [
                 'status'    => self::ERROR_404, 
                 'message'   => preg_replace(
                     '/^[ \t]+|[ \t]+$/m', '', 
@@ -338,9 +337,7 @@ class MySqlExec  extends Constants{
                         <<\\PDO::ERROR>> {$e->getMessage()}
                     "
                 )
-            ]
-        );
-        exit(1);
+        ];
     }
 
     /**

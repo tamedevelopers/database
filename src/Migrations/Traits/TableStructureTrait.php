@@ -329,16 +329,28 @@ trait TableStructureTrait{
      */
     private function regixifyQuery(?string $formatted)
     {
-        // Replace the comma with comma + newline
-        $formatted = preg_replace("/,\s*/m", ",\n", $formatted);
+        $formattedQuery = '';
+        $indentationLevel = 0;
+        $keywords = ['SELECT', 'FROM', 'WHERE', 'JOIN', 'GROUP BY', 'ORDER BY', 'INSERT', 'UPDATE', 'DELETE'];
+        $lines = explode("\n", $formatted);
 
-        // clean string from begining and ending
-        $formatted = preg_replace("/^[ \t]+|[ \t]+$/m", "", $formatted);
+        foreach ($lines as $line) {
+            $trimmedLine = trim($line);
 
-        // replace back-slash
-        $formatted = str_replace('\\', '', $formatted);
+            if (!empty($trimmedLine)) {
+                if (in_array(strtoupper($trimmedLine), $keywords)) {
+                    $formattedQuery .= str_repeat('  ', $indentationLevel) . $trimmedLine . "\n";
+                    $indentationLevel++;
+                } elseif ($trimmedLine === ')') {
+                    $indentationLevel--;
+                    $formattedQuery .= str_repeat('  ', $indentationLevel) . $trimmedLine . "\n";
+                } else {
+                    $formattedQuery .= str_repeat('  ', $indentationLevel) . $trimmedLine . "\n";
+                }
+            }
+        }
 
-        return $formatted;
+        return $formattedQuery;
     }
 
 }

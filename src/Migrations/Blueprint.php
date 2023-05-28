@@ -119,7 +119,7 @@ class Blueprint extends Constants{
 
             // execute query
             if($this->status_runned){
-                $this->db->query( $mysqlHandle['message'] )->execute();
+                $this->db->dbDriver()->exec($mysqlHandle['message']);
             }
 
             return [

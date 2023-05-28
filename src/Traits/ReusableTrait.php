@@ -65,7 +65,10 @@ trait ReusableTrait{
             Debugger::$maxDepth = 5; // default: 3
             Debugger::$maxLength = 1000; // default: 150
             Debugger::$dumpTheme = $this->getBgColor(APP_DEBUG_BG);
-            Debugger::enable(!APP_DEBUG);
+            // set cookie
+            if (!headers_sent()) {
+                Debugger::enable(!APP_DEBUG);
+            }
         } 
     }
 

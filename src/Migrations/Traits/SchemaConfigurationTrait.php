@@ -65,8 +65,8 @@ trait SchemaConfigurationTrait{
     protected function addColumn($name, $type, $length = null)
     {
         $column = [
-            'name' => $name, 
-            'type' => $type
+            'name' => trim((string) $name), 
+            'type' => trim((string) $type)
         ];
 
         // add legnth
@@ -134,7 +134,7 @@ trait SchemaConfigurationTrait{
         // for enum|set
         if(isset($options['values'])){
             array_walk($options['values'], function (&$value, $key){
-                $value = "\'{$value}\'";
+                $value = "'{$value}'";
             });
             $values = implode(', ', $options['values']);
             $columnDef .= "({$values})";
@@ -225,7 +225,7 @@ trait SchemaConfigurationTrait{
     {
         $columnDef = "";
         if (!is_null($options['default'])) {
-            $columnDef .= " DEFAULT \'{$options['default']}\'";
+            $columnDef .= " DEFAULT '{$options['default']}'";
         }
 
         return $columnDef;
