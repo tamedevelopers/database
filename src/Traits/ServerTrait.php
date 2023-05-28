@@ -88,6 +88,26 @@ trait ServerTrait{
     }
 
     /**
+     * Format path with Domain Path
+     * 
+     * @param string $path
+     * - [optional] You can pass a path to include with the domain link
+     * - Final result: i.e https://domain.com/path
+     * 
+     * @return string
+     */
+    static public function formatWithDomainURI(?string $path = null)
+    {
+        $server = rtrim(
+            self::getServers('domain'),
+            '/'
+        );
+        return self::pathReplacer(
+            "{$server}/{$path}"
+        );
+    }
+
+    /**
      * Get the base URL and domain information.
      *
      * @param string $mode 

@@ -286,36 +286,46 @@ if (! function_exists('config_pagination')) {
 if (! function_exists('directory')) {
     /**
      * Get Base Directory `Path`
+     * @param string $path
+     * - [optional] You can pass a path to include with the base directory
+     * - Final result: i.e C:/server_path/path
      * 
      * @return string
      */
-    function directory()
+    function directory(?string $path = null)
     {
-        return base_path();
+        return base_path($path);
     }
 }
 
 if (! function_exists('base_path')) {
     /**
      * Get Base Directory `Path`
+     * @param string $path
+     * - [optional] You can pass a path to include with the base directory
+     * - Final result: i.e C:/server_path/path
      * 
      * @return string
      */
-    function base_path()
+    function base_path(?string $path = null)
     {
-        return env_orm()->getDirectory();
+        return env_orm()->formatWithBaseDirectory($path);
     }
 }
 
 if (! function_exists('domain')) {
     /**
-     * Get Domain `URL` Link
+     * Get Domain `URL` URI
+     * 
+     * @param string $path
+     * - [optional] You can pass a path to include with the domain link
+     * - Final result: i.e https://domain.com/path
      * 
      * @return string
      */
-    function domain()
+    function domain(?string $path = null)
     {
-        return env_orm()->getServers('domain');
+        return env_orm()->formatWithDomainURI($path);
     }
 }
 
