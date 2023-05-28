@@ -12,6 +12,7 @@ declare(strict_types=1);
  */
 namespace builder\Database;
 
+use builder\Database\Query\MySqlExec;
 use builder\Database\Schema\Insertion;
 
 class DB extends Insertion{
@@ -35,5 +36,8 @@ class DB extends Insertion{
                 $this->configPagination($options);
             }
         }
+
+        // open default logger
+        (new MySqlExec)->autoStartDebugger();
     }
 }

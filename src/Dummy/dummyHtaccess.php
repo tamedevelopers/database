@@ -2,17 +2,8 @@
     # Start Engine
     RewriteEngine On
     
-    # Cache-busting rule
-    RewriteCond %{QUERY_STRING} !cache-buster [NC]
-    RewriteRule \.(php|html)$ %{REQUEST_URI}?cache-buster=%{TIME_SEC} [L]
-    
-    # Disable caching for PHP files
-    RewriteCond %{ENV:REDIRECT_NO_CACHE} !^$
-    RewriteRule \.php$ - [E=NO_CACHE:1]
-
     # Define additional rules below
     # 
-
     
     # Cache control headers
     <IfModule mod_headers.c>
@@ -37,15 +28,6 @@
         <filesMatch "\.(x?php)$">
             Header set Cache-Control "private, must-revalidate"
         </filesMatch>
-        
-        # Disable caching for PHP files when NO_CACHE is defined
-        <IfDefine NO_CACHE>
-            <FilesMatch "\.php$">
-                Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
-                Header set Pragma "no-cache"
-                Header set Expires "Thu, 01 Jan 1970 00:00:00 GMT"
-            </FilesMatch>
-        </IfDefine>
     </IfModule>
     
     # Mod security

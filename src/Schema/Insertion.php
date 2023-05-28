@@ -23,7 +23,7 @@ abstract class Insertion extends Builder {
      */
 	public function __construct(?array $options = [])
     {
-        parent::__construct();
+        parent::__construct($options);
 
         // init configuration
         $this->initConfiguration($options);

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace builder\Database;
 
 use builder\Database\DB;
-use builder\Database\Capsule\Manager;
 use builder\Database\Schema\EnvOrm;
+use builder\Database\Capsule\Manager;
 
 class EnvAutoLoad{
 
@@ -17,7 +17,7 @@ class EnvAutoLoad{
      * 
      * @param array $options 
      * path \Path to .env file
-     * bg \dump background color (default | main | dark | red | blue)
+     * bg \dump background color (light | dark)
      * 
      * @return void
      */
@@ -28,10 +28,10 @@ class EnvAutoLoad{
         | Create default path and bg for errors
         |--------------------------------------------------------------------------
         */
-        $default = [
-            'path'  => $options['path'] ?? null,
-            'bg'    => $options['bg']   ?? 'default',
-        ];
+        $default = array_merge([
+            'path'  => null,
+            'bg'    => Manager::$default_bg,
+        ], $options);
         
         /*
         |--------------------------------------------------------------------------
@@ -153,19 +153,26 @@ class EnvAutoLoad{
         |--------------------------------------------------------------------------
         */
         $text       = Manager::$pagination_text;
-        $default    = [
-            'allow'     => $options['allow']            ?? 'disallow',
-            'class'     => $options['class']            ?? null,
-            'view'      => in_array($options['view']    ?? null, ['bootstrap', 'simple']) ? $options['view'] : $text['view'],
-            'first'     => $options['first']            ?? $text['first'],
-            'last'      => $options['last']             ?? $text['last'],
-            'next'      => $options['next']             ?? $text['next'],
-            'prev'      => $options['prev']             ?? $text['prev'],
-            'span'      => $options['span']             ?? $text['span'],
-            'showing'   => $options['showing']          ?? $text['showing'],
-            'of'        => $options['of']               ?? $text['of'],
-            'results'   => $options['results']          ?? $text['results'],
-        ];
+        $getViews   = Manager::$pagination_views;
+        
+        $default = array_merge([
+            'allow'     => 'disallow',
+            'class'     => null,
+            'view'      => null,
+            'first'     => $text['first'],
+            'last'      => $text['last'],
+            'next'      => $text['next'],
+            'prev'      => $text['prev'],
+            'span'      => $text['span'],
+            'showing'   => $text['showing'],
+            'of'        => $text['of'],
+            'results'   => $text['results'],
+        ], $options);
+
+        // get actual view
+        $default['view'] = in_array($default['view'], $getViews)
+                        ? $options['view'] 
+                        : $text['view'];
 
         /*
         |--------------------------------------------------------------------------

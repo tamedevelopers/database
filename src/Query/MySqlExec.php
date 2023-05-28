@@ -326,7 +326,7 @@ class MySqlExec  extends Constants{
             }
         }
 
-        ddump(
+        dd(
             [
                 'status'    => self::ERROR_404, 
                 'message'   => preg_replace(

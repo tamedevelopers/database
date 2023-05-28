@@ -210,7 +210,7 @@ $db->table('users')
 |-------------------|-----------|-----------------------|
 | DRIVER_NAME       |  string   |  mysql                |
 | APP_DEBUG         |  boolean  |  true                 |
-| APP_DEBUG_BG      |  string   |  Default value is `default` and other color \| `main` \| `dark` \| `red` \| `blue` |
+| APP_DEBUG_BG      |  string   |  Default value is `dark` and other color \| `light` |
 | DB_HOST           |  string   |  `localhost`          |
 | DB_USERNAME       |  string   |                       |
 | DB_PASSWORD       |  string   |                       |
@@ -1463,9 +1463,7 @@ class PostClass extends DB{
 
 | function  | Description     |
 |-----------|-----------------|
-| ddump     | Custom made error dump  |
-| dump      | Dump error handling |
-| dd        | Dump and Die - Error handling |
+| dd        | Dump or Die - Error handling |
 
 
 ## Error Status

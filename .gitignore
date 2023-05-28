@@ -5,6 +5,7 @@
 /demo
 /database
 /storage
+/path
 .env
 .htaccess
 .gitignore

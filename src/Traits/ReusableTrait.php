@@ -4,17 +4,10 @@ declare(strict_types=1);
 
 namespace builder\Database\Traits;
 
+use Tracy\Debugger;
 use builder\Database\Capsule\Manager;
-use builder\Database\Query\MySqlExec;
-use Symfony\Component\VarDumper\VarDumper;
 
 trait ReusableTrait{
-    
-    /**
-     * Define var_dump background color
-     * @var string
-    */
-    public $bg = 'default';
     
     /**
      * Exit script on dump
@@ -23,80 +16,83 @@ trait ReusableTrait{
     public $dump_final = true;
     
     /**
-     * Background colors
-     * @return array
+     * Headers
+     * 
+     * @return void
     */
-    private function getBackgrounds()
+    private function setHeaders()
     {
-        return [
-            'default'   => '',
-            'main'      => 'background-color: #18171B !important; color: #FF8400 !important;',
-            'dark'      => 'background-color: #222222 !important; color: #F1F1F1 !important;',
-            'red'       => 'background-color: #840808 !important; color: #FFFFFF !important;',
-            'blue'      => 'background-color: #160082 !important; color: #FF8400 !important;',
-        ];
+        Manager::setHeaders();
     }
     
     /**
-     * Format query data to browser
+     * Die or Dump Error Handler
      * @param mixed $data
      *  
      * @return mixed
      */
     public function dump(...$data)
     {
-        // get App Config
-        $envData = (new MySqlExec)->env();
-        
-        // get bg
-        $bg =   isset($_ENV['APP_DEBUG_BG']) 
-                ? $_ENV['APP_DEBUG_BG'] 
-                : isset($envData['APP_DEBUG_BG']) 
-                ?? $this->bg;
-        
-        // app data
-        $App =  is_array($envData) 
-                ? $envData['APP_DEBUG'] 
-                : true;
-        
         // if DEBUG MODE IS ON
-        if(Manager::setEnvBool($App)){
-            $bt     = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            $caller = array_shift($bt);
-            $header = sprintf("#1: %s:%d ", $caller['file'], $caller['line']);
-
+        if(Manager::setEnvBool(APP_DEBUG)){
             $dataArray = $data[0] ?? $data;
             if(is_array($dataArray)){
                 foreach ($dataArray as $var) {
-                    VarDumper::dump($var);
+                    Debugger::dump($var);
                 }
             }else{
-                VarDumper::dump($dataArray);
-            }
-            
-            echo "<style>pre.sf-dump, pre.sf-dump .sf-dump-default{{$this->getBgColor( $bg )}}</style>";
-            if($this->dump_final){
-                exit(1);
+                Debugger::dump($dataArray);
             }
         } else{
             if($this->dump_final){
-                exit(1);
+                $this->setHeaders();
             }
         }
     }
-    
+
+    /**
+     * Autostart debugger for error logger
+     * 
+     * @return string
+     */
+    public function autoStartDebugger()
+    {
+        // if DEBUG MODE IS ON
+        if(Manager::setEnvBool(APP_DEBUG)){
+            // register debugger
+            Debugger::$showBar = false;
+            Debugger::$strictMode = true; // display all errors
+            Debugger::$maxDepth = 5; // default: 3
+            Debugger::$maxLength = 1000; // default: 150
+            Debugger::$dumpTheme = $this->getBgColor(APP_DEBUG_BG);
+            Debugger::enable(!APP_DEBUG);
+        } 
+    }
+
+    /**
+     * Remove footer
+     * @return void
+     */
+    private function removeFooter()
+    {
+        echo "<style>footer, .tracy-footer--sticky{display: none !important; visibility: hidden !important;}</style>";
+    }
+
     /**
      * Get background color
      * @param string $color
      * 
      * @return string
      */
-    private function getBgColor($color)
+    private function getBgColor(?string $color = null)
     {
-        $bgColors = $this->getBackgrounds();
-        return isset($bgColors[$color]) 
-                ? $bgColors[$color] 
-                : $bgColors['default'];
+        $data = [
+            'light' => 'light',
+            'dark'  => 'dark',
+        ];
+
+        return $data[$color] ?? $data['light'];
     }
+
 
 }

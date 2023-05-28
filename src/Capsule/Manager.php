@@ -42,6 +42,14 @@ class Manager extends Constants{
     /**
      * @var array
      */
+    static public $pagination_views = [
+        'bootstrap' => 'bootstrap',
+        'simple'    => 'simple',
+    ];
+    
+    /**
+     * @var array
+     */
     static private $disallow_method = [
         'errorTemp',
         'executeAction',
@@ -65,7 +73,7 @@ class Manager extends Constants{
         'latin1_bin',
     ];
 
-     /**
+    /**
      * @var array
      */
     static private $charsets = [
@@ -73,6 +81,11 @@ class Manager extends Constants{
         'utf8',
         'latin1',
     ];
+
+    /**
+     * @var string
+     */
+    static public $default_bg = 'dark';
     
     /**
      * Initilize and Set the Database Configuration on constructor
@@ -91,18 +104,18 @@ class Manager extends Constants{
      */
     static public function initConfiguration(?array $options = [])
     {
-        $defaultOption = [
-            'APP_DEBUG'     => $options['APP_DEBUG']    ?? true,
-            'APP_DEBUG_BG'  => $options['APP_DEBUG_BG'] ?? 'default',
-            'DRIVER_NAME' => $options['DRIVER_NAME']?? 'mysql',
-            'DB_HOST'       => $options['DB_HOST']      ?? 'localhost',
-            'DB_DATABASE'   => $options['DB_DATABASE']  ?? '',
-            'DB_USERNAME'   => $options['DB_USERNAME']  ?? '',
-            'DB_PASSWORD'   => $options['DB_PASSWORD']  ?? '',
-            'DB_PORT'       => $options['DB_PORT']      ?? 3306,
-            'DB_COLLATION'  => $options['DB_COLLATION'] ?? 'utf8mb4_unicode_ci',
-            'DB_CHARSET'    => $options['DB_CHARSET']   ?? 'utf8mb4',
-        ];
+        $defaultOption = array_merge([
+            'APP_DEBUG'     => true,
+            'APP_DEBUG_BG'  => self::$default_bg,
+            'DRIVER_NAME'   => 'mysql',
+            'DB_HOST'       => 'localhost',
+            'DB_DATABASE'   => '',
+            'DB_USERNAME'   => '',
+            'DB_PASSWORD'   => '',
+            'DB_PORT'       => 3306,
+            'DB_COLLATION'  => 'utf8mb4_unicode_ci',
+            'DB_CHARSET'    => 'utf8mb4',
+        ], $options);
 
         // get accepted data
         $defaultOption['DB_COLLATION']  = self::findCollation($defaultOption['DB_COLLATION']);
@@ -171,7 +184,7 @@ class Manager extends Constants{
     {
         $data =  [
             'APP_DEBUG'     => defined('APP_DEBUG')     ? APP_DEBUG     : true,
-            'APP_DEBUG_BG'  => defined('APP_DEBUG_BG')  ? APP_DEBUG_BG  : 'default',
+            'APP_DEBUG_BG'  => defined('APP_DEBUG_BG')  ? APP_DEBUG_BG  : self::$default_bg,
             'DRIVER_NAME'   => defined('DRIVER_NAME')   ? DRIVER_NAME   : 'mysql',
             'DB_HOST'       => defined('DB_HOST')       ? DB_HOST       : 'localhost',
             'DB_DATABASE'   => defined('DB_DATABASE')   ? DB_DATABASE   : null,
@@ -218,7 +231,7 @@ class Manager extends Constants{
         flush();
 
         // Exit with response 404
-        exit();
+        exit(1);
     }
 
     /**
@@ -586,33 +599,6 @@ class Manager extends Constants{
             'error'     => $errorStatus,
             'message'   => $temp,
         ];
-    }
-
-    /**
-     * Create String Template of all possible error
-     * @param Exception $exception 
-     * 
-     * @return string
-     */ 
-    static public function convertExceptionErrorTemp(Exception $exception)
-    {
-        $temp = '';
-        $getTrace = ($exception)->getTrace();
-        unset($getTrace[0]);
-
-        foreach($getTrace as $key => $error){
-            if(!in_array($error['function'], self::$disallow_method)){
-                $temp .= "
-                    <<\\File>> {$error['file']}
-                    <<\\Line>> {$error['line']}
-                    <<\\Function>> {$error['function']}
-                    <<\\Class>> {$error['class']}
-                    ====================================================
-                ";
-            }
-        }
-
-        return $temp;
     }
 
 }

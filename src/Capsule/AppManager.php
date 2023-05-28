@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace builder\Database\Capsule;
 
 use builder\Database\Constants;
+use builder\Database\Capsule\Manager;
 
 
 class AppManager extends Constants{
@@ -29,7 +30,7 @@ class AppManager extends Constants{
             APP_ENV=local
             APP_KEY='. self::generateAppKey() .'
             APP_DEBUG=true
-            APP_DEBUG_BG=default
+            APP_DEBUG_BG='. Manager::$default_bg .'
             SITE_EMAIL=
             
             DRIVER_NAME=mysql

@@ -393,7 +393,7 @@ if (! function_exists('to_json')) {
     }
 }
 
-if (! function_exists('ddump')) {
+if (! function_exists('dd')) {
     /**
      * Die or Dump
      * Only works when .env APP_DEBUG is set to true
@@ -402,7 +402,7 @@ if (! function_exists('ddump')) {
      * 
      * @return mixed
      */
-    function ddump(...$data)
+    function dd(...$data)
     {
         return (new MySqlExec)->dump($data);
     }

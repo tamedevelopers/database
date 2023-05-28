@@ -91,12 +91,12 @@ trait SchemaConfigurationTrait{
     {
         // array merge
         $options = array_merge($options, [
-            'name'      => $options['name']     ?? '',
-            'type'      => $options['type']     ?? '',
-            'length'    => $options['length']   ?? null,
-            'default'   => $options['default']  ?? null,
-            'nullable'  => $options['nullable'] ?? false,
-        ]);
+            'name'      => '',
+            'type'      => '',
+            'length'    => null,
+            'default'   => null,
+            'nullable'  => false,
+        ], $options);
         
         // create default string
         $getType    = $this->getColumnType($options['type']);

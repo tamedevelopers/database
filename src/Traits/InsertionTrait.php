@@ -271,6 +271,9 @@ trait InsertionTrait{
      */ 
     protected function firstCollectionQuery(?bool $firstOrFail = true)
     {
+        // headers
+        $headers = new Manager();
+
         try {
             $this->limit(1)->compileQuery()->execute();
             
@@ -283,7 +286,7 @@ trait InsertionTrait{
             if($firstOrFail){
                 if(!$result){
                     // exit with header code
-                    (new Manager)::setHeaders();
+                    $headers->setHeaders();
                 }
             }
 
@@ -291,7 +294,7 @@ trait InsertionTrait{
         } catch (\PDOException $e) {
             // first or fail
             if($firstOrFail){
-                (new Manager)::setHeaders();
+                $headers->setHeaders();
             } else{
                 return $this->errorTemp($e, true);
             }
