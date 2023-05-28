@@ -97,18 +97,21 @@ class Blueprint extends Constants{
             return $mysqlHandle;
         } 
 
+        // style css
+        $style = self::$style;
+
         // Handle query
         try{
             // check if table already exist
-            if($this->db->tableExist($this->tableName)){
+            if($this->db->tableExists($this->tableName)){
                 $message = "Migration 
-                                <span style='background: #ee0707; {$this->style}'>
+                                <span style='background: #ee0707; {$style}'>
                                     Failed
                                 </span> Table exist on `{$traceTable}` <br>\n";
             }else{
                 $this->status_runned = true;
                 $message = "Migration runned 
-                                <span style='background: #027b02; {$this->style}'>
+                                <span style='background: #027b02; {$style}'>
                                     Successfully
                                 </span> on
                                 `{$traceTable}` <br>\n";
@@ -145,13 +148,16 @@ class Blueprint extends Constants{
      */
     private function checkDBConnect()
     {
+        // style css
+        $style = self::$style;
+
         // if database connection is okay
         $dbConnection = $this->db->dbConnection();
         if($dbConnection['status'] !== self::ERROR_200){
             return [
                 'status'    => self::ERROR_404,
                 'message'   => "Connection Error 
-                                    <span style='background: #ee0707; {$this->style}'>
+                                    <span style='background: #ee0707; {$style}'>
                                         Database Connection Error
                                     </span>
                                     `{$dbConnection['message']}` <br>\n",

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Pagination\Traits;
-
-use yidas\data\Pagination;
+namespace builder\Database\Pagination;
+    
 use builder\Database\Capsule\Manager;
-use builder\Database\Pagination\OrmPagination;
+use builder\Database\Pagination\Yidas\PaginationLoader;
+use builder\Database\Pagination\Yidas\PaginationWidget;
 
-trait PaginateTrait{
+trait Pagination{
     
     /**
      * pagination data
@@ -19,39 +19,19 @@ trait PaginateTrait{
      * global config traction
      * @var bool
      */
-    public $use_global;
-
-    /**
-     * pagination style
-     * @var string
-     */
-    public $pagination_css;
+    private $use_global;
 
     /**
      * pagination settings
      * @var array
      */
     public $pagination_settings = [];
-    
-    /**
-     * pagination view
-     * @var array
-     */
-    public $pagination_view = [
-        'bootstrap' => 'bootstrap',
-        'simple'    => 'simple',
-    ];
 
     /**
-     * pagination text
-     * @param string $type
-     * 
-     * @return string
+     * pagination style
+     * @var string
      */
-    private function text(?string $type = null)
-    {
-        return Manager::$pagination_text[$type] ?? '';
-    }
+    private $pagination_css;
 
     /**
      * Get Pagination data
@@ -61,6 +41,9 @@ trait PaginateTrait{
      */
     public function configPagination(?array $options = [])
     {
+        // getViews
+        $getViews = $this->getViews();
+
         // trying to us global EnvAutoLoad::configPagination data
         if(defined('PAGINATION_CONFIG') && is_bool(PAGINATION_CONFIG['allow']) && PAGINATION_CONFIG['allow'] === true){
             $this->pagination_settings = PAGINATION_CONFIG;
@@ -69,7 +52,7 @@ trait PaginateTrait{
             $this->pagination_settings = [
                 'allow'     => $options['allow']    ?? false,
                 'class'     => $options['class']    ?? null,
-                'view'      => in_array($options['view'] ?? null, $this->pagination_view) ? $options['view'] : $this->text('view'),
+                'view'      => in_array($options['view'] ?? null, $getViews) ? $options['view'] : $this->text('view'),
                 'first'     => $options['first']    ?? $this->text('first'),
                 'last'      => $options['last']     ?? $this->text('last'),
                 'next'      => $options['next']     ?? $this->text('next'),
@@ -85,10 +68,10 @@ trait PaginateTrait{
         $this->use_global = $this->pagination_settings['allow'];
 
         // if bootstrap view
-        if(strtolower($this->pagination_settings['view']) == $this->pagination_view['bootstrap']){
-            $this->pagination_css = OrmPagination::getBootstrapCss();
+        if(strtolower($this->pagination_settings['view']) == $getViews['bootstrap']){
+            $this->pagination_css = $getViews['bootstrap'];
         }else{
-            $this->pagination_css = OrmPagination::getSimpleCss();
+            $this->pagination_css = $getViews['simple'];
         }
 
         return $this;
@@ -108,15 +91,21 @@ trait PaginateTrait{
         // get pagination settings
         $settings = $this->getSettings($options);
 
-        echo \yidas\widgets\Pagination::widget([
+        // pagination css get style
+        $getStyle = $this->getStyles($this->pagination_css);
+
+        // instance of Yidas Widgets 
+        $yidasWidgets = new PaginationWidget;
+
+        echo $yidasWidgets->widget([
             'pagination'        => $this->pagination,
             'ulCssClass'        => $settings['class'],
             'view'              => $settings['view'],
             'firstPageLabel'    => $settings['first'],
             'lastPageLabel'     => $settings['last'],
             'nextPageLabel'     => $settings['next'],
-            'prevPageLabel'     => $settings['prev']
-        ]) . "{$this->pagination_css}";
+            'prevPageLabel'     => $settings['prev'],
+        ]) . "{$getStyle}";
     }
 
     /**
@@ -270,19 +259,30 @@ trait PaginateTrait{
     protected function getPagination($per_page = 10)
     {
         try {
+            // reset headers
+            $this->headerControlNoCache();
+
             // get Counted Data
-            $countData = $this->count(false);
+            $totalCount = $this->count(false);
 
             // Initialize a Data Pagination with previous count number
-            $this->pagination = new Pagination([
-                'totalCount'    => $countData,
-                'perPage'       => $per_page
+            $this->pagination = new PaginationLoader([
+                'totalCount'    => $totalCount,
+                'perPage'       => $per_page,
             ]);
 
             // auto set the Per Page 
             // With this we override the perPage from the browser
             // and collect that from the var above\$per_page
             $this->pagination->setPerPage($per_page);
+            
+            // Turn off the per-page number change
+            $this->pagination->perPageParam = false;
+
+            // create additional pagination links
+            $this->pagination->params = [
+                'cache-buster' => time()
+            ];
 
             // query pagination
             $this->allowPaginate()
@@ -292,17 +292,99 @@ trait PaginateTrait{
                     ->execute();
             
             // get data
-            $stmt = $this->tryFetchAll();
-            
-            $this->close();
+            $data = $this->getQueryResult( 
+                $this->fetchAll()
+            );
             
             return [
-                'data'          => $stmt,
+                'data'          => $data,
                 'pagination'    => $this,
             ];
-        } catch (\Throwable $th) {
-            $this->dump( $this->errorTemp($th)['message'] );
+        } catch (\PDOException $e) {
+            return $this->errorTemp($e);
         }
+    }
+
+    /**
+     * pagination text
+     * @param string $type
+     * 
+     * @return string
+     */
+    private function text(?string $type = null)
+    {
+        return Manager::$pagination_text[$type] ?? '';
+    }
+
+    /**
+     * pagination view
+     * 
+     * @return array
+     */
+    private function getViews()
+    {
+        return [
+            'bootstrap' => 'bootstrap',
+            'simple'    => 'simple',
+        ];
+    }
+
+    /**
+     * Customize browser header
+     *
+     * @return void
+     */
+    private function headerControlNoCache()
+    {
+        @header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+        @header("Pragma: no-cache");
+        @header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
+    }
+
+    /**
+     * Pagination style
+     * @param string $mode
+     * 
+     * @return array
+     */
+    private function getStyles(?string $mode = 'simple')
+    {
+        if(!defined('STYLE_EXISTS')){
+            // Helps to define not getting style more than once per page
+            define('STYLE_EXISTS', true);
+
+            if($mode == $this->getViews()['simple']){
+                return $this->getSimpleCss();
+            }
+            return $this->getBootstrapCss();
+        }
+    }
+
+    /**
+     * Return boostrap pagination css style
+     *
+     * @return string
+     */
+    private function getBootstrapCss()
+    {
+        return "
+            <style>
+                .pagination{text-align:center;margin-top:20px}.pagination .page-item.active .page-link,.pagination .page-item.active .page-link:hover{background-color:#1098ad}.pagination .page-item{margin:0 1px}.pagination .page-link{border:0;height:40px;min-width:40px;text-align:center;padding:10px;font-weight:600;color:#212121;border-radius:2em;background:0 0;box-shadow:none}.pagination .page-item.disabled .page-link{background:0 0;color:#a6a6a6}.pagination .page-item:not(.disabled) .page-link:hover{background-color:#fff}.pagination .page-item.active .page-link,.pagination .page-item.active .page-link:hover{background-color:#1098ad}.pagination .page-item:first-child .page-link,.pagination .page-item:last-child .page-link{border-radius:2em}
+            </style>";
+    }
+
+    /**
+     * Return boostrap pagination css style
+     *
+     * @return string
+     */
+    private function getSimpleCss()
+    {
+        return "
+            <style>
+                .pagination{text-align: center;margin-top: 20px;display: block;}.pagination * {margin: 0 5px 0 0;}.pagination span {background: 0 0;color: #a6a6a6;}.pagination span:not(.disabled) a[href]:hover {background-color: #fff;}
+                .pagination a[href] {display: inline-block;background-color: rgba(0, 0, 0, 0);background: 0 0;text-align: center;color: #212121;font-weight: 600;padding: 5px 10px;border: 0;box-shadow: none;}.pagination a[href].active,.pagination a[href].active:hover {background-color: #d0e2ff;}
+            </style>";
     }
 
 }

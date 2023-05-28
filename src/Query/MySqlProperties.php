@@ -36,7 +36,7 @@ trait MySqlProperties{
     /**
      * @var string|null
      */
-    protected $special_key = '__**';
+    protected $special_key = '$__annon_orm__**$';
 
     /**
      * @var object|null|void
@@ -87,6 +87,11 @@ trait MySqlProperties{
      * @var string|null
      */
     protected $tempRawQuery;
+
+    /**
+     * @var string|null
+     */
+    protected $timeStampsQuery;
 
     /**
      * @var string|null

@@ -276,7 +276,7 @@ trait SchemaTrait{
      * 
      * @return \builder\Database\Migrations\Traits\addColumn
      */
-    public function enum($name, ?array $values)
+    public function enum($name, array $values)
     {
         return $this->addColumn($name, 'enum', compact('values'));
     }

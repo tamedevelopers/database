@@ -82,6 +82,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Database Migration](#database-migration)
   * [Create Table Schema](#create-table-schema)
   * [Default String Length](#default-string-length)
+  * [Update Column Default Value](#update-column-default-value)
   * [Run Migration](#run-migration)
   * [Drop Table](#drop-table)
   * [Drop Column](#drop-column)
@@ -115,7 +116,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.1.7"
+    "peterson/php-orm-database": "^4.1.8"
 }
 ```
 
@@ -1202,6 +1203,20 @@ Schema::defaultStringLength(200);
 - or -- `Helpers Function`
 ```
 schema()->defaultStringLength(2000);
+```
+
+### Update Column Default Value
+- In some cases you may want to update the default column value
+    - Yes! It's very much possible with the help of Schema. Takes three (3) params
+    - `$tablename` as string
+    - `$column_name` as string
+    - `$values` as mixed data `NULL` `NOT NULL\|None` `STRING` `current_timestamp()`
+
+```
+use builder\Database\Migrations\Schema;
+
+Schema::updateColumnDefaultValue('users_table', 'email_column', 'NOT NULL);
+Schema::updateColumnDefaultValue('users_table', 'gender_column', []);
 ```
 
 ### Run Migration

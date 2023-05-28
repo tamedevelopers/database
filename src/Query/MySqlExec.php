@@ -35,7 +35,7 @@ class MySqlExec  extends Constants{
      */
     public function env()
     {
-        return $this->console::getConfig('all');
+        return $this->console->getConfig('all');
     }
 
     /**
@@ -60,7 +60,7 @@ class MySqlExec  extends Constants{
     {
         return $this->connection[$type] ?? $this->connection;
     }
-
+    
     /**
      * Get Database `PDO` Driver
      * 
@@ -68,7 +68,7 @@ class MySqlExec  extends Constants{
      */
     public function dbDriver()
     {
-        return $this->connection['driver'] ?? false;
+        return $this->dbh ?? false;
     }
 
     /**
@@ -123,9 +123,12 @@ class MySqlExec  extends Constants{
     {
         try {
             $this->query = str_replace("{$this->special_key} ", '', $query);
+            $this->query = $this->console->replaceWhiteSpace(
+                $this->query
+            );
             $this->stmt  = $this->dbh->prepare($this->query);
-        } catch (\PDOException $th) {
-            return $this->errorTemp($th, true);
+        } catch (\PDOException $e) {
+            return $this->errorTemp($e, true);
         }
 
         return $this;
@@ -165,8 +168,8 @@ class MySqlExec  extends Constants{
         // bind params
         try {
             $this->stmt->bindValue($param, $value, $type);
-        } catch (\Throwable $th) {
-            return $this->errorTemp($th, true);
+        } catch (\PDOException $e) {
+            return $this->errorTemp($e, true);
         }
 
         return $this;
@@ -183,6 +186,78 @@ class MySqlExec  extends Constants{
 
         return $this;
     }
+
+    /**
+     * Fetch Request 
+     * @param int $mode 
+     * - [optional] PDO MySQL CONSTANTs
+     * Default is PDO::FETCH_ASSOC
+     * 
+     * @return mixed
+     */
+    public function fetch(int $mode = PDO::FETCH_ASSOC)
+    {
+        return $this->stmt->fetch($mode);
+    }
+
+    /**
+     * Fetch All Request
+     * @param int $mode 
+     * - [optional] PDO MySQL CONSTANTs
+     * Default is PDO::FETCH_ASSOC
+     *
+     * @return mixed
+     */
+    protected function fetchAll(int $mode = PDO::FETCH_OBJ)
+    {
+        try {
+            return $this->stmt->fetchAll($mode);
+        } catch (\PDOException $e) {
+            return $this->errorTemp($e, true);
+        }
+    }
+
+    /**
+     * Close all query and get results
+     * 
+     * @return mixed
+     */
+    protected function getQueryResult( $data )
+    {
+        // end final time
+        $this->getExecutionTime();
+
+        // save to temp query data
+        $this->setQueryProperty();
+
+        // close query on completion
+        $this->closeQuery();
+        
+        return $data;
+    } 
+    
+    /**
+     * set query property
+     * 
+     * @return object|array\builder\Database\setQueryProperty
+     */
+    protected function setQueryProperty()
+    {
+        // save to temp queri data
+        $this->dbQuery = [
+            'stmt'          => $this->stmt,
+            'raw'           => $this->rawQuery,
+            'where'         => $this->where,
+            'groupBy'       => $this->groupBy,
+            'joins'         => $this->joins,
+            'selectColumns' => $this->selectColumns,
+            'paramValues'   => $this->paramValues,
+            'time'          => $this->timer,
+            'runtime'       => $this->runtime,
+        ];
+        
+        return $this->dbQuery;
+    } 
 
     /**
      * Bind Where Querie
@@ -251,18 +326,21 @@ class MySqlExec  extends Constants{
             }
         }
 
-        return [
-            'status'    => self::ERROR_404, 
-            'message'   => preg_replace(
-                '/^[ \t]+|[ \t]+$/m', '', 
-                "   $dbError
-                    {$exception->getTraceAsString()}
-                    <<\\Query>> {$queryString}
-                    <br><br>
-                    <<\\PDO::ERROR>> {$e->getMessage()}
-                "
-            )
-        ];
+        ddump(
+            [
+                'status'    => self::ERROR_404, 
+                'message'   => preg_replace(
+                    '/^[ \t]+|[ \t]+$/m', '', 
+                    "   $dbError
+                        {$exception->getTraceAsString()}
+                        <<\\Query>> {$queryString}
+                        <br><br>
+                        <<\\PDO::ERROR>> {$e->getMessage()}
+                    "
+                )
+            ]
+        );
+        exit(1);
     }
 
     /**
@@ -279,7 +357,7 @@ class MySqlExec  extends Constants{
             $this->execute();
 
             // message
-            $result = $this->console::convertOptimizeErrorTemp( $this->tryFetchAll(false) );
+            $result = $this->console->convertOptimizeErrorTemp( $this->fetchAll(PDO::FETCH_ASSOC) );
 
             $this->endTimer();
 
@@ -287,18 +365,18 @@ class MySqlExec  extends Constants{
             if($result['error']){
                 return [
                     'status'    => self::ERROR_404, 
-                    'message'   => $this->console::replaceLeadEndSpace($result['message']),
+                    'message'   => $this->console->replaceLeadEndSpace($result['message']),
                     'time'      => $this->timer,
                 ];
             }
 
             return [
                 'status'    => self::ERROR_200, 
-                'message'   => $this->console::replaceLeadEndSpace($result['message']),
+                'message'   => $this->console->replaceLeadEndSpace($result['message']),
                 'time'      => $this->timer,
             ];
-        } catch (\Throwable $th) {
-            return $this->errorTemp($th, true);
+        } catch (\PDOException $e) {
+            return $this->errorTemp($e, true);
         }
         
         return $this;
@@ -317,7 +395,7 @@ class MySqlExec  extends Constants{
             $this->execute();
             
             // message
-            $result = $this->console::convertOptimizeErrorTemp( $this->tryFetchAll(false) );
+            $result = $this->console->convertOptimizeErrorTemp( $this->fetchAll(PDO::FETCH_ASSOC) );
 
             $this->endTimer();
 
@@ -325,18 +403,18 @@ class MySqlExec  extends Constants{
             if($result['error']){
                 return [
                     'status'    => self::ERROR_404, 
-                    'message'   => $this->console::replaceLeadEndSpace($result['message']),
+                    'message'   => $this->console->replaceLeadEndSpace($result['message']),
                     'time'      => $this->timer,
                 ];
             }
 
             return [
                 'status'    => self::ERROR_200, 
-                'message'   => $this->console::replaceLeadEndSpace($result['message']),
+                'message'   => $this->console->replaceLeadEndSpace($result['message']),
                 'time'      => $this->timer,
             ];
-        } catch (\Throwable $th) {
-            return $this->errorTemp($th, true);
+        } catch (\PDOException $e) {
+            return $this->errorTemp($e, true);
         }
         
         return $this;
@@ -416,8 +494,8 @@ class MySqlExec  extends Constants{
     protected function restructureQueryString()
     {
         // save into property
-        $joins = $this->console::formatJoinQuery($this->joins);
-        $limit = $this->console::getLimitQuery($this->limit);
+        $joins = $this->console->formatJoinQuery($this->joins);
+        $limit = $this->console->getLimitQuery($this->limit);
         
         // if query is count(*) only | perform SELECT By columns query 
         if($this->countQuery || $this->selectQuery){
@@ -428,14 +506,14 @@ class MySqlExec  extends Constants{
             $query = "SELECT * FROM `{$this->table}`";
         }
 
-        return trim($this->console::replaceWhiteSpace(
+        return trim(
             "{$query}
             {$joins} 
             {$this->rawAndWherePositionBuilder()}
             {$this->groupBy} 
             {$this->orderBy} 
             {$limit}"
-        ));
+        );
     }
 
     /**
@@ -504,7 +582,7 @@ class MySqlExec  extends Constants{
             }
 
             // trim excess strings if any
-            $this->selectColumns = $this->console::arrayWalkerTrim($this->selectColumns, $formatColumn);
+            $this->selectColumns = $this->console->arrayWalkerTrim($this->selectColumns, $formatColumn);
 
             // get query string
             $queryString = implode(', ', $this->selectColumns);
@@ -520,7 +598,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function saveTempRawQuery(?array $query = [])
     {
-        $this->tempRawQuery = $this->console::saveTempQuery($query);
+        $this->tempRawQuery = $this->console->saveTempQuery($query);
 
         return $this;
     }
@@ -535,7 +613,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function saveTempQuery(?array $query = [])
     {
-        $this->tempQuery = $this->console::saveTempQuery($query);
+        $this->tempQuery = $this->console->saveTempQuery($query);
 
         return $this;
     }
@@ -550,7 +628,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function saveTempUpdateQuery(?array $param = [])
     {
-        $this->tempUpdateQuery = $this->console::saveTempUpdateQuery($param);
+        $this->tempUpdateQuery = $this->console->saveTempUpdateQuery($param);
         
         return $this;
     }
@@ -566,7 +644,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function saveTempIncrementQuery($data = [], $type = true)
     {
-        $this->tempIncrementQuery = $this->console::saveTempIncrementQuery($data, $type);
+        $this->tempIncrementQuery = $this->console->saveTempIncrementQuery($data, $type);
         
         return $this;
     }
@@ -579,9 +657,32 @@ class MySqlExec  extends Constants{
      */ 
     protected function saveTempInsertQuery(?array $param = [])
     {
-        $this->tempInsertQuery = $this->console::saveTempInsertQuery($param);
+        $this->tempInsertQuery = $this->console->saveTempInsertQuery($param);
         
         return $this;
+    }
+
+    /**
+     * Perform time stamp query to determine if 
+     * `created_at` and `updated_at` columns exists in a table
+     * 
+     * @return object
+     */ 
+    protected function timeStampsQuery()
+    {
+        try {
+            $PDO    = $this->dbDriver();
+            $stmt   = $PDO->query("SHOW COLUMNS FROM {$this->table} WHERE Field IN ('created_at', 'updated_at')");
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            if(is_array($result) && count($result) === 2){
+                return true;
+            }
+            return false;
+        } catch (\PDOException $th) {
+            return false;
+        }
     }
 
     /**
@@ -601,6 +702,7 @@ class MySqlExec  extends Constants{
         $this->groupBy              = null;
         $this->tempQuery            = null;
         $this->tempRawQuery         = null;
+        $this->timeStampsQuery      = null;
         $this->tempUpdateQuery      = null;
         $this->tempInsertQuery      = null;
         $this->tempIncrementQuery   = null;
@@ -623,73 +725,6 @@ class MySqlExec  extends Constants{
             'runtime' => 0.00,
         ];
     }
-
-    /**
-     * Get last insert ID
-     * @param bool $type true or false
-     * If true then it return an OBJECT data
-     * Else returns and ARRAY data
-     *
-     * @return mixed\tryFetchAll
-     */
-    protected function tryFetchAll($type = true)
-    {
-        try {
-            $getType = $type ? 
-                        PDO::FETCH_OBJ : 
-                        PDO::FETCH_ASSOC;
-
-            return $this->stmt->fetchAll($getType);
-        } catch (\Throwable $th) {
-            return $this->errorTemp($th, true);
-        }
-    }
-
-    /**
-     * Close all query and get results
-     * 
-     * @return mixed
-     */
-    protected function getQueryResult( $data )
-    {
-        // end final time
-        $this->getExecutionTime();
-
-        // save to temp query data
-        $this->setQueryProperty();
-
-        if(is_bool($data)){
-            return false;
-        }
-
-        // close query on completion
-        $this->closeQuery();
-        
-        return $data;
-    } 
-    
-    /**
-     * set query property
-     * 
-     * @return object|array\builder\Database\setQueryProperty
-     */
-    protected function setQueryProperty()
-    {
-        // save to temp queri data
-        $this->dbQuery = [
-            'stmt'          => $this->stmt,
-            'raw'           => $this->rawQuery,
-            'where'         => $this->where,
-            'groupBy'       => $this->groupBy,
-            'joins'         => $this->joins,
-            'selectColumns' => $this->selectColumns,
-            'paramValues'   => $this->paramValues,
-            'time'          => $this->timer,
-            'runtime'       => $this->runtime,
-        ];
-        
-        return $this->dbQuery;
-    } 
 
     /**
      * Microtime start time
@@ -734,7 +769,7 @@ class MySqlExec  extends Constants{
     {
         try {
             // get all data
-            $db = $this->console::getConfig('all');
+            $db = $this->console->getConfig('all');
             
             // Set DSN
             $dsn = "mysql:host={$db['DB_HOST']};port={$db['DB_PORT']};dbname={$db['DB_DATABASE']}";
@@ -778,7 +813,7 @@ class MySqlExec  extends Constants{
      */
     protected function initConfiguration(?array $options = [])
     {
-        $this->console::initConfiguration( $options );
+        $this->console->initConfiguration( $options );
     }
 
 }

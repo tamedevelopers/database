@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace builder\Database\Schema;
 
+use PDO;
 use PDOException;
 use builder\Database\Query\Builder;
+use builder\Database\Pagination\Pagination;
 use builder\Database\Traits\InsertionTrait;
 use builder\Database\Collections\Collection;
-use builder\Database\Pagination\Traits\PaginateTrait;
 
 abstract class Insertion extends Builder {
 
     use InsertionTrait, 
-        PaginateTrait;
+        Pagination;
 
     /**
      * Constructor
@@ -56,7 +57,7 @@ abstract class Insertion extends Builder {
         }
 
         // filter array
-        $this->table = $this->console::arrayWalkerTrim($this->table);
+        $this->table = $this->console->arrayWalkerTrim($this->table);
         array_walk($this->table, function (&$value, $key){
             $value = "`{$value}`";
         });
@@ -178,10 +179,7 @@ abstract class Insertion extends Builder {
     {
         if($this->modelQuery){
             // query build
-            $this->query = "SELECT EXISTS(SELECT 1 FROM `{$this->table}` {$this->tempQuery} LIMIT 1) as `exists`";
-
-            // set query
-            $this->query($this->query);
+            $this->query("SELECT EXISTS(SELECT 1 FROM `{$this->table}` {$this->tempQuery} LIMIT 1) as `exists`");
 
             // bind query for where clause
             $this->bindWhereQuery();
@@ -193,13 +191,11 @@ abstract class Insertion extends Builder {
                 // try execute
                 $this->execute();
 
-                $data = $this->getQueryResult( 
-                    $this->tryFetchAll(false)[0] ?? [] 
+                $count = $this->getQueryResult( 
+                    $this->fetch(PDO::FETCH_COLUMN)
                 );
 
-                return isset($data['exists']) && $data['exists'] >= self::ONE
-                        ? true
-                        : false;
+                return $count >= self::ONE ? true : false;
             } catch (\PDOException $e) {
                 return false;
             }
@@ -235,7 +231,20 @@ abstract class Insertion extends Builder {
     public function first()
     {
         $data = $this->firstCollectionQuery(false);
-        if(!is_null($data)){
+        if($data){
+            return new Collection($data);
+        }
+    }
+
+    /**
+     * Get first query or abort with response code
+     *
+     * @return mixed\builder\Database\Collections\Collection
+     */
+    public function firstOrFail()
+    {
+        $data = $this->firstCollectionQuery();
+        if($data){
             return new Collection($data);
         }
     }
@@ -262,20 +271,7 @@ abstract class Insertion extends Builder {
     }
 
     /**
-     * Get first query or abort with response code
-     *
-     * @return mixed\builder\Database\Collections\Collection
-     */
-    public function firstOrFail()
-    {
-        $data = $this->firstCollectionQuery();
-        if(!is_null($data)){
-            return new Collection($data);
-        }
-    }
-
-    /**
-     * Insert query data
+     * Insert new records
      * 
      * @param array $param
      * 
@@ -324,8 +320,6 @@ abstract class Insertion extends Builder {
             // save to temp memory
             $this->saveTempUpdateQuery($param);
 
-            $this->query = "UPDATE `{$this->table}` SET {$this->tempUpdateQuery} {$this->tempQuery}";
-
             return $this->updateInsertionQuery($param);
         }
     }
@@ -344,9 +338,7 @@ abstract class Insertion extends Builder {
             // save to temp memory
             $this->saveTempUpdateQuery($param);
 
-            $this->query = "UPDATE IGNORE `{$this->table}` SET {$this->tempUpdateQuery} {$this->tempQuery}";
-
-            return $this->updateInsertionQuery($param, false);
+            return $this->updateInsertionQuery($param, true);
         }
     }
 
@@ -364,7 +356,7 @@ abstract class Insertion extends Builder {
         if($this->modelQuery){
 
             // operator
-            $temp  = $this->console::configIncrementOperator($column, $count, $param);
+            $temp  = $this->console->configIncrementOperator($column, $count, $param);
 
             // save to temp memory
             $this->saveTempUpdateQuery($temp['param']);
@@ -390,7 +382,7 @@ abstract class Insertion extends Builder {
         if($this->modelQuery){
 
             // operator
-            $temp = $this->console::configIncrementOperator($column, $count, $param);
+            $temp = $this->console->configIncrementOperator($column, $count, $param);
 
             // save to temp memory
             $this->saveTempUpdateQuery($temp['param']);
@@ -418,42 +410,35 @@ abstract class Insertion extends Builder {
 
     /**
      * Count results
-     * @param bool $close
+     * @param bool $closeQuery
+     * - [optional] Close Database Query After Count
      *
      * @return int
      */
-    public function count(?bool $close = true)
+    public function count(?bool $closeQuery = true)
     {
         try {
             // get query data
-            $data = $this->allowCount()
-                    ->compileQuery()
-                    ->execute()
-                    ->tryFetchAll(false);
+            $count = $this->allowCount()
+                        ->compileQuery()
+                        ->execute()
+                        ->fetch(PDO::FETCH_COLUMN);
             
-            // get data
-            $data = $data[0] ?? [];
-
             // get data and close connection
-            if($close){
-                $data = $this->getQueryResult( $data );
+            if($closeQuery){
+                $count = $this->getQueryResult( $count );
             }
 
-            return isset($data['count(*)']) && $data['count(*)'] >= self::ONE
-                    ? $data['count(*)'] 
-                    : 0;
+            return $count;
         } catch (PDOException $e) {
-            $this->dump_final = false;
-            $this->dump( 
-                $this->errorTemp($e)['message'] 
-            );
+            return $this->errorTemp($e);
         }
     }
 
     /**
      * Get SQL Query
      *
-     * @return string\toSql
+     * @return string
      */
     public function toSql()
     {
@@ -468,7 +453,7 @@ abstract class Insertion extends Builder {
     /**
      * Close all queries and restore back to default
      *
-     * @return void\close
+     * @return void
      */
     public function close()
     {

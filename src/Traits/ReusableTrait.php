@@ -21,18 +21,21 @@ trait ReusableTrait{
      * @var bool
     */
     public $dump_final = true;
-
+    
     /**
      * Background colors
-     * @var array
+     * @return array
     */
-    private $backgroundColors = [
-        'default'   => '',
-        'main'      => 'background-color: #18171B !important; color: #FF8400 !important;',
-        'dark'      => 'background-color: #222222 !important; color: #F1F1F1 !important;',
-        'red'       => 'background-color: #840808 !important; color: #FFFFFF !important;',
-        'blue'      => 'background-color: #160082 !important; color: #FF8400 !important;',
-    ];
+    private function getBackgrounds()
+    {
+        return [
+            'default'   => '',
+            'main'      => 'background-color: #18171B !important; color: #FF8400 !important;',
+            'dark'      => 'background-color: #222222 !important; color: #F1F1F1 !important;',
+            'red'       => 'background-color: #840808 !important; color: #FFFFFF !important;',
+            'blue'      => 'background-color: #160082 !important; color: #FF8400 !important;',
+        ];
+    }
     
     /**
      * Format query data to browser
@@ -90,9 +93,10 @@ trait ReusableTrait{
      */
     private function getBgColor($color)
     {
-        return isset($this->backgroundColors[$color]) 
-                ? $this->backgroundColors[$color] 
-                : $this->backgroundColors['default'];
+        $bgColors = $this->getBackgrounds();
+        return isset($bgColors[$color]) 
+                ? $bgColors[$color] 
+                : $bgColors['default'];
     }
 
 }

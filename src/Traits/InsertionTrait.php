@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace builder\Database\Traits;
 
+use PDO;
 use builder\Database\Capsule\Manager;
 
 trait InsertionTrait{
@@ -18,13 +19,24 @@ trait InsertionTrait{
      */ 
     protected function insertInsertionQuery(?array $param = [], ?bool $tryOrFail = false)
     {
-        // for insert
-        $tempQuery = "INSERT INTO";
-        if($tryOrFail){
-            $tempQuery = "INSERT IGNORE INTO";
+        // if true `INSERT IGNORE INTO` else then `INSERT INTO`
+        $indexQuery = $tryOrFail ? "INSERT IGNORE INTO" : "INSERT INTO";
+
+        // timestamp create
+        if($this->timeStampsQuery()){
+            $this->tempInsertQuery['columns']  .= ", created_at, updated_at";
+            $this->tempInsertQuery['values']   .= ", :created_at, :updated_at";
+            $param = array_merge($param, [
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
         }
 
-        $this->query = "{$tempQuery} `{$this->table}` ({$this->tempInsertQuery['columns']}) values({$this->tempInsertQuery['values']})";
+        // create queries
+        $this->query = "{$indexQuery} 
+                        `{$this->table}` 
+                        ({$this->tempInsertQuery['columns']}) 
+                        values({$this->tempInsertQuery['values']})";
 
         // set query
         $this->query($this->query);
@@ -71,9 +83,23 @@ trait InsertionTrait{
      */ 
     protected function updateInsertionQuery(?array $param = [], ?bool $tryOrFail = false)
     {
+        // if true `UPDATE IGNORE` else then `UPDATE`
+        $indexQuery = $tryOrFail ? "UPDATE IGNORE" : "UPDATE";
+
+        // timestamp create
+        if($this->timeStampsQuery()){
+            $this->timeStampsQuery = ", updated_at = NOW()";
+        }
+
+        // create queries
+        $this->query = "{$indexQuery} 
+                        `{$this->table}` 
+                        SET {$this->tempUpdateQuery}{$this->timeStampsQuery}
+                        {$this->tempQuery}";
+        
         // set query
         $this->query($this->query);
-
+        
         // bind query for param
         foreach($param as $key => $value){
             $this->bind(":$key", $this->whitelistInput($value));
@@ -116,7 +142,16 @@ trait InsertionTrait{
      */ 
     protected function incrementInsertionQuery(?array $temp = [])
     {
-        $this->query = "UPDATE `{$this->table}` SET {$this->tempIncrementQuery} {$this->tempUpdateQuery} {$this->tempQuery}";
+        // timestamp create
+        if($this->timeStampsQuery()){
+            $this->timeStampsQuery = ", updated_at = NOW()";
+        }
+
+        // set query
+        $this->query = "UPDATE 
+                        `{$this->table}` 
+                        SET {$this->tempIncrementQuery} 
+                        {$this->tempUpdateQuery}{$this->timeStampsQuery} {$this->tempQuery}";
 
         // set query
         $this->query($this->query);
@@ -152,7 +187,8 @@ trait InsertionTrait{
     }
 
     /**
-     * get Query Try
+     * For the ->get() Method
+     * Try\Catch
      *
      * @return object
      */
@@ -163,7 +199,7 @@ trait InsertionTrait{
             $this->compileQuery()->execute();
 
             return $this->getQueryResult(
-                $this->tryFetchAll(true)
+                $this->fetchAll()
             );
         } catch (\PDOException $e) {
             return $this->errorTemp($e, true);
@@ -202,7 +238,7 @@ trait InsertionTrait{
         $record = $this->limit(1)
                         ->compileQuery()
                         ->execute()
-                        ->tryFetchAll()[0] ?? null;
+                        ->fetch(PDO::FETCH_OBJ);
 
         // Return the existing record if found
         if ($record) {
@@ -237,15 +273,15 @@ trait InsertionTrait{
     {
         try {
             $this->limit(1)->compileQuery()->execute();
-
-            $result = $this->tryFetchAll()[0] ?? null;
+            
+            $result = $this->fetch(PDO::FETCH_OBJ);
 
             // close query after execution
             $this->getQueryResult( $result );
 
             // first or fail
             if($firstOrFail){
-                if(is_null($result)){
+                if(!$result){
                     // exit with header code
                     (new Manager)::setHeaders();
                 }
@@ -267,12 +303,9 @@ trait InsertionTrait{
      * @return int
      */ 
     protected function deleteCollectionQuery()
-    {
+    {   
         // query build
-        $this->query = "DELETE FROM `{$this->table}` {$this->tempQuery}";
-
-        // set query
-        $this->query($this->query);
+        $this->query("DELETE FROM `{$this->table}` {$this->tempQuery}");
 
         // bind query for where clause
         $this->bindWhereQuery();

@@ -49,7 +49,7 @@ trait SchemaCollectionTrait{
      */
     public function id($name = 'id')
     {
-        return $this->addColumn($name, 'integer', [
+        return $this->addColumn($name, 'bigInteger', [
             'primary'           => "PRIMARY", 
             'unsigned'          => true, 
             'auto_increment'    => true,
@@ -66,7 +66,7 @@ trait SchemaCollectionTrait{
      */
     public function primary(?string $name, $autoIncrement = true, $unsigned = true)
     {
-        return $this->addColumn($name, 'integer', [
+        return $this->addColumn($name, 'bigInteger', [
             'primary'           => "PRIMARY", 
             'unsigned'          => $unsigned, 
             'auto_increment'    => $autoIncrement,
@@ -109,6 +109,37 @@ trait SchemaCollectionTrait{
     public function foreign($column)
     {
         return $this->addColumn($column, 'foreign');
+    }
+
+    /**
+     * Creating Constraints Property
+     * @param string $column
+     * - Child column name
+     * 
+     * @return object\foreignId
+     */
+    public function foreignId($column)
+    {
+        $this->bigInteger($column)->unsigned();
+
+        return $this->foreign($column);
+    }
+
+    /**
+     * Create a foreign key constraint on this column referencing the "id" column of the conventionally related table.
+     *
+     * @param string $table
+     * @param string $column
+     * - [optional] Default is `id`
+     * 
+     * @return object\constrained
+     */
+    public function constrained(?string $table = null, $column = 'id')
+    {
+        // we try to use defined tabled name, if no name is given to the method
+        $tableName = explode('_', $this->tableName);
+        
+        return $this->references($column)->on($table ?? $tableName[0] ?? '');
     }
 
     /**

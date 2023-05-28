@@ -228,7 +228,7 @@ class Builder extends MySqlExec{
     public function where($column, $operator = null, $value = null)
     {
         // operator
-        $temp       = $this->console::configWhereClauseOperator($operator, $value);
+        $temp       = $this->console->configWhereClauseOperator($operator, $value);
         $value      = $temp['value'];
         $operator   = $temp['operator'];
         $query      = $this->whereAndOrWhereQuery($column, $operator);
@@ -275,7 +275,7 @@ class Builder extends MySqlExec{
     public function orWhere($column, $operator = null, $value = null)
     {
         // operator
-        $temp       = $this->console::configWhereClauseOperator($operator, $value);
+        $temp       = $this->console->configWhereClauseOperator($operator, $value);
         $value      = $temp['value'];
         $operator   = $temp['operator'];
         $query      = $this->whereAndOrWhereQuery($column, $operator);
@@ -310,7 +310,7 @@ class Builder extends MySqlExec{
     public function whereColumn($column, $operator = null, $column2 = null)
     {
         // operator
-        $temp = (array) $this->console::configWhereColumnClauseOperator($column, $operator, $column2);
+        $temp = (array) $this->console->configWhereColumnClauseOperator($column, $operator, $column2);
 
         // Create a placeholder for each value in the array
         $placeholders = implode(' AND ', array_map(function($value){
@@ -502,7 +502,7 @@ class Builder extends MySqlExec{
     public function whereIn($column, ?array $param = [])
     {
         // trim excess strings if any
-        $param = $this->console::arrayWalkerTrim($param) ?? [];
+        $param = $this->console->arrayWalkerTrim($param) ?? [];
 
         // Create a placeholder for each value in the array
         $placeholders = implode(', ', array_map(function($value){
@@ -546,7 +546,7 @@ class Builder extends MySqlExec{
     public function whereNotIn($column, ?array $param = [])
     {
         // trim excess strings if any
-        $param = $this->console::arrayWalkerTrim($param) ?? [];
+        $param = $this->console->arrayWalkerTrim($param) ?? [];
 
         // Create a placeholder for each value in the array
         $placeholders = implode(', ', array_map(function($value){

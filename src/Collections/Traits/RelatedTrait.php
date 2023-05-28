@@ -6,9 +6,9 @@ namespace builder\Database\Collections\Traits;
 
 
 /**
- * @property-read bool $is_paginate
- * @property-read mixed $pagination
- * @property-read bool $unescapeIsObjectWithoutArray
+ * @property bool $is_paginate
+ * @property mixed $pagination
+ * @property bool $unescapeIsObjectWithoutArray
  */
 trait RelatedTrait{
 

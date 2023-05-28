@@ -6,17 +6,77 @@ namespace builder\Database\MigrationTrait\Traits;
 
 trait TableStructureTrait{
     
+    /**
+     * Instance of Database Object
+     *
+     * @var object\builder\Database\DB
+     */
     protected $db;
+    
+    /**
+     * The character set for the table.
+     *
+     * @var string
+     */
     protected $charSet;
+    
+    /**
+     * The name of the table.
+     *
+     * @var string
+     */
     protected $tableName;
+    
+    /**
+     * The collation for the table.
+     *
+     * @var string
+     */
     protected $collation;
+    
+    /**
+     * The primary key value.
+     *
+     * @var mixed
+     */
     protected $primaryKeyValue;
-    protected $columns            = [];
-    protected $queryIndex         = [];
-    protected $queryStructure     = [];
-    protected $queryConstraints   = [];
-    protected $queryTimeStamps    = [];
+    
+    /**
+     * The columns of the table.
+     *
+     * @var array
+     */
+    protected $columns = [];
+    
+    /**
+     * The query index collection.
+     *
+     * @var array
+     */
+    protected $queryIndex = [];
+    
+    /**
+     * The query structure collection.
+     *
+     * @var array
+     */
+    protected $queryStructure = [];
+    
+    /**
+     * The query constraints collection.
+     *
+     * @var array
+     */
+    protected $queryConstraints = [];
+    
+    /**
+     * The query timestamps collection.
+     *
+     * @var array
+     */
+    protected $queryTimeStamps = [];
 
+    
     /**
      * Creating Table Structure
      * Indexs|Primary|Constraints 
@@ -35,7 +95,9 @@ trait TableStructureTrait{
         $this->alterPrimaryKey();
 
         // Add triggers
-        $this->createTriggers();
+        // Adding triggers give an error for reserved key `SET`
+        // so we have to remove and create new methods to update an insert created_at and updated_at columns
+        // The method of trigger still exist, just incase. ->createTriggers()
 
         // alter constriants
         $this->alterConstraints();
@@ -85,8 +147,8 @@ trait TableStructureTrait{
             
             // for references
             else{
-                $onDelete = strtoupper($column['onDelete']) ?? null;
-                $onUpdate = strtoupper($column['onUpdate']) ?? null;
+                $onDelete = strtoupper($column['onDelete'] ?? 'CASCADE');
+                $onUpdate = strtoupper($column['onUpdate'] ?? 'RESTRICT');
 
                 $this->queryConstraints[] = "
                     ADD CONSTRAINT `{$column['generix']}` 
@@ -97,7 +159,8 @@ trait TableStructureTrait{
                 ";
             }
 
-            // checkout for triggers
+            // checkout for timestamps
+            // created_at and updated_at
             if($column['type'] === 'timestamps'){
                 $this->queryTimeStamps[] = $column;
             }
@@ -107,7 +170,7 @@ trait TableStructureTrait{
     /**
      * Add query into collections
      * 
-     * @return void\addCollectionQuery
+     * @return void
      */
     private function addCollectionQuery($query = '')
     {
@@ -258,9 +321,11 @@ trait TableStructureTrait{
     }
 
     /**
-     * Format Query with Regix
-     * 
-     * @return string
+     * Regixify the query.
+     *
+     * @param string $query The query to be regixified.
+     *
+     * @return string The regixified query.
      */
     private function regixifyQuery(?string $formatted)
     {

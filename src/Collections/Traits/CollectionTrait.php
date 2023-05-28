@@ -7,11 +7,11 @@ namespace builder\Database\Collections\Traits;
 use builder\Database\Collections\CollectionMapper;
 
 /**
- * @property-read array $proxies_compact
- * @property-read array $proxies
- * @property-read mixed $instance
- * @property-read mixed $pagination
- * @property-read bool $is_paginate
+ * @property array $proxies_compact
+ * @property array $proxies
+ * @property mixed $instance
+ * @property mixed $pagination
+ * @property bool $is_paginate
  */
 trait CollectionTrait{
 

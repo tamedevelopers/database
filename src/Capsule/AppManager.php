@@ -11,9 +11,11 @@ class AppManager extends Constants{
     
     static private $year;
 
-    static function initAppManager() 
-    {
-        self::$year = date('Y', strtotime('now'));
+    /**
+     * initialize
+     */
+    public function __construct() {
+        self::$year = date('Y', time());
     }
 
     /**
@@ -23,8 +25,6 @@ class AppManager extends Constants{
      */
     static public function envDummy()
     {
-       self::initAppManager();
-
         return preg_replace("/^[ \t]+|[ \t]+$/m", "", 'APP_NAME="ORM Model"
             APP_ENV=local
             APP_KEY='. self::generateAppKey() .'

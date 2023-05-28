@@ -357,7 +357,7 @@ class EnvOrm extends Constants{
      */
     static private function envTxt()
     {
-        return AppManager::envDummy();
+        return (new AppManager)->envDummy();
     }
 
     /**

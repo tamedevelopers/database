@@ -225,12 +225,7 @@ trait SchemaConfigurationTrait{
     {
         $columnDef = "";
         if (!is_null($options['default'])) {
-            // for enum|set
-            if(isset($options['values'])){
-                $columnDef .= " DEFAULT \'{$options['default']}\'";
-            }else{
-                $columnDef .= " DEFAULT {$options['default']}";
-            }
+            $columnDef .= " DEFAULT \'{$options['default']}\'";
         }
 
         return $columnDef;
