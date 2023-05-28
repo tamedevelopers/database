@@ -1445,9 +1445,6 @@ class PostClass extends DB{
 | config_pagination()       | Same as `$db->configPagination()` or `EnvAutoLoad::configPagination`  |
 | autoload_register()       | Same as `AutoloadRegister::load()`            |
 | app_data()                | Get `path\|database\|pagination` info         |
-| base_dir()                | Get absolute base directory path. It accepts a param as `string` if given, will be appended to the path |
-| directory()               | Same as `base_dir()` just naming difference        |
-| domain()                  | Similar to `base_dir()` as it returns domain URI. Also accepts path given and this will append to the endpoint of URL. |
 | env()                     | Same as `$db->env()`                          |
 | env_orm()                 | Return instance of `(new EnvOrm)` class       |
 | env_start()               | Same as `EnvAutoLoad::start()`                |
@@ -1456,8 +1453,9 @@ class PostClass extends DB{
 | schema()                  | Return instance of `(new Schema)` class       |
 | asset()                   | Return Absolute path of asset. Same as `Asset::asset()`   |
 | asset_config()            | Same as `Asset::config()`. Configure Asset root directory |
-| base_path()               | Return `server` base directory                |
-| directory()               | Return `server` base directory                |
+| base_path()               | Get absolute base directory path. It accepts a param as `string` if given, will be appended to the path |
+| directory()               | Same as `base_path()` just naming difference        |
+| domain()                  | Similar to `base_path()` as it returns domain URI. Also accepts path given and this will append to the endpoint of URL. |
 | to_array()                | `array` Convert items to array                |
 | to_object()               | `object` Convert items to object              |
 | to_json()                 | `string` Convert items to json                |
