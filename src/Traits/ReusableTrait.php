@@ -4,26 +4,12 @@ declare(strict_types=1);
 
 namespace builder\Database\Traits;
 
-use Tracy\Debugger;
+use Whoops\Run;
 use builder\Database\Capsule\Manager;
+use Whoops\Handler\PrettyPageHandler;
+use Symfony\Component\VarDumper\VarDumper;
 
 trait ReusableTrait{
-    
-    /**
-     * Exit script on dump
-     * @var bool
-    */
-    public $dump_final = true;
-    
-    /**
-     * Headers
-     * 
-     * @return void
-    */
-    private function setHeaders()
-    {
-        Manager::setHeaders();
-    }
     
     /**
      * Die or Dump Error Handler
@@ -34,18 +20,14 @@ trait ReusableTrait{
     public function dump(...$data)
     {
         // if DEBUG MODE IS ON
-        if(Manager::setEnvBool(APP_DEBUG)){
+        if(Manager::setEnvBool(APP_DEBUG)){ 
             $dataArray = $data[0] ?? $data;
             if(is_array($dataArray)){
                 foreach ($dataArray as $var) {
-                    Debugger::dump($var);
+                    VarDumper::dump($var);
                 }
-            }else{
-                Debugger::dump($dataArray);
-            }
-        } else{
-            if($this->dump_final){
-                $this->setHeaders();
+            } else{
+                VarDumper::dump($dataArray);
             }
         }
     }
@@ -59,44 +41,14 @@ trait ReusableTrait{
     {
         // if DEBUG MODE IS ON
         if(Manager::setEnvBool(APP_DEBUG)){
-
-            // register debugger
             // header not sent
+            // register error handler
             if (!headers_sent()) {
-                // Debugger::enable(!APP_DEBUG); 
+                $whoops = new Run();
+                $whoops->pushHandler(new PrettyPageHandler());
+                $whoops->register();
             }
-            Debugger::$showBar = false;
-            Debugger::$strictMode = true; // display all errors
-            Debugger::$maxDepth = 5; // default: 3
-            Debugger::$maxLength = 5000; // default: 150
-            Debugger::$dumpTheme = $this->getBgColor(APP_DEBUG_BG);
         } 
     }
-
-    /**
-     * Remove footer
-     * @return void
-     */
-    private function removeFooter()
-    {
-        echo "<style>footer, .tracy-footer--sticky{display: none !important; visibility: hidden !important;}</style>";
-    }
-
-    /**
-     * Get background color
-     * @param string $color
-     * 
-     * @return string
-     */
-    private function getBgColor(?string $color = null)
-    {
-        $data = [
-            'light' => 'light',
-            'dark'  => 'dark',
-        ];
-
-        return $data[$color] ?? $data['light'];
-    }
-
 
 }

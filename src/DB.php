@@ -12,32 +12,27 @@ declare(strict_types=1);
  */
 namespace builder\Database;
 
-use builder\Database\Query\MySqlExec;
 use builder\Database\Schema\Insertion;
+use builder\Database\Traits\DBSetupTrait;
 
 class DB extends Insertion{
     
+    use DBSetupTrait;
+    
     /**
-     * Extending Settings
+     * Extending Constructor opitons if Available
+     * - If User Extends the DB::Class and has their own __construct()
+     * - They must call the parent::__construct();
+     * - For Loaded Data to be returned
      * 
-     * @param  array $options
+     * @param array $options
      */
-    public function __construct(?array $options = []) {
-        parent::__construct($options);
-
-        // configuring pagination settings 
-        if ( ! defined('PAGINATION_CONFIG') ) {
-            $this->configPagination($options);
-        } else{
-            // if set to allow global use of ENV Autoloader Settings
-            if(is_bool(PAGINATION_CONFIG['allow']) && PAGINATION_CONFIG['allow'] === true){
-                $this->configPagination(PAGINATION_CONFIG);
-            }else{
-                $this->configPagination($options);
-            }
+    public function __construct(?array $options = []) 
+    {
+        if (!$this->initialized) {
+            $this->initializeSetup($options);
+            $this->initialized = true;
         }
-
-        // open default logger
-        (new MySqlExec)->autoStartDebugger();
     }
+
 }

@@ -17,7 +17,6 @@ class EnvAutoLoad{
      * 
      * @param array $options 
      * path \Path to .env file
-     * bg \dump background color (light | dark)
      * 
      * @return void
      */
@@ -30,7 +29,6 @@ class EnvAutoLoad{
         */
         $default = array_merge([
             'path'  => null,
-            'bg'    => Manager::$default_bg,
         ], $options);
         
         /*
@@ -58,30 +56,6 @@ class EnvAutoLoad{
         
         /*
         |--------------------------------------------------------------------------
-        | Defining background color for var dump
-        |--------------------------------------------------------------------------
-        | default | main | dark | red | blue
-        */
-        $EnvOrm->{'bg'} = $default['bg'];
-        
-        /*
-        |--------------------------------------------------------------------------
-        | Update ENV variable
-        |--------------------------------------------------------------------------
-        | Here we do not want to temper with the environment file always
-        | - Since this path will always run at every application call
-        | - We only will update APP_DEBUG_BG if env path is set and 
-        | - If the APP_DEBUG_BG is empty
-        |
-        */
-        if(isset($_ENV['APP_DEBUG_BG'])){
-            if(empty($_ENV['APP_DEBUG_BG'])){
-                $EnvOrm::updateENV('APP_DEBUG_BG', $EnvOrm->{'bg'}, false);
-            }
-        }
-        
-        /*
-        |--------------------------------------------------------------------------
         | Check If There was an error getting the environment file
         |--------------------------------------------------------------------------
         |
@@ -90,11 +64,6 @@ class EnvAutoLoad{
         |
         */
         if($loader['status'] != 200){
-            /**
-             * Setting application to use the dump error handling
-             */
-            $EnvOrm->dump_final = false;
-
             /**
              * Dump error message
              */

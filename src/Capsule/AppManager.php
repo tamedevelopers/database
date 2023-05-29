@@ -30,7 +30,6 @@ class AppManager extends Constants{
             APP_ENV=local
             APP_KEY='. self::generateAppKey() .'
             APP_DEBUG=true
-            APP_DEBUG_BG='. Manager::$default_bg .'
             SITE_EMAIL=
             
             DRIVER_NAME=mysql

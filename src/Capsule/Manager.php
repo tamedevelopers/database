@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace builder\Database\Capsule;
 
-use Exception;
 use builder\Database\Constants;
 
 
@@ -46,19 +45,6 @@ class Manager extends Constants{
         'bootstrap' => 'bootstrap',
         'simple'    => 'simple',
     ];
-    
-    /**
-     * @var array
-     */
-    static private $disallow_method = [
-        'errorTemp',
-        'executeAction',
-        'execute',
-        'insert',
-        'delete',
-        'update',
-        'select',
-    ];
 
     /**
      * @var array
@@ -81,11 +67,6 @@ class Manager extends Constants{
         'utf8',
         'latin1',
     ];
-
-    /**
-     * @var string
-     */
-    static public $default_bg = 'dark';
     
     /**
      * Initilize and Set the Database Configuration on constructor
@@ -106,7 +87,6 @@ class Manager extends Constants{
     {
         $defaultOption = array_merge([
             'APP_DEBUG'     => true,
-            'APP_DEBUG_BG'  => self::$default_bg,
             'DRIVER_NAME'   => 'mysql',
             'DB_HOST'       => 'localhost',
             'DB_DATABASE'   => '',
@@ -125,11 +105,6 @@ class Manager extends Constants{
         // APP_DEBUG
         if ( ! defined('APP_DEBUG') ) {
             define('APP_DEBUG', self::setEnvBool($_ENV['APP_DEBUG'] ?? $defaultOption['APP_DEBUG']));
-        }
-
-        // APP_DEBUG_BG
-        if ( ! defined('APP_DEBUG_BG') ) {
-            define('APP_DEBUG_BG', $_ENV['APP_DEBUG_BG'] ?? $defaultOption['APP_DEBUG_BG']);
         }
 
         // DRIVER_NAME
@@ -184,7 +159,6 @@ class Manager extends Constants{
     {
         $data =  [
             'APP_DEBUG'     => defined('APP_DEBUG')     ? APP_DEBUG     : true,
-            'APP_DEBUG_BG'  => defined('APP_DEBUG_BG')  ? APP_DEBUG_BG  : self::$default_bg,
             'DRIVER_NAME'   => defined('DRIVER_NAME')   ? DRIVER_NAME   : 'mysql',
             'DB_HOST'       => defined('DB_HOST')       ? DB_HOST       : 'localhost',
             'DB_DATABASE'   => defined('DB_DATABASE')   ? DB_DATABASE   : null,

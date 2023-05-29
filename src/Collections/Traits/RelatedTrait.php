@@ -90,7 +90,7 @@ trait RelatedTrait{
         return array_key_exists($key, $this->items);
     }
 
-     /**
+    /**
      * Check if an item exists in the collection.
      *
      * @param  string  $key
@@ -229,9 +229,9 @@ trait RelatedTrait{
     {
         if (self::$is_paginate) {
             return json_decode(json_encode($items), true);
-        } elseif ($this->isValidJson()) {
+        } elseif ($this->isValidJson($items)) {
             return json_decode($items, true);
-        } elseif (is_array($items) || is_string($items)) {
+        } elseif (is_array($items)) {
             return $items;
         } 
 
@@ -246,16 +246,16 @@ trait RelatedTrait{
      */ 
     private function convertOnInit(mixed $items = null)
     {
+        // first or insert request
         if ($this->unescapeIsObjectWithoutArray) {
-            if(!is_bool($items))
-                return json_decode(json_encode($items), true);
-        } elseif ($this->isValidJson()) {
+            return json_decode(json_encode($items), true);
+        } elseif($this->isValidJson($items)) {
             return json_decode($items, true);
-        } elseif (is_array($items) || is_string($items)) {
+        } elseif(is_array($items)){
             return $items;
         } 
 
-        return (array) $items;
+        return $items;
     }
 
     /**

@@ -8,6 +8,11 @@ namespace builder\Database\Traits;
 trait MySqlProperties{
     
     /**
+     * @var mixed
+     */
+    private $dbh;
+
+    /**
      * @var array|null
      */
     protected $connection;
@@ -23,11 +28,6 @@ trait MySqlProperties{
     protected $table;
 
     /**
-     * @var object|null|void
-     */
-    protected $dbh;
-
-    /**
      * @var int
      * When to position raw query
      */
@@ -36,7 +36,7 @@ trait MySqlProperties{
     /**
      * @var string|null
      */
-    protected $special_key = '$__annon_orm__**$';
+    protected $special_key = '$**__annon_orm_**$';
 
     /**
      * @var object|null|void

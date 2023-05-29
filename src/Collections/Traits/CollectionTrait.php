@@ -49,10 +49,10 @@ trait CollectionTrait{
     static protected function getTrace() 
     {
         // get Trace
-        $getTrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
         // instance functions
-        $functions = array_map('strtolower', array_column($getTrace, 'function'));
+        $functions = array_map('strtolower', array_column($backtrace, 'function'));
         
         // get array interests
         $interest = array_intersect(self::$proxies_compact, $functions);
@@ -83,23 +83,6 @@ trait CollectionTrait{
             return array_map(function ($item, $key){
                 return new CollectionMapper($item, $key);
             }, $items, array_keys($items));
-        }
-
-        return $items;
-    }
-
-    /**
-     * Results array of items from Collection or Arrayable.
-     *
-     * @param  mixed  $items
-     * 
-     * @return array
-     */
-    protected function getArrayItems($items)
-    {
-        // first or insert request
-        if ($this->unescapeIsObjectWithoutArray || !is_array($items)) {
-            return  $this->convertOnInit($items);
         }
 
         return $items;

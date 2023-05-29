@@ -48,9 +48,9 @@ class PostClass extends DB{
     public function sample()
     {
         $this->dump(
-            $this->getConnection(), // database connection
-            $this->AppConfig(), // app configuration
-            $this->getQuery(), // to get last query
+            $this->dbConnection(), // database connection
+            $this->dbDriver(), // `PDO` Driver
+            $this->dbQuery(), // to get last query
         );
     }
 

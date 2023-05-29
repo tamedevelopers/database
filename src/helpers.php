@@ -402,18 +402,3 @@ if (! function_exists('to_json')) {
         return json_encode( $items );
     }
 }
-
-if (! function_exists('dd')) {
-    /**
-     * Die or Dump
-     * Only works when .env APP_DEBUG is set to true
-     * 
-     * @param mixed ...$data
-     * 
-     * @return mixed
-     */
-    function dd(...$data)
-    {
-        return (new MySqlExec)->dump($data);
-    }
-}

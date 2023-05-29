@@ -116,7 +116,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.1.9"
+    "peterson/php-orm-database": "^4.2.0"
 }
 ```
 
@@ -210,7 +210,6 @@ $db->table('users')
 |-------------------|-----------|-----------------------|
 | DRIVER_NAME       |  string   |  mysql                |
 | APP_DEBUG         |  boolean  |  true                 |
-| APP_DEBUG_BG      |  string   |  Default value is `dark` and other color \| `light` |
 | DB_HOST           |  string   |  `localhost`          |
 | DB_USERNAME       |  string   |                       |
 | DB_PASSWORD       |  string   |                       |
@@ -1462,9 +1461,10 @@ class PostClass extends DB{
 
 ## Error Dump
 
-| function  | Description     |
-|-----------|-----------------|
-| dd        | Dump or Die - Error handling |
+| function  | Description       |
+|-----------|-------------------|
+| dump      | Dump Data         |
+| dd        | Dump and Die      |
 
 
 ## Error Status

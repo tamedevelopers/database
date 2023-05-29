@@ -23,7 +23,22 @@ class MySqlExec  extends Constants{
      */
 	public function __construct()
     {
-        $this->console = new Manager();
+        if(is_null($this->console)){
+            $this->initConsole();
+        }
+	}
+
+    /**
+     * Constructor init
+     * For class that extends without calling the constructor
+     */
+	public function initConsole()
+    {
+        if(is_null($this->console)){
+            $this->console = new Manager();
+        }
+
+        return $this->console;
 	}
 
     /**
@@ -35,7 +50,7 @@ class MySqlExec  extends Constants{
      */
     public function env()
     {
-        return $this->console->getConfig('all');
+        return $this->initConsole()->getConfig('all');
     }
 
     /**
@@ -123,7 +138,7 @@ class MySqlExec  extends Constants{
     {
         try {
             $this->query = str_replace("{$this->special_key} ", '', $query);
-            $this->query = $this->console->replaceWhiteSpace(
+            $this->query = $this->initConsole()->replaceWhiteSpace(
                 $this->query
             );
             $this->stmt  = $this->dbh->prepare($this->query);
@@ -353,8 +368,11 @@ class MySqlExec  extends Constants{
         try {
             $this->execute();
 
+            // cons
+            $con = $this->initConsole();
+
             // message
-            $result = $this->console->convertOptimizeErrorTemp( $this->fetchAll(PDO::FETCH_ASSOC) );
+            $result = $con->convertOptimizeErrorTemp( $this->fetchAll(PDO::FETCH_ASSOC) );
 
             $this->endTimer();
 
@@ -362,14 +380,14 @@ class MySqlExec  extends Constants{
             if($result['error']){
                 return [
                     'status'    => self::ERROR_404, 
-                    'message'   => $this->console->replaceLeadEndSpace($result['message']),
+                    'message'   => $con->replaceLeadEndSpace($result['message']),
                     'time'      => $this->timer,
                 ];
             }
 
             return [
                 'status'    => self::ERROR_200, 
-                'message'   => $this->console->replaceLeadEndSpace($result['message']),
+                'message'   => $con->replaceLeadEndSpace($result['message']),
                 'time'      => $this->timer,
             ];
         } catch (\PDOException $e) {
@@ -390,9 +408,12 @@ class MySqlExec  extends Constants{
 
         try {
             $this->execute();
+
+            // cons
+            $con = $this->initConsole();
             
             // message
-            $result = $this->console->convertOptimizeErrorTemp( $this->fetchAll(PDO::FETCH_ASSOC) );
+            $result = $con->convertOptimizeErrorTemp( $this->fetchAll(PDO::FETCH_ASSOC) );
 
             $this->endTimer();
 
@@ -400,14 +421,14 @@ class MySqlExec  extends Constants{
             if($result['error']){
                 return [
                     'status'    => self::ERROR_404, 
-                    'message'   => $this->console->replaceLeadEndSpace($result['message']),
+                    'message'   => $con->replaceLeadEndSpace($result['message']),
                     'time'      => $this->timer,
                 ];
             }
 
             return [
                 'status'    => self::ERROR_200, 
-                'message'   => $this->console->replaceLeadEndSpace($result['message']),
+                'message'   => $con->replaceLeadEndSpace($result['message']),
                 'time'      => $this->timer,
             ];
         } catch (\PDOException $e) {
@@ -490,9 +511,12 @@ class MySqlExec  extends Constants{
      */ 
     protected function restructureQueryString()
     {
+        // cons
+        $con = $this->initConsole();
+
         // save into property
-        $joins = $this->console->formatJoinQuery($this->joins);
-        $limit = $this->console->getLimitQuery($this->limit);
+        $joins = $con->formatJoinQuery($this->joins);
+        $limit = $con->getLimitQuery($this->limit);
         
         // if query is count(*) only | perform SELECT By columns query 
         if($this->countQuery || $this->selectQuery){
@@ -579,7 +603,7 @@ class MySqlExec  extends Constants{
             }
 
             // trim excess strings if any
-            $this->selectColumns = $this->console->arrayWalkerTrim($this->selectColumns, $formatColumn);
+            $this->selectColumns = $this->initConsole()->arrayWalkerTrim($this->selectColumns, $formatColumn);
 
             // get query string
             $queryString = implode(', ', $this->selectColumns);
@@ -595,7 +619,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function saveTempRawQuery(?array $query = [])
     {
-        $this->tempRawQuery = $this->console->saveTempQuery($query);
+        $this->tempRawQuery = $this->initConsole()->saveTempQuery($query);
 
         return $this;
     }
@@ -610,7 +634,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function saveTempQuery(?array $query = [])
     {
-        $this->tempQuery = $this->console->saveTempQuery($query);
+        $this->tempQuery = $this->initConsole()->saveTempQuery($query);
 
         return $this;
     }
@@ -625,7 +649,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function saveTempUpdateQuery(?array $param = [])
     {
-        $this->tempUpdateQuery = $this->console->saveTempUpdateQuery($param);
+        $this->tempUpdateQuery = $this->initConsole()->saveTempUpdateQuery($param);
         
         return $this;
     }
@@ -641,7 +665,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function saveTempIncrementQuery($data = [], $type = true)
     {
-        $this->tempIncrementQuery = $this->console->saveTempIncrementQuery($data, $type);
+        $this->tempIncrementQuery = $this->initConsole()->saveTempIncrementQuery($data, $type);
         
         return $this;
     }
@@ -654,7 +678,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function saveTempInsertQuery(?array $param = [])
     {
-        $this->tempInsertQuery = $this->console->saveTempInsertQuery($param);
+        $this->tempInsertQuery = $this->initConsole()->saveTempInsertQuery($param);
         
         return $this;
     }
@@ -766,7 +790,7 @@ class MySqlExec  extends Constants{
     {
         try {
             // get all data
-            $db = $this->console->getConfig('all');
+            $db = $this->initConsole()->getConfig('all');
             
             // Set DSN
             $dsn = "mysql:host={$db['DB_HOST']};port={$db['DB_PORT']};dbname={$db['DB_DATABASE']}";
@@ -810,7 +834,7 @@ class MySqlExec  extends Constants{
      */
     protected function initConfiguration(?array $options = [])
     {
-        $this->console->initConfiguration( $options );
+        $this->initConsole()->initConfiguration( $options );
     }
 
 }

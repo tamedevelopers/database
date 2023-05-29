@@ -17,22 +17,6 @@ abstract class Insertion extends Builder {
         Pagination;
 
     /**
-     * Constructor
-     * 
-     * @param array $options\Database options settings
-     */
-	public function __construct(?array $options = [])
-    {
-        parent::__construct($options);
-
-        // init configuration
-        $this->initConfiguration($options);
-        
-        // start db
-        $this->startDatabase();
-	}
-
-    /**
      * Table names's on index arrays
      * Optimize multiple table
      * 

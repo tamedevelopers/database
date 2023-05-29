@@ -42,7 +42,7 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
     public function __construct($items = [])
     {
         $this->unescapeIsObjectWithoutArray = self::checkProxiesType();
-        $this->items = $this->getArrayItems($items);
+        $this->items = $this->convertOnInit($items);
 
         // if pagination request is `true`
         if(self::$is_paginate){
