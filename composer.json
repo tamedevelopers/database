@@ -19,8 +19,9 @@
         "php": ">=7.2",
         "vlucas/phpdotenv": "^5.3",
         "ezyang/htmlpurifier": "^4.16.0",
+        "symfony/var-dumper": "^4.4",
         "filp/whoops": "^2.15",
-        "symfony/var-dumper": "^4.4"
+        "psr/log": "^1.0.1 || ^2.0"
     },
     "config": {
         "platform": {
