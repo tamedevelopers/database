@@ -229,13 +229,13 @@ trait RelatedTrait{
     {
         if (self::$is_paginate) {
             return json_decode(json_encode($items), true);
-        } elseif ($this->isValidJson($items)) {
-            return json_decode($items, true);
         } elseif (is_array($items)) {
             return $items;
+        } elseif ($this->isValidJson((string) $items)) {
+            return json_decode($items, true);
         } 
 
-        return (array) $items;
+        return $items;
     }
     
     /**
@@ -249,11 +249,11 @@ trait RelatedTrait{
         // first or insert request
         if ($this->unescapeIsObjectWithoutArray) {
             return json_decode(json_encode($items), true);
-        } elseif($this->isValidJson($items)) {
-            return json_decode($items, true);
         } elseif(is_array($items)){
             return $items;
-        } 
+        } elseif($this->isValidJson((string) $items)) {
+            return json_decode($items, true);
+        }
 
         return $items;
     }
@@ -266,7 +266,7 @@ trait RelatedTrait{
      */
     private function isValidJson(?string $data = null)
     {
-        json_decode((string) $data);
+        json_decode($data);
         return json_last_error() === JSON_ERROR_NONE;
     }
 

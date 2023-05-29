@@ -107,7 +107,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
 
 ## Requirements
 
-- `>= php7.2+`
+- `>= php7.2.5+`
 
 ## Installation
 
