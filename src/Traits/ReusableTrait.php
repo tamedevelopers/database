@@ -59,16 +59,16 @@ trait ReusableTrait{
     {
         // if DEBUG MODE IS ON
         if(Manager::setEnvBool(APP_DEBUG)){
-            // header not sent
-            if (!headers_sent()) {
-                // Debugger::enable(!APP_DEBUG);
-            }
 
             // register debugger
+            // header not sent
+            if (!headers_sent()) {
+                // Debugger::enable(!APP_DEBUG); 
+            }
             Debugger::$showBar = false;
             Debugger::$strictMode = true; // display all errors
             Debugger::$maxDepth = 5; // default: 3
-            Debugger::$maxLength = 10000; // default: 150
+            Debugger::$maxLength = 5000; // default: 150
             Debugger::$dumpTheme = $this->getBgColor(APP_DEBUG_BG);
         } 
     }
