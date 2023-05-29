@@ -231,7 +231,7 @@ trait RelatedTrait{
             return json_decode(json_encode($items), true);
         } elseif (is_array($items)) {
             return $items;
-        } elseif ($this->isValidJson((string) $items)) {
+        } elseif ($this->isValidJson($items)) {
             return json_decode($items, true);
         } 
 
@@ -251,7 +251,7 @@ trait RelatedTrait{
             return json_decode(json_encode($items), true);
         } elseif(is_array($items)){
             return $items;
-        } elseif($this->isValidJson((string) $items)) {
+        } elseif($this->isValidJson($items)) {
             return json_decode($items, true);
         }
 
@@ -261,13 +261,17 @@ trait RelatedTrait{
     /**
      * Check if a string is valid JSON.
      *
-     * @param string $data
+     * @param mixed $data
      * @return bool
      */
-    private function isValidJson(?string $data = null)
+    private function isValidJson(mixed $data = null)
     {
-        json_decode($data);
-        return json_last_error() === JSON_ERROR_NONE;
+        if(is_string($data)){
+            json_decode($data);
+            return json_last_error() === JSON_ERROR_NONE;
+        }
+
+        return false;
     }
 
 }
