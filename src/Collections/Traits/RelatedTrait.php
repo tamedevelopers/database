@@ -6,9 +6,11 @@ namespace builder\Database\Collections\Traits;
 
 
 /**
- * @property bool $is_paginate
  * @property mixed $pagination
- * @property bool $unescapeIsObjectWithoutArray
+ * @property mixed $database
+ * @property bool $isPaginate
+ * @property bool $isProxyAllowed
+ * @property bool $isDBInstance
  */
 trait RelatedTrait{
 
@@ -19,18 +21,40 @@ trait RelatedTrait{
      */
     public function getPagination()
     {
-        if(self::$is_paginate){
-            if(self::$pagination){
-                $pagination = self::$pagination->pagination;
-                return (object) [
-                    'limit'         => (int) $pagination->limit,
-                    'offset'        => (int) $pagination->offset,
-                    'page'          => (int) $pagination->page,
-                    'pageCount'     => (int) $pagination->pageCount,
-                    'perPage'       => (int) $pagination->perPage,
-                    'totalCount'    => (int) $pagination->totalCount,
-                ];
-            }
+        if($this->pagination){
+            $pagination = $this->pagination->pagination;
+            return (object) [
+                'limit'         => (int) $pagination->limit,
+                'offset'        => (int) $pagination->offset,
+                'page'          => (int) $pagination->page,
+                'pageCount'     => (int) $pagination->pageCount,
+                'perPage'       => (int) $pagination->perPage,
+                'totalCount'    => (int) $pagination->totalCount,
+            ];
+        }
+    }
+
+    /**
+     * Get SQL Query
+     *
+     * @return string|null
+     */
+    public function toSql()
+    {
+        if($this->isDBInstance){
+            dd( $this->database->dbQuery()->stmt->queryString );
+        }
+    }
+
+    /**
+     * Dumb and Die
+     *
+     * @return mixed
+     */
+    public function dd()
+    {
+        if($this->isDBInstance){
+            dd( $this->database->dbQuery() );
         }
     }
 
@@ -161,7 +185,7 @@ trait RelatedTrait{
      */
     public function isEmpty()
     {
-        if($this->unescapeIsObjectWithoutArray){
+        if($this->isProxyAllowed){
             return true;
         }
         return $this->count() === 0 ? true : false;
@@ -222,35 +246,20 @@ trait RelatedTrait{
     /**
      * Convert data to an array on Initializaiton
      * @param mixed $items
+     * @param bool $mapper
      * 
      * @return array
      */ 
-    private function convertMapperOnInit(mixed $items = null)
+    private function convertOnInit(mixed $items = null, ?bool $mapper = false)
     {
-        if (self::$is_paginate) {
-            return json_decode(json_encode($items), true);
-        } elseif (is_array($items)) {
-            return $items;
-        } elseif ($this->isValidJson($items)) {
-            return json_decode($items, true);
-        } 
+        // on loop use
+        // if $mapper === false then we return for proxy checks 
+        // else then it's for Mapper Collections
+        $typePaginateOrProxy = !$mapper ? $this->isProxyAllowed : $this->isPaginate;
 
-        return $items;
-    }
-    
-    /**
-     * Convert data to an array on Initializaiton
-     * @param mixed $items
-     * 
-     * @return array
-     */ 
-    private function convertOnInit(mixed $items = null)
-    {
         // first or insert request
-        if ($this->unescapeIsObjectWithoutArray) {
+        if ($typePaginateOrProxy || is_array($items)) {
             return json_decode(json_encode($items), true);
-        } elseif(is_array($items)){
-            return $items;
         } elseif($this->isValidJson($items)) {
             return json_decode($items, true);
         }

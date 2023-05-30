@@ -16,7 +16,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function orderBy($column, $direction = null)
+    public function orderBy(string $column, $direction = null)
     {
         // empty check
         if(empty($direction) || is_null($direction)){
@@ -36,7 +36,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function orderByRaw($query = null)
+    public function orderByRaw(string $query = null)
     {
         $this->orderBy = "ORDER BY {$query}";
 
@@ -50,7 +50,7 @@ class Builder extends MySqlExec{
      *
      * @return object
      */
-    public function latest($column = 'id')
+    public function latest(string $column = 'id')
     {
         $this->orderBy($column, 'DESC');
 
@@ -64,7 +64,7 @@ class Builder extends MySqlExec{
      *
      * @return object
      */
-    public function oldest($column = 'id')
+    public function oldest(string $column = 'id')
     {
         $this->orderBy($column);
 
@@ -98,14 +98,14 @@ class Builder extends MySqlExec{
     /**
      * Set limits
      * 
-     * @param string $limit\Default is set to `0`
+     * @param string|int $limit\Default is set to `0`
      * 
      * @return object
      */ 
-    public function limit($limit = 1)
+    public function limit(string|int $limit = 1)
     {
         // limit
-        $this->limitCount = $limit;
+        $this->limitCount = (int) $limit;
 
         $this->limit = "LIMIT {$this->limitCount}";
 
@@ -120,14 +120,14 @@ class Builder extends MySqlExec{
     /**
      * Set offset
      * 
-     * @param string $offset\Default is set to `0`
+     * @param string|int $offset\Default is set to `0`
      * 
      * @return object
      */ 
-    public function offset($offset = 0)
+    public function offset(string|int $offset = 0)
     {
         // offset
-        $this->offsetCount = $offset;
+        $this->offsetCount = (int) $offset;
 
         // offset query
         $this->offset = "OFFSET {$this->offsetCount}";
@@ -152,7 +152,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function join($table, $foreignColumn, $operator, $localColumn)
+    public function join(string $table, string $foreignColumn, string $operator, string $localColumn)
     {
         $this->joins[] = [
             'type'          => 'INNER',
@@ -175,7 +175,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function leftJoin($table, $foreignColumn, $operator, $localColumn)
+    public function leftJoin(string $table, string $foreignColumn, string $operator, string $localColumn)
     {
         $this->joins[] = [
             'type'          => 'LEFT',
@@ -194,7 +194,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function raw(?string $query = null)
+    public function raw(string $query)
     {
         // if query already exists
         if($this->isRawExist()){
@@ -225,7 +225,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function where($column, $operator = null, $value = null)
+    public function where(string $column, $operator = null, $value = null)
     {
         // operator
         $temp       = $this->console->configWhereClauseOperator($operator, $value);
@@ -272,7 +272,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function orWhere($column, $operator = null, $value = null)
+    public function orWhere(string $column, $operator = null, $value = null)
     {
         // operator
         $temp       = $this->console->configWhereClauseOperator($operator, $value);
@@ -307,7 +307,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function whereColumn($column, $operator = null, $column2 = null)
+    public function whereColumn(string|array $column, $operator = null, $column2 = null)
     {
         // operator
         $temp = (array) $this->console->configWhereColumnClauseOperator($column, $operator, $column2);
@@ -354,7 +354,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function whereNull($column)
+    public function whereNull(string $column)
     {
         // if query already exists
         if($this->isWhereExist()){
@@ -387,7 +387,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function whereNotNull($column)
+    public function whereNotNull(string $column)
     {
         // if query already exists
         if($this->isWhereExist()){
@@ -421,7 +421,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function whereBetween($column, ?array $param = [])
+    public function whereBetween(string $column, ?array $param = [])
     {
         // set param
         $param = $param ?? [];
@@ -460,7 +460,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function whereNotBetween($column, ?array $param = [])
+    public function whereNotBetween(string $column, ?array $param = [])
     {
         // set param
         $param = $param ?? [];
@@ -499,7 +499,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function whereIn($column, ?array $param = [])
+    public function whereIn(string $column, ?array $param = [])
     {
         // trim excess strings if any
         $param = $this->console->arrayWalkerTrim($param) ?? [];
@@ -543,7 +543,7 @@ class Builder extends MySqlExec{
      * 
      * @return object
      */ 
-    public function whereNotIn($column, ?array $param = [])
+    public function whereNotIn(string $column, ?array $param = [])
     {
         // trim excess strings if any
         $param = $this->console->arrayWalkerTrim($param) ?? [];
@@ -585,7 +585,7 @@ class Builder extends MySqlExec{
      * @param string $column
      * @return object
      */ 
-    public function groupBy($column)
+    public function groupBy(string $column)
     {
         $this->groupBy = $column;
 

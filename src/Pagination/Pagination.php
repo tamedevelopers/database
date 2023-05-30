@@ -258,13 +258,16 @@ trait Pagination{
 
     /**
      * Get Pagination data
-     * @param int|float $per_page
+     * @param int|string $per_page
      *
      * @return mixed
      */
-    protected function getPagination($per_page = 10)
+    protected function getPagination(int|string $per_page = 10)
     {
         try {
+            // convert to int
+            $per_page = (int) $per_page;
+
             // reset headers
             $this->headerControlNoCache();
 
@@ -297,15 +300,10 @@ trait Pagination{
                     ->compileQuery()
                     ->execute();
             
-            // get data
-            $data = $this->getQueryResult( 
+            // get results while closing connection
+            return $this->getDataAndCloseConnection( 
                 $this->fetchAll()
             );
-            
-            return [
-                'data'          => $data,
-                'pagination'    => $this,
-            ];
         } catch (\PDOException $e) {
             return $this->errorTemp($e);
         }

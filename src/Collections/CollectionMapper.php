@@ -14,13 +14,6 @@ use builder\Database\Collections\Traits\RelatedTrait;
 class CollectionMapper extends CollectionProperty implements IteratorAggregate, ArrayAccess
 {
     use RelatedTrait;
-    
-    /**
-     * The items contained in the collection.
-     *
-     * @var array
-     */
-    protected $items = [];
 
     /**
      * Array index key
@@ -33,11 +26,18 @@ class CollectionMapper extends CollectionProperty implements IteratorAggregate, 
      *
      * @param  mixed $items
      * @param  mixed $key
+     * @param  object\builder\Database\Collections\Collection
+     * - Instance of Collection
      */
-    public function __construct($items = [], mixed $key = 0)
+    public function __construct($items = [], mixed $key = 0, object $collection)
     {
-        $this->key    = ((int) $key + 1);
-        $this->items  = $this->convertMapperOnInit($items);
+        $this->key              = ((int) $key + 1);
+        $this->database         = $collection->database;
+        $this->isDBInstance     = $collection->isDBInstance;
+        $this->isPaginate       = $collection->isPaginate;
+        $this->pagination       = $collection->pagination;
+        $this->isProxyAllowed   = $collection->isProxyAllowed;
+        $this->items            = $this->convertOnInit($items, true);
     }
 
     /**
@@ -57,7 +57,7 @@ class CollectionMapper extends CollectionProperty implements IteratorAggregate, 
      */
     public function numbers()
     {
-        if(self::$is_paginate){
+        if($this->isPaginate){
             $pagination = $this->getPagination();
             return ($pagination->offset + $this->key);
         }

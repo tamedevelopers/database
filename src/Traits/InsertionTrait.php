@@ -57,11 +57,9 @@ trait InsertionTrait{
             $result = $this->table($this->table)
                             ->where('id', $this->lastInsertId())
                             ->first();
-
-            // close query after execution
-            $this->getQueryResult( $result );
             
-            return $result;
+            // get results while closing connection
+            return $this->getDataAndCloseConnection( $result );
         } catch (\PDOException $e) {
             if($tryOrFail){
                 if ($e->errorInfo[1] === 1062) {
@@ -115,13 +113,10 @@ trait InsertionTrait{
             // try execute
             $this->execute();
 
-            // results
-            $result = $this->stmt->rowCount();
-
-            // close query after execution
-            $this->getQueryResult( $result );
-
-            return $result;
+            // get results while closing connection
+            return $this->getDataAndCloseConnection( 
+                $this->stmt->rowCount()
+            );
         } catch (\PDOException $e) {
             if($tryOrFail){
                 if ($e->errorInfo[1] === 1062) {
@@ -174,13 +169,10 @@ trait InsertionTrait{
             // try execute
             $this->execute();
 
-            // results
-            $result = $this->stmt->rowCount();
-
-            // close query after execution
-            $this->getQueryResult( $result );
-
-            return $result;
+            // get results while closing connection
+            return $this->getDataAndCloseConnection( 
+                $this->stmt->rowCount()
+            );
         } catch (\PDOException $e) {
             return $this->errorTemp($e, true);
         }
@@ -189,16 +181,26 @@ trait InsertionTrait{
     /**
      * For the ->get() Method
      * Try\Catch
+     * 
+     * @param int|string $per_page
      *
      * @return object
      */
-    protected function getCollector()
+    protected function getCollector(int|string $per_page = 0)
     {
         try {
-            // query builder
-            $this->compileQuery()->execute();
+            // convert to int
+            $per_page = (int) $per_page;
+            if($per_page > 0){
+                // query builder
+                $this->limit($per_page)->compileQuery()->execute();
+            } else{
+                // query builder
+                $this->compileQuery()->execute();
+            }
 
-            return $this->getQueryResult(
+            // get results while closing connection
+            return $this->getDataAndCloseConnection(
                 $this->fetchAll()
             );
         } catch (\PDOException $e) {
@@ -242,9 +244,10 @@ trait InsertionTrait{
 
         // Return the existing record if found
         if ($record) {
-            // close query after execution
-            $this->getQueryResult( $record );
-            return $record;
+            // get results while closing connection
+            return $this->getDataAndCloseConnection( 
+                $record
+            );
         }
 
         // merge conditions and data
@@ -257,10 +260,10 @@ trait InsertionTrait{
             $create = $create->toObject();
         }
 
-        // close query after execution
-        $this->getQueryResult( $create );
-
-        return $create;
+        // get results while closing connection
+        return $this->getDataAndCloseConnection( 
+            $create
+        );
     }
     
     /**
@@ -279,9 +282,6 @@ trait InsertionTrait{
             
             $result = $this->fetch(PDO::FETCH_OBJ);
 
-            // close query after execution
-            $this->getQueryResult( $result );
-
             // first or fail
             if($firstOrFail){
                 if(!$result){
@@ -290,7 +290,10 @@ trait InsertionTrait{
                 }
             }
 
-            return $result;
+            // get results while closing connection
+            return $this->getDataAndCloseConnection( 
+                $result
+            );
         } catch (\PDOException $e) {
             // first or fail
             if($firstOrFail){
@@ -319,14 +322,11 @@ trait InsertionTrait{
         try {
             // try execute
             $this->execute();
-
-            // results
-            $result = $this->stmt->rowCount();
-
-            // close query after execution
-            $this->getQueryResult( $result );
-
-            return $result;
+            
+            // get results while closing connection
+            return $this->getDataAndCloseConnection( 
+                $this->stmt->rowCount()
+            );
         } catch (\PDOException $e) {
             return $this->errorTemp($e, true);
         }

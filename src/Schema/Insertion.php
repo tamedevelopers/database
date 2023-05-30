@@ -175,7 +175,7 @@ abstract class Insertion extends Builder {
                 // try execute
                 $this->execute();
 
-                $count = $this->getQueryResult( 
+                $count = $this->getDataAndCloseConnection( 
                     $this->fetch(PDO::FETCH_COLUMN)
                 );
 
@@ -188,23 +188,26 @@ abstract class Insertion extends Builder {
 
     /**
      * Get result data as an arrays of objects
-     *
+     * @param int|string $per_page
+     * 
      * @return object\builder\Database\Collections\Collection
      */
-    public function get()
+    public function get(int|string $per_page = 0)
     {
-        return new Collection($this->getCollector());
+        $this->function = __FUNCTION__;
+        return new Collection($this->getCollector($per_page), $this);
     }
 
     /**
      * Get result data as an arrays of objects
-     * @param int $per_page
+     * @param int|string $per_page
      *
      * @return object\builder\Database\Collections\Collection
      */
-    public function paginate($per_page = 10)
+    public function paginate(int|string $per_page = 10)
     {
-        return new Collection($this->getPagination($per_page));
+        $this->function = __FUNCTION__;
+        return new Collection($this->getPagination($per_page), $this);
     }
 
     /**
@@ -216,7 +219,8 @@ abstract class Insertion extends Builder {
     {
         $data = $this->firstCollectionQuery(false);
         if($data){
-            return new Collection($data);
+            $this->function = __FUNCTION__;
+            return new Collection($data, $this);
         }
     }
 
@@ -229,7 +233,8 @@ abstract class Insertion extends Builder {
     {
         $data = $this->firstCollectionQuery();
         if($data){
-            return new Collection($data);
+            $this->function = __FUNCTION__;
+            return new Collection($data, $this);
         }
     }
 
@@ -249,8 +254,10 @@ abstract class Insertion extends Builder {
      */
     public function firstOrCreate(array $conditions, ?array $data = [])
     {
+        $this->function = __FUNCTION__;
         return new Collection(
-            $this->firstOrCreateCollectionQuery($conditions, $data)
+            $this->firstOrCreateCollectionQuery($conditions, $data), 
+            $this
         );
     }
 
@@ -410,28 +417,13 @@ abstract class Insertion extends Builder {
             
             // get data and close connection
             if($closeQuery){
-                $count = $this->getQueryResult( $count );
+                $count = $this->getDataAndCloseConnection( $count );
             }
 
             return $count;
         } catch (PDOException $e) {
             return $this->errorTemp($e);
         }
-    }
-
-    /**
-     * Get SQL Query
-     *
-     * @return string
-     */
-    public function toSql()
-    {
-        $this->compileQuery();
-
-        $query = $this->query;
-        $this->closeQuery();
-
-        return $query;
     }
 
     /**

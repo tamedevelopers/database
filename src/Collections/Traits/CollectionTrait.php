@@ -4,88 +4,72 @@ declare(strict_types=1);
 
 namespace builder\Database\Collections\Traits;
 
+use builder\Database\DB;
 use builder\Database\Collections\CollectionMapper;
 
 /**
- * @property array $proxies_compact
- * @property array $proxies
- * @property mixed $instance
  * @property mixed $pagination
- * @property bool $is_paginate
+ * @property mixed $database
+ * @property array $proxies
+ * @property bool $isPaginate
+ * @property bool $isDBInstance
  */
 trait CollectionTrait{
 
     /**
-     * Check if is object without array
-     *
-     * @var bool
+     * Convert arrays into instance of Collection
+     * 
+     * @return mixed
      */
-    protected $unescapeIsObjectWithoutArray = false;
+    protected function wrapArrayIntoNewCollections()
+    {
+        // check if valid array data
+        if (is_array($this->items) && count($this->items) > 0) {
+            return array_map(function ($item, $key){
+                return new CollectionMapper($item, $key, $this);
+            }, $this->items, array_keys($this->items));
+        }
+
+        return $this->items;
+    }
 
     /**
      * Check Proxies Type
-     * Check type of Database Method request
-     *
+     * Determine and get ORM Database Method/Function request
+     * 
      * @return bool
      */
-    static protected function checkProxiesType()
+    protected function checkProxiesType()
     {
-        // get Trace
-        self::getTrace();
+        // check database instance
+        $this->checkInstanceOfDatabase();
         
-        // if in first or insert proxies
-        if(in_array(self::$instance, self::$proxies['first']) || in_array(self::$instance, self::$proxies['insert'])){
-            return true;
+        if($this->isDBInstance){
+            // if in first or insert proxies
+            $function = strtolower((string) $this->database->function);
+            if(in_array($function, self::$proxies)){
+                return true;
+            } elseif($function === 'paginate'){
+                // instance of DB Paginate request
+                $this->isPaginate = true;
+            }
         }
         
         return false;
     }
     
     /**
-     * Get Instance of Database Fetch Method
+     * Get Instance of ORM Database
      *
-     * @return bool
+     * @return void
      */
-    static protected function getTrace() 
+    protected function checkInstanceOfDatabase()
     {
-        // get Trace
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-
-        // instance functions
-        $functions = array_map('strtolower', array_column($backtrace, 'function'));
-        
-        // get array interests
-        $interest = array_intersect(self::$proxies_compact, $functions);
-
-        // reset keys
-        if(is_array($interest) && count($interest) > 0){
-            $interest = array_values($interest);
+        if ($this->database instanceof DB){
+            $this->isDBInstance = true;
+        } else{
+            $this->isDBInstance = false;
         }
-        
-        // instance of DB fetch request
-        self::$instance = $interest[0] ?? null;
-
-        // instance of DB Paginate request
-        self::$is_paginate = in_array(self::$instance, self::$proxies['paginate']);
-    }
-
-    /**
-     * Convert arrays into instance of Collection Mappers
-     *
-     * @param  mixed  $items
-     * 
-     * @return array
-     */
-    protected function wrapArrayIntoCollectionMappers(mixed $items)
-    {
-        // check if valid array data
-        if (is_array($items) && count($items) > 0) {
-            return array_map(function ($item, $key){
-                return new CollectionMapper($item, $key);
-            }, $items, array_keys($items));
-        }
-
-        return $items;
     }
 
 }

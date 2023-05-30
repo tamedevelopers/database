@@ -104,9 +104,7 @@ if (! function_exists('db_driver')) {
     function db_driver()
     {
         // get database connection
-        return isDatabaseConnectionDefined() 
-                ? DATABASE_CONNECTION->dbConnection()['driver']
-                : db()->dbConnection()['driver'];
+        return db_connection('driver');
     }
 }
 

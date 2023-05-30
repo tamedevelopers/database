@@ -19,9 +19,12 @@
         "php": ">=7.2.5",
         "vlucas/phpdotenv": "^5.3",
         "ezyang/htmlpurifier": "^4.16.0",
-        "symfony/var-dumper": "^4.4",
+        "symfony/var-dumper": "4.4.*",
         "filp/whoops": "^2.15",
-        "psr/log": "^1.1.4"
+        "psr/log": "^1.0"
+    },
+    "conflict": {
+        "symfony/var-dumper": "^6.0"
     },
     "autoload": {
         "files": [
@@ -39,7 +42,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.2.0-dev"
+            "dev-main": "4.2.1-dev"
         }
     },
     "minimum-stability": "stable",

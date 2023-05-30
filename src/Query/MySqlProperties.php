@@ -23,6 +23,11 @@ trait MySqlProperties{
     protected $console;
 
     /**
+     * @var string
+     */
+    public $function;
+
+    /**
      * @var string|null
      */
     protected $table;
@@ -39,7 +44,7 @@ trait MySqlProperties{
     protected $special_key = '$**__annon_orm_**$';
 
     /**
-     * @var object|null|void
+     * @var mixed
      */
     protected $stmt;
 
@@ -167,9 +172,8 @@ trait MySqlProperties{
      * @var array
      */
     protected $timer = [
-        'start'   => 0.00,
-        'end'     => 0.00,
-        'runtime' => 0.00,
+        'start'   => 0,
+        'end'     => 0,
     ];
 
     /**

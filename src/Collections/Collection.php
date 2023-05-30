@@ -25,30 +25,25 @@ use builder\Database\Collections\Traits\CollectionTrait;
 class Collection extends CollectionProperty implements IteratorAggregate, ArrayAccess
 {
     use CollectionTrait, RelatedTrait;
-
-    /**
-     * The items contained in the collection.
-     *
-     * @var array
-     */
-    protected $items = [];
-    
     
     /**
      * Create a new collection.
      *
-     * @param  array $items
+     * @param  mixed $items
+     * @param  mixed $database Instance of ORM Database \builder\Database\DB
+     * - [optional] Used on ORM Database Only
+     * Meant for easy manupulation of collection instance
+     * This doesn't have affect on using this the Collection class on other projects
      */
-    public function __construct($items = [])
+    public function __construct(mixed $items = [], mixed $database = null)
     {
-        $this->unescapeIsObjectWithoutArray = self::checkProxiesType();
-        $this->items = $this->convertOnInit($items);
-
+        $this->database         = $database;
+        $this->isProxyAllowed   = self::checkProxiesType();
+        $this->items            = $this->convertOnInit($items);
+        
         // if pagination request is `true`
-        if(self::$is_paginate){
-            $tempItems          = $this->items;
-            $this->items        = $tempItems['data'] ?? [];
-            self::$pagination   = $tempItems['pagination'] ?? false;
+        if($this->isPaginate){
+            $this->pagination = $this->database;
         }
     }
     
@@ -62,7 +57,7 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
         // On interation (foreach) 
         // Wrap items into instance of CollectionMapper
         return new ArrayIterator(
-            $this->wrapArrayIntoCollectionMappers($this->items)
+            $this->wrapArrayIntoNewCollections()
         );
     }
 
@@ -74,8 +69,8 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
      */
     public function links(?array $options = [])
     {
-        if(self::$pagination){
-            self::$pagination->links($options);
+        if($this->pagination){
+            $this->pagination->links($options);
         }
     }
 
@@ -87,26 +82,9 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
      */
     public function showing(?array $options = [])
     {
-        if(self::$pagination){
-            self::$pagination->showing($options);
+        if($this->pagination){
+            $this->pagination->showing($options);
         }
-    }
-
-    /**
-     * Get Pagination Numbers
-     * @param mixed $key
-     *
-     * @return string
-     */
-    public function numbers(mixed $key = 0)
-    {
-        if(self::$is_paginate){
-            $key        = (int) $key + 1;
-            $pagination = $this->getPagination();
-            return ($pagination->offset + $key);
-        }
-
-        return $key;
     }
 
 }

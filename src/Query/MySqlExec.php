@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace builder\Database\Query;
 
 use PDO;
+use DateTime;
 use Exception;
 use Throwable;
 use PDOException;
@@ -60,9 +61,11 @@ class MySqlExec  extends Constants{
      */
     public function dbQuery()
     {
-        return is_null($this->dbQuery) 
-                ? (object) $this->setQueryProperty()
-                : (object) $this->dbQuery;
+        if(is_null($this->dbQuery)){
+            $this->setQueryProperty();
+        }
+
+        return (object) $this->dbQuery;
     }
 
     /**
@@ -233,17 +236,17 @@ class MySqlExec  extends Constants{
     }
 
     /**
-     * Close all query and get results
+     * Close Database Connecton while returning the results
      * 
      * @return mixed
      */
-    protected function getQueryResult( $data )
+    protected function getDataAndCloseConnection( $data )
     {
-        // end final time
-        $this->getExecutionTime();
-
         // save to temp query data
         $this->setQueryProperty();
+
+        // end final time
+        $this->getExecutionTime();
 
         // close query on completion
         $this->closeQuery();
@@ -254,24 +257,22 @@ class MySqlExec  extends Constants{
     /**
      * set query property
      * 
-     * @return object|array\builder\Database\setQueryProperty
+     * @return void
      */
     protected function setQueryProperty()
     {
         // save to temp queri data
         $this->dbQuery = [
             'stmt'          => $this->stmt,
+            'query'         => $this->query,
             'raw'           => $this->rawQuery,
             'where'         => $this->where,
             'groupBy'       => $this->groupBy,
             'joins'         => $this->joins,
             'selectColumns' => $this->selectColumns,
             'paramValues'   => $this->paramValues,
-            'time'          => $this->timer,
             'runtime'       => $this->runtime,
         ];
-        
-        return $this->dbQuery;
     } 
 
     /**
@@ -741,9 +742,8 @@ class MySqlExec  extends Constants{
         $this->allowAllTags         = true;
         $this->runtime              = 0.00;
         $this->timer                = [
-            'start'   => 0.00,
-            'end'     => 0.00,
-            'runtime' => 0.00,
+            'start'   => 0,
+            'end'     => 0,
         ];
     }
 
@@ -753,7 +753,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function startTimer()
     {
-        $this->timer['start'] = microtime(true);
+        $this->timer['start'] = new DateTime();
     }
 
     /**
@@ -762,7 +762,7 @@ class MySqlExec  extends Constants{
      */ 
     protected function endTimer()
     {
-        $this->timer['end'] = microtime(true);
+        $this->timer['end'] = new DateTime();
     }
 
     /**
@@ -774,11 +774,19 @@ class MySqlExec  extends Constants{
         // end timer
         $this->endTimer();
 
-        $this->runtime = ($this->timer['end'] - $this->timer['start']) * 1000;
+        $start  = $this->timer['start'];
+        $end    = $this->timer['end'];
 
-        $this->runtime = (float) sprintf('%0.1f', $this->runtime);
+        // time difference
+        if(is_object($start)){
+            $diff = $start->diff($end);
 
-        $this->timer['runtime'] = $this->runtime;
+            // runtime  
+            $this->runtime = $diff->format('%s.%f');
+
+            // round to 2 decimal
+            $this->runtime = round((float) $this->runtime, 2);
+        }
     }
 
     /**

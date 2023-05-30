@@ -54,7 +54,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
     * [Pagination Links Config](#pagination-links-config)
     * [Pagination Showing](#pagination-showing)
     * [Pagination Showing Config](#pagination-showing-config)
-    * [Pagination Numbers](#pagination-numbers)
+    * [Pagination Foreach Numbers](#pagination-foreach-numbers)
     * [Get Pagination](#get-pagination)
 * [Clause](#clause)
   * [Raw](#raw)
@@ -116,7 +116,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.2.0"
+    "peterson/php-orm-database": "^4.2.1"
 }
 ```
 
@@ -390,15 +390,16 @@ $db->table('post')
 
 ## Fetching Data
 
-| object name   |  Returns           |
-|---------------|--------------------|
-| get()         |  array of objects  |
-| first()       |  object            |
-| firstOrFail() |  object or exit with 404 status   |
-| count()       |  int               |
-| paginate()    |  array of objects  |
-| exists()      |  boolean `true` \| `false` |
-| tableExists() |  boolean `true` \| `false` |
+| object name       |  Returns                          |
+|-------------------|-----------------------------------|
+| get()             |  array of objects                 |
+| first()           |  object                           |
+| FirstOrCreate()   |  object or exit with 404 status   |
+| firstOrFail()     |  object or exit with 404 status   |
+| count()           |  int                              |
+| paginate()        |  array of objects                 |
+| exists()          |  boolean `true` \| `false`        |
+| tableExists()     |  boolean `true` \| `false`        |
 
 ### GET
 ```
@@ -563,17 +564,18 @@ http://domain.com/storage/[asset_file]?v=111111111
 
 
 ### Collection Methods
-|    Methods        |          Description                      |
-|-------------------|-------------------------------------------|
-|  getAttributes()  |  `array` Returns an array of data         |
-|  getOriginal()    |  `object` Returns an object of data       |
-|  isEmpty()        |  `boolean` `true \| false` If data is empty |
-|  isNotEmpty()     |  `opposite` of `->isEmpty()`              |
-|  count()          |  `int` count data in items collection     |
-|  toArray()        |  `array` Convert items to array           |
-|  toObject()       |  `object` Convert items to object         |
-|  toJson()         |  `string` Convert items to json           |
-|  toSql()          |  `string` Sql Query String without execution |
+|    Methods        |          Description                          |
+|-------------------|-----------------------------------------------|
+|  getAttributes()  |  `array` Returns an array of data             |
+|  getOriginal()    |  `object` Returns an object of data           |
+|  isEmpty()        |  `boolean` `true \| false` If data is empty   |
+|  isNotEmpty()     |  `opposite` of `->isEmpty()`                  |
+|  count()          |  `int` count data in items collection         |
+|  toArray()        |  `array` Convert items to array               |
+|  toObject()       |  `object` Convert items to object             |
+|  toJson()         |  `string` Convert items to json               |
+|  toSql()          |  `string` Sql Query String without execution  |
+|  dd()             |  `object` Returns dbQuery and exit the script |
  
 
 ### Collection Usage
@@ -731,9 +733,10 @@ $users->showing([
 ```
 </details>
 
-### Pagination Numbers
+### Pagination Foreach Numbers
 - Page numbering `starts counting from 1`
-    - This will format each numbers of data according to it's possition
+    - This will format all pagination items collections
+    - On each page, it starts counting from last pagination item number
 
 ```
 $users = $db->table('users')->paginate(20);

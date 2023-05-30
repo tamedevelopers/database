@@ -16,24 +16,44 @@ namespace builder\Database\Collections;
 class CollectionProperty
 {
     /**
-     * Instance of Database fetch request method
+     * The items contained in the collection.
      *
      * @var mixed
      */
-    static protected $instance;
+    protected $items = [];
+
+    /**
+     * Check if is object without array
+     *
+     * @var bool
+     */
+    protected $isProxyAllowed = false;
+
+    /**
+     * If Instance of Database Pagination Method is true
+     * @var mixed
+     */
+    protected $isPaginate = false;
+
+    /**
+     * If Instance of \builder\Database\DB is true
+     * @var bool
+     */
+    protected $isDBInstance = false;
 
     /**
      * Get pagination items
      *
      * @var mixed\builder\Database\DB
      */
-    static protected $pagination;
-
+    protected $pagination;
+    
     /**
-     * If Instance of Database Pagination Method is true
-     * @var mixed
+     * Instance of ORM Database Class
+     *
+     * @var mixed\builder\Database\DB
      */
-    static protected $is_paginate = false;
+    protected $database;
 
     /**
      * The methods that can be proxied.
@@ -41,25 +61,11 @@ class CollectionProperty
      * @var array
      */
     static protected $proxies = [
-        'get'       => ['get'],
-        'first'     => ['first', 'firstorcreate', 'firstorfail'],
-        'insert'    => ['insert', 'insertorignore'],
-        'paginate'  => ['paginate'],
-    ];
-
-    /**
-     * The methods that can be proxied.
-     *
-     * @var array
-     */
-    static protected $proxies_compact = [
-        'get',
         'first',
         'firstorcreate',
         'firstorfail',
         'insert',
         'insertorignore',
-        'paginate',
     ];
 
 }

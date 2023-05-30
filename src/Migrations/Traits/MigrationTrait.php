@@ -156,7 +156,8 @@ trait MigrationTrait{
      * drop database column
      * @param string $input
      *
-     * @return string \toSnakeCase
+     * @return string 
+     * - String toSnakeCase
      */
     static private function toSnakeCase(?string $input)
     {
@@ -175,7 +176,7 @@ trait MigrationTrait{
      * Getting all files in directory
      * @param string $directory 
      * 
-     * @return array|string\directoryfiles
+     * @return array|string
      */
     static private function directoryfiles(?string $directory)
     {
