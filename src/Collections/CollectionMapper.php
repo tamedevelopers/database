@@ -29,7 +29,7 @@ class CollectionMapper extends CollectionProperty implements IteratorAggregate, 
      * @param  object\builder\Database\Collections\Collection
      * - Instance of Collection
      */
-    public function __construct($items = [], mixed $key = 0, object $collection)
+    public function __construct(mixed $items = [], mixed $key = 0, object $collection = null)
     {
         $this->key              = ((int) $key + 1);
         $this->database         = $collection->database;

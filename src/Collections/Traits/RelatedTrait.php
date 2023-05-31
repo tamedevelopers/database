@@ -42,7 +42,7 @@ trait RelatedTrait{
     public function toSql()
     {
         if($this->isDBInstance){
-            dd( $this->database->dbQuery()->stmt->queryString );
+            dump( $this->database->dbQuery()->stmt->queryString );
         }
     }
 
@@ -251,14 +251,35 @@ trait RelatedTrait{
      */ 
     private function convertOnInit(mixed $items = null)
     {
-        // For ORM Database Proxies Data
-        if ($this->isProxyAllowed || $this->isPaginate || is_array($items)) {
+        // For ORM Database Proxies and Paginate Data
+        // Convert to an array
+        if($this->isDBInstance){
             return json_decode(json_encode($items), true);
         } elseif($this->isValidJson($items)) {
             return json_decode($items, true);
-        }
+        } elseif($this->isNotValidArray($items)){
+            return json_decode(json_encode($items), true);
+        } 
 
         return $items;
+    }
+
+    /**
+     * Check if data is not a valid array
+     *
+     * @param mixed $data
+     * @return bool
+     */
+    private function isNotValidArray(mixed $data = null)
+    {
+        if (!is_array($data)) {
+            return true;
+        }
+
+        // array filter
+        $filteredArray = array_filter($data, 'is_array');
+    
+        return count($filteredArray) === count($data);
     }
 
     /**

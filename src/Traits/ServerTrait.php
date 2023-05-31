@@ -242,7 +242,7 @@ trait ServerTrait{
         if (strpos($currentScript, $documentRoot) === 0) {
             $projectRootPath = substr($currentScript, strlen($documentRoot));
             $projectRootPath = trim($projectRootPath, '/');
-            $projectRootPath = substr($projectRootPath, 0, strpos($projectRootPath, '/'));
+            $projectRootPath = substr($projectRootPath, 0, (int) strpos($projectRootPath, '/'));
             $projectRootPath = $documentRoot . '/' . $projectRootPath;
             
             // if not directory then get the directory of the path link

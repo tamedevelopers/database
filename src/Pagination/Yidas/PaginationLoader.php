@@ -127,7 +127,7 @@ class PaginationLoader
         // Page fetching
         if ($this->page===null) {
             
-            $this->page = isset($_GET[$this->pageParam]) ? $_GET[$this->pageParam] : 1;
+            $this->page = isset($_GET[$this->pageParam]) ? (int) $_GET[$this->pageParam] : 1;
         }
 
         // PrePage fetching
@@ -135,8 +135,8 @@ class PaginationLoader
             
             // Limit check
             $input = (int) $_GET[$this->perPageParam];
-            list($min, $max) = $this->perPageLimit;
-            $this->perPage = ($input <= $max && $input >= $min) ? $input : $this->perPage;
+            list($min, $max) = (int) $this->perPageLimit;
+            $this->perPage = ($input <= $max && $input >= $min) ? (int) $input : (int) $this->perPage;
         }
 
         $this->_init();
@@ -200,14 +200,12 @@ class PaginationLoader
      */
     protected function _init()
     {
-        $this->convertToIntegers();
-        
         // Format
-        $this->totalCount = ($this->totalCount > 0) ? floor($this->totalCount) : 0;
-        $this->perPage = ($this->perPage >= 1) ? floor($this->perPage) : 20;
-        $this->page = ($this->page >= 1) ? floor($this->page) : 1;
-        $this->pageCount = ceil($this->totalCount / $this->perPage);
-        $this->pageCount = ($this->pageCount > 0) ? $this->pageCount : 1;
+        $this->totalCount   = ($this->totalCount > 0) ? floor($this->totalCount) : 0;
+        $this->perPage      = ($this->perPage >= 1) ? floor($this->perPage) : 20;
+        $this->page         = ($this->page >= 1) ? floor($this->page) : 1;
+        $this->pageCount    = ceil($this->totalCount / $this->perPage);
+        $this->pageCount    = ($this->pageCount > 0) ? $this->pageCount : 1;
 
         // Validate page
         if ($this->validatePage) {
@@ -217,6 +215,8 @@ class PaginationLoader
         $this->offset = $this->perPage * ($this->page - 1);
         // Limit ignores (total - offset)
         $this->limit = $this->perPage;
+
+        $this->convertToIntegers();
     }
 
     /**
@@ -227,6 +227,8 @@ class PaginationLoader
     protected function convertToIntegers()
     {
         // Format
+        $this->limit        = (int) $this->limit;
+        $this->offset       = (int) $this->offset;
         $this->page         = (int) $this->page;
         $this->perPage      = (int) $this->perPage;
         $this->pageCount    = (int) $this->pageCount;

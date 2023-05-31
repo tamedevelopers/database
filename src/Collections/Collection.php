@@ -25,7 +25,7 @@ use builder\Database\Collections\Traits\CollectionTrait;
 class Collection extends CollectionProperty implements IteratorAggregate, ArrayAccess
 {
     use CollectionTrait, RelatedTrait;
-    
+
     /**
      * Create a new collection.
      *
@@ -40,7 +40,6 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
         $this->database         = $database;
         $this->isProxyAllowed   = self::checkProxiesType();
         $this->items            = $this->convertOnInit($items);
-        
         // if pagination request is `true`
         if($this->isPaginate){
             $this->pagination = $this->database;
@@ -54,11 +53,16 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
      */
     public function getIterator() : Traversable
     {
-        // On interation (foreach) 
+        // On interation of (foreach) 
         // Wrap items into instance of CollectionMapper
-        return new ArrayIterator(
-            $this->wrapArrayIntoNewCollections()
-        );
+        if(!$this->isProxyAllowed){
+            return new ArrayIterator(
+                $this->wrapArrayIntoNewCollections()
+            );
+        } else{
+            // disallow loop through Proxies items collections
+            return new ArrayIterator([]);
+        }
     }
 
     /**
