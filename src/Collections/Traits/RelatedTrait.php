@@ -35,9 +35,9 @@ trait RelatedTrait{
     }
 
     /**
-     * Get SQL Query
+     * Dump SQL Query
      *
-     * @return string|null
+     * @return void
      */
     public function toSql()
     {
@@ -47,9 +47,9 @@ trait RelatedTrait{
     }
 
     /**
-     * Dumb and Die
+     * Dumb and Die\DbQuery
      *
-     * @return mixed
+     * @return void
      */
     public function dd()
     {
@@ -246,19 +246,13 @@ trait RelatedTrait{
     /**
      * Convert data to an array on Initializaiton
      * @param mixed $items
-     * @param bool $mapper
      * 
      * @return array
      */ 
-    private function convertOnInit(mixed $items = null, ?bool $mapper = false)
+    private function convertOnInit(mixed $items = null)
     {
-        // on loop use
-        // if $mapper === false then we return for proxy checks 
-        // else then it's for Mapper Collections
-        $typePaginateOrProxy = !$mapper ? $this->isProxyAllowed : $this->isPaginate;
-
-        // first or insert request
-        if ($typePaginateOrProxy || is_array($items)) {
+        // For ORM Database Proxies Data
+        if ($this->isProxyAllowed || $this->isPaginate || is_array($items)) {
             return json_decode(json_encode($items), true);
         } elseif($this->isValidJson($items)) {
             return json_decode($items, true);

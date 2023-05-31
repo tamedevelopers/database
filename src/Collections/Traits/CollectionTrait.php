@@ -24,7 +24,7 @@ trait CollectionTrait{
     protected function wrapArrayIntoNewCollections()
     {
         // check if valid array data
-        if (is_array($this->items) && count($this->items) > 0) {
+        if (!$this->isProxyAllowed && is_array($this->items) && count($this->items) > 0) {
             return array_map(function ($item, $key){
                 return new CollectionMapper($item, $key, $this);
             }, $this->items, array_keys($this->items));

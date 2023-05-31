@@ -37,7 +37,7 @@ class CollectionMapper extends CollectionProperty implements IteratorAggregate, 
         $this->isPaginate       = $collection->isPaginate;
         $this->pagination       = $collection->pagination;
         $this->isProxyAllowed   = $collection->isProxyAllowed;
-        $this->items            = $this->convertOnInit($items, true);
+        $this->items            = $this->convertOnInit($items);
     }
 
     /**

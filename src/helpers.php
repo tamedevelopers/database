@@ -400,3 +400,30 @@ if (! function_exists('to_json')) {
         return json_encode( $items );
     }
 }
+
+if (! function_exists('dump')) {
+    /**
+     * Dump Data
+     * @param mixed $data
+     * 
+     * @return void
+     */ 
+    function dump(...$data)
+    {
+        env_orm()->dump($data);
+    }
+}
+
+if (! function_exists('dd')) {
+    /**
+     * Dump and Data
+     * @param mixed $data
+     * 
+     * @return void
+     */ 
+    function dd(...$data)
+    {
+        env_orm()->dump($data);
+        exit(1);
+    }
+}

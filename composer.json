@@ -17,11 +17,11 @@
     ],
     "require": {
         "php": ">=7.2.5",
+        "psr/log": "^1.0 || ^1.1.4",
         "vlucas/phpdotenv": "^5.3",
         "ezyang/htmlpurifier": "^4.16.0",
-        "symfony/var-dumper": "^4.4 || ^5 || ^6",
         "filp/whoops": "^2.15",
-        "psr/log": "^1.0 || ^1.1.4"
+        "kint-php/kint": "^5.0"
     },
     "autoload": {
         "files": [
