@@ -8,11 +8,11 @@ namespace builder\Database\Migrations;
 use PDO;
 use PDOException;
 use builder\Database\DB;
-use builder\Database\Constants;
+use builder\Database\Constant;
 use builder\Database\Migrations\Blueprint;
 use builder\Database\Migrations\Traits\ManagerTrait;
 
-class Schema extends Constants{
+class Schema{
     
     use ManagerTrait;
     
@@ -21,14 +21,14 @@ class Schema extends Constants{
      *
      * @var object\builder\Database\DB
      */
-    static private $db;
+    private static $db;
 
     /**
      * Creating Instance of Database
      * 
      * @return void
      */
-    static private function initSchemaDatabase() 
+    private static function initSchemaDatabase() 
     {
         self::$db = new DB();
     }
@@ -39,7 +39,7 @@ class Schema extends Constants{
      * 
      * @return void
      */
-    static public function defaultStringLength($length = 255) 
+    public static function defaultStringLength($length = 255) 
     {
         // MySQL 5.0.3 and later: 65,535 characters (bytes)
         // MySQL 5.0.3 to 5.0.22: 65,532 characters (bytes)
@@ -63,7 +63,7 @@ class Schema extends Constants{
      * 
      * @return mixed
      */
-    static public function create(?string $tableName, callable $callback) 
+    public static function create(?string $tableName, callable $callback) 
     {
         $callback(new Blueprint($tableName));
     }
@@ -82,7 +82,7 @@ class Schema extends Constants{
      * 
      * @return array
      */
-    static public function updateColumnDefaultValue(?string $table, ?string $column, mixed $value = null)
+    public static function updateColumnDefaultValue(?string $table, ?string $column, mixed $value = null)
     {
         self::initSchemaDatabase();
 
@@ -125,18 +125,18 @@ class Schema extends Constants{
             self::$db->query($query)->execute();
 
             return [
-                'status'    => self::ERROR_200,
+                'status'    => Constant::STATUS_200,
                 'message'   => sprintf("Table `%s` has been altered. <br>\n %s", $table, $query),
             ];
         } catch (PDOException $e){
             return [
-                'status'    => self::ERROR_404,
+                'status'    => Constant::STATUS_404,
                 'message'   => preg_replace(
                     '/^[ \t]+|[ \t]+$/m', '', 
                     sprintf("<<\\Error code>> %s
                         <br><br>
                         <<\\PDO::ERROR>> %s `%s` <br>\n 
-                    ", self::ERROR_404, $e->getMessage(), $value)
+                    ", Constant::STATUS_404, $e->getMessage(), $value)
                 ),
             ];
         }
@@ -148,7 +148,7 @@ class Schema extends Constants{
      * 
      * @return array
      */
-    static public function dropTable(?string $tableName)
+    public static function dropTable(?string $tableName)
     {
         self::initSchemaDatabase();
 
@@ -164,18 +164,18 @@ class Schema extends Constants{
             self::$db->query( "DROP TABLE {$tableName};" )->execute();
 
             return [
-                'status'    => self::ERROR_200,
+                'status'    => Constant::STATUS_200,
                 'message'   => "Table `{$tableName}` dropped successfully <br> \n",
             ];
         } catch (PDOException $e){
             return [
-                'status'    => self::ERROR_404,
+                'status'    => Constant::STATUS_404,
                 'message'   => preg_replace(
                     '/^[ \t]+|[ \t]+$/m', '', 
                     sprintf("<<\\Error code>> %s
                         <br><br>
                         <<\\PDO::ERROR>> %s <br> \n
-                    ", self::ERROR_404, $e->getMessage())
+                    ", Constant::STATUS_404, $e->getMessage())
                 ),
             ];
         }
@@ -188,7 +188,7 @@ class Schema extends Constants{
      * 
      * @return array
      */
-    static public function dropColumn(?string $tableName, ?string $columnName)
+    public static function dropColumn(?string $tableName, ?string $columnName)
     {
         self::initSchemaDatabase();
 
@@ -201,7 +201,7 @@ class Schema extends Constants{
         // if empty
         if(empty($columnName)){
             return [
-                'status'    => self::ERROR_404,
+                'status'    => Constant::STATUS_404,
                 'message'   => "Table column name cannot be empty. Please pass a value.<br>\n",
             ];
         }
@@ -218,18 +218,18 @@ class Schema extends Constants{
             self::$db->query( "DROP TRIGGER IF EXISTS {$columnName}_updated_at;" )->execute();
             
             return [
-                'status'    => self::ERROR_200,
+                'status'    => Constant::STATUS_200,
                 'message'   => "Column `{$columnName}` on `{$tableName}` dropped successfully <br> \n",
             ];
         } catch (PDOException $e){
             return [
-                'status'    => self::ERROR_404,
+                'status'    => Constant::STATUS_404,
                 'message'   => preg_replace(
                     '/^[ \t]+|[ \t]+$/m', '', 
                     sprintf("<<\\Error code>> %s
                         <br><br>
                         <<\\PDO::ERROR>> %s <br> \n
-                    ", self::ERROR_404, $e->getMessage())
+                    ", Constant::STATUS_404, $e->getMessage())
                 ),
             ];
         }
@@ -242,7 +242,7 @@ class Schema extends Constants{
      * 
      * @return string
      */
-    static private function formatDefaultValue(mixed $value = null)
+    private static function formatDefaultValue(mixed $value = null)
     {
         // convert default values to string
         if(is_array($value)){
@@ -271,15 +271,15 @@ class Schema extends Constants{
      * 
      * @return mixed
      */
-    static private function checkDBConnect()
+    private static function checkDBConnect()
     {
         $style = self::$style;
 
         // if database connection is okay
         $dbConnection = self::$db->dbConnection();
-        if($dbConnection['status'] !== self::ERROR_200){
+        if($dbConnection['status'] !== Constant::STATUS_200){
             return [
-                'status'    => self::ERROR_404,
+                'status'    => Constant::STATUS_404,
                 'message'   => "Connection Error 
                                     <span style='background: #ee0707; {$style}'>
                                         Database Connection Error

@@ -9,7 +9,7 @@ use builder\Database\Traits\ServerTrait;
 class Asset{
     
     use ServerTrait;
-
+    
     /**
      * Create assets Real path url
      * 
@@ -21,7 +21,7 @@ class Asset{
      * 
      * @return string
      */
-    static public function asset(?string $asset = null)
+    public static function asset(?string $asset = null)
     {
         // if coniguration has not been used in the global space
         // then we call to define paths for us
@@ -45,7 +45,7 @@ class Asset{
 
         return "{$file_domain}{$cache}";
     }
-
+    
     /**
      * Configure Assets Default Directory
      * 
@@ -61,7 +61,7 @@ class Asset{
      * 
      * @return void
      */
-    static public function config(?string $base_path = null, ?bool $cache = true) 
+    public static function config(?string $base_path = null, ?bool $cache = true) 
     {
         // severs
         $server = self::getServers();
@@ -86,7 +86,7 @@ class Asset{
             ]);
         }
     }
-
+    
     /**
      * Get Last Modification of File
      * 
@@ -94,7 +94,7 @@ class Asset{
      * 
      * @return int|false
      */
-    static private function getFiletime(?string $file_path = null) 
+    private static function getFiletime(?string $file_path = null) 
     {
         return file_exists($file_path) 
                 ? "?v=" . filemtime($file_path)

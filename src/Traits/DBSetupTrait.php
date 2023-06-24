@@ -4,50 +4,59 @@ declare(strict_types=1);
 
 namespace builder\Database\Traits;
 
+
 use builder\Database\Capsule\Manager;
+use builder\Database\Connectors\Connector;
 
+/**
+ * @property static $staticConn
+ */
 trait DBSetupTrait{
-    
-    /**
-     * Check if Setup Initalization has been carried out already
-     * @var bool
-     */
-    protected $initialized = false;
 
     /**
-     * Extending Settings if Available
-     * 
+     * Configuring pagination settings 
      * @param array $options
+     * 
+     * @return void
      */
-    private function initializeSetup(?array $options = []) 
+    private static function initConfiguration(array $options) 
     {
-        // init configuration
-        $this->initConfiguration($options);
-        
-        // start db
-        $this->startDatabase();
-
-        /**
-         * Configuring pagination settings 
-         * Only if the Global Constant is not yet defined
-         */
+        // Only if the Global Constant is not yet defined
         if ( ! defined('PAGINATION_CONFIG') ) {
-            $this->configPagination($options);
+            self::configPagination($options);
         } else{
-            /**
-             * If set to allow global use of ENV Autoloader Settings
-             */
-            if(Manager::setEnvBool(PAGINATION_CONFIG['allow']) === true){
-                $this->configPagination(PAGINATION_CONFIG);
-            }else{
-                $this->configPagination($options);
+            // If set to allow global use of ENV Autoloader Settings
+            if(Manager::isEnvBool(PAGINATION_CONFIG['allow']) === true){
+                self::configPagination(PAGINATION_CONFIG);
+            } else{
+                self::configPagination($options);
             }
         }
-
-        /**
-         * Autostart to Handle Error Exceptions by default 
-         */
-        $this->autoStartDebugger();
     }
 
+    /**
+     * Table name
+     * This is being used on all instance of one query
+     * 
+     * @param string $table
+     * 
+     * @return \builder\Database\Schema\Builder
+     */
+    public static function table(string $table)
+    {
+        return (new Connector)->table($table);
+    }
+
+    /**
+     * Check if table exists
+     * 
+     * @param string $table
+     * 
+     * @return bool
+     */
+    public static function tableExists(?string $table)
+    {
+        return (new Connector)->table('')->tableExists($table);
+    }
+    
 }

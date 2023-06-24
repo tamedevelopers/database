@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace builder\Database\Migrations;
 
-use builder\Database\Constants;
-use builder\Database\Schema\EnvOrm;
+use builder\Database\Constant;
 use builder\Database\Migrations\Traits\ManagerTrait;
 use builder\Database\Migrations\Traits\FilePathTrait;
 use builder\Database\Migrations\Traits\MigrationTrait;
 
-class Migration extends Constants{
+class Migration{
 
     use FilePathTrait,
         ManagerTrait,
@@ -35,7 +34,7 @@ class Migration extends Constants{
      * 
      * @return array
      */
-    static public function run(?string $type = null, ?string $column = null)
+    public static function run(?string $type = null, ?string $column = null)
     {
         // read file inside folders
         $files = self::initBaseDirectory();
@@ -48,14 +47,14 @@ class Migration extends Constants{
         // Check if method exist
         if(!in_array(strtolower($type), ['up', 'drop', 'column'])  || !method_exists(__CLASS__, strtolower($type))){
             return [
-                'status'    => self::ERROR_404,
+                'status'    => Constant::STATUS_404,
                 'message'   => sprintf("The method or type `%s` you're trying to call doesn't exist", $type)
             ];
         }
 
         // run migration methods of included file
         $errorMessage   = [];
-        $errorstatus    = self::ERROR_200;
+        $errorstatus    = Constant::STATUS_200;
         foreach($files as $file){
             $migration = include_once "{$file}";
 
@@ -69,8 +68,8 @@ class Migration extends Constants{
             $errorMessage[] = $handle['message'];
             
             // error occured stop code execution
-            if($handle['status'] != self::ERROR_200){
-                $errorstatus = self::ERROR_404;
+            if($handle['status'] != Constant::STATUS_200){
+                $errorstatus = Constant::STATUS_404;
                 break;
             }
         }
@@ -92,7 +91,7 @@ class Migration extends Constants{
      * 
      * @return void
      */
-    static public function create(?string $table_name, ?string $type = null)
+    public static function create(?string $table_name, ?string $type = null)
     {
         self::initStatic();
 

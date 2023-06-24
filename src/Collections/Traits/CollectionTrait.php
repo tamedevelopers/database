@@ -46,10 +46,10 @@ trait CollectionTrait{
         
         if($this->isDBInstance){
             // if in first or insert proxies
-            $function = strtolower((string) $this->database->function);
-            if(in_array($function, self::$proxies)){
+            $method = strtolower((string) $this->database->method);
+            if(in_array($method, self::$proxies)){
                 return true;
-            } elseif($function === 'paginate'){
+            } elseif($method === 'paginate'){
                 // instance of DB Paginate request
                 $this->isPaginate = true;
             }

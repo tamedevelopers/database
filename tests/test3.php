@@ -1,12 +1,12 @@
 <?php
     
 use builder\Database\DBImport;
-use builder\Database\EnvAutoLoad;
+use builder\Database\AutoLoader;
 
 include_once __DIR__ . "/../vendor/autoload.php";
 
 // start env configuration
-EnvAutoLoad::start();
+AutoLoader::start();
 
 
 

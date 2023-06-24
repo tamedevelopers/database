@@ -6,7 +6,7 @@ namespace builder\Database\Migrations;
 
 use PDOException;
 use builder\Database\DB;
-use builder\Database\Constants;
+use builder\Database\Constant;
 use builder\Database\Migrations\Traits\SchemaTrait;
 use builder\Database\Migrations\Traits\ManagerTrait;
 use builder\Database\Migrations\Traits\FilePathTrait;
@@ -14,7 +14,7 @@ use builder\Database\Migrations\Traits\SchemaCollectionTrait;
 use builder\Database\MigrationTrait\Traits\TableStructureTrait;
 use builder\Database\Migrations\Traits\SchemaConfigurationTrait;
 
-class Blueprint extends Constants{
+class Blueprint{
     
     use SchemaTrait, 
         SchemaCollectionTrait,
@@ -64,13 +64,13 @@ class Blueprint extends Constants{
         $checkPrimary = array_column($this->columns, 'primary');
         if(count($checkPrimary) > 1){
             return [
-                'status'    => self::ERROR_404,
+                'status'    => Constant::STATUS_404,
                 'message'   => sprintf("Primary Key can not be more than one in `%s` @table", $this->tableName),
             ];
         }
         
         return [
-            'status'    => self::ERROR_200,
+            'status'    => Constant::STATUS_200,
             'message'   => $this->toMySQLQuery()
         ];
     }
@@ -83,7 +83,7 @@ class Blueprint extends Constants{
     public function handle() 
     {
         // create traceable table
-        $traceTable = $this->traceable($this->tableName);
+        $traceTable = $this->traceableTableFileName($this->tableName);
 
         // handle error
         $handle = self::checkDBConnect();
@@ -93,7 +93,7 @@ class Blueprint extends Constants{
 
         // primary key error
         $mysqlHandle = $this->MySQLTemplate();
-        if($mysqlHandle['status'] != self::ERROR_200){
+        if($mysqlHandle['status'] != Constant::STATUS_200){
             return $mysqlHandle;
         } 
 
@@ -123,11 +123,11 @@ class Blueprint extends Constants{
             }
 
             return [
-                'status'    => self::ERROR_200,
+                'status'    => Constant::STATUS_200,
                 'message'   => $message,
             ];
         } catch (PDOException $e){
-            return ['status' => self::ERROR_404, 'message' => $e->getMessage()];
+            return ['status' => Constant::STATUS_404, 'message' => $e->getMessage()];
         }
     }
 
@@ -153,9 +153,9 @@ class Blueprint extends Constants{
 
         // if database connection is okay
         $dbConnection = $this->db->dbConnection();
-        if($dbConnection['status'] !== self::ERROR_200){
+        if($dbConnection['status'] !== Constant::STATUS_200){
             return [
-                'status'    => self::ERROR_404,
+                'status'    => Constant::STATUS_404,
                 'message'   => "Connection Error 
                                     <span style='background: #ee0707; {$style}'>
                                         Database Connection Error

@@ -16,19 +16,19 @@ class AutoloadRegister{
      * The base directory to scan for classes and files.
      * @var string
      */
-    static private $baseDirectory;
+    private static $baseDirectory;
 
     /**
      * The class map that stores the class names and their corresponding file paths.
      * @var array
      */
-    static private $classMap = [];
+    private static $classMap = [];
 
     /**
      * The file map that stores the file paths and their corresponding relative paths.
      * @var array
      */
-    static private $fileMap = [];
+    private static $fileMap = [];
 
     /**
      * Autoload function to load class and files in a given folder
@@ -40,7 +40,7 @@ class AutoloadRegister{
      * 
      * @return void
      */
-    static public function load(string|array $baseDirectory)
+    public static function load(string|array $baseDirectory)
     {
         if(is_array($baseDirectory)){
             foreach($baseDirectory as $directory){
@@ -64,7 +64,7 @@ class AutoloadRegister{
      * - Scanning the directory, and registering the autoload method.
      * @return void
      */
-    static private function boot()
+    private static function boot()
     {
         self::generateClassMap();
         self::generateFileMap();
@@ -78,7 +78,7 @@ class AutoloadRegister{
      * @param string $className The name of the class to load.
      * @return void
      */
-    static private function loadClass($className)
+    private static function loadClass($className)
     {
         $filePath = self::$classMap[$className] ?? null;
         if ($filePath && file_exists($filePath)) {
@@ -91,7 +91,7 @@ class AutoloadRegister{
      *
      * @return void
      */
-    static private function loadFiles()
+    private static function loadFiles()
     {
         foreach (self::$fileMap as $fileName => $filePath) {
             if (file_exists($filePath)) {
@@ -105,7 +105,7 @@ class AutoloadRegister{
      *
      * @return void
      */
-    static private function generateClassMap()
+    private static function generateClassMap()
     {
         $fileIterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator(self::$baseDirectory)
@@ -127,7 +127,7 @@ class AutoloadRegister{
      *
      * @return void
      */
-    static private function generateFileMap()
+    private static function generateFileMap()
     {
         $fileIterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator(self::$baseDirectory)
@@ -152,7 +152,7 @@ class AutoloadRegister{
      * @param string $filePath The file path.
      * @return string The relative path.
      */
-    static private function getRelativePath($filePath)
+    private static function getRelativePath($filePath)
     {
         $relativePath = substr($filePath, strlen(self::$baseDirectory));
         return ltrim($relativePath, '/\\');
@@ -164,7 +164,7 @@ class AutoloadRegister{
      * @param string $filePath The file path.
      * @return string|null The class name, or null if not found.
      */
-    static private function getClassName($filePath)
+    private static function getClassName($filePath)
     {
         $namespace  = '';
         $content    = file_get_contents($filePath);

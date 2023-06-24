@@ -3,25 +3,61 @@
 use builder\Database\DB;
 use builder\Database\Asset;
 use builder\Database\DBImport;
-use builder\Database\EnvAutoLoad;
-use builder\Database\Query\MySqlExec;
+use builder\Database\AutoLoader;
 use builder\Database\AutoloadRegister;
-use builder\Database\Schema\EnvOrm;
+use builder\Database\Env;
 use builder\Database\Migrations\Schema;
 use builder\Database\Migrations\Migration;
 
-if (! function_exists('isDatabaseConnectionDefined')) {
+if (! function_exists('autoloader_start')) {
     /**
-     * Get Database Connection Constant Status
-     * - When You connecto to Database using autoload or -- Direct connection
-     * A Global Constant is Instantly defined for us.
-     * This is to check if it has been defined or not
+     * Configure Instance of AutoLoader `Environment`
      * 
-     * @return bool\builder\Database\isDatabaseConnectionDefined
+     * @param string $custom_path 
+     * path \Path to .env file
+     * - [optional] path \By default we use project root path
+     * 
+     * @return void
      */
-    function isDatabaseConnectionDefined()
+    function autoloader_start(?string $custom_path = null)
     {
-        return (new MySqlExec)->isDatabaseConnectionDefined();
+        (new AutoLoader)->start($custom_path);
+    }
+}
+
+if (! function_exists('autoload_register')) {
+    /**
+     * Autoload function to load class and files in a given folder
+     *
+     * @param string|array $baseDirectory 
+     * - The directory path to load
+     * - Do not include the root path, as The Application already have a copy of your path
+     * - e.g 'classes' or ['app/main', 'includes']
+     * 
+     * @return void\builder\Database\AutoloadRegister
+     */
+    function autoload_register(string|array $directory)
+    {
+        (new AutoloadRegister)::load($directory);
+    }
+}
+
+if (! function_exists('config')) {
+    /**
+     * Get the value of a configuration option.
+     *
+     * @param string $key 
+     * The configuration key in dot notation (e.g., 'database.connections.mysql')
+     * 
+     * @param mixed $default 
+     * [optional] The default value to return if the configuration option is not found
+     * 
+     * @return mixed
+     * The value of the configuration option, or null if it doesn't exist
+     */
+    function config(string $key, $default = null)
+    {
+        return (new AutoLoader)->config($key, $default);
     }
 }
 
@@ -29,49 +65,15 @@ if (! function_exists('db')) {
     /**
      * Get Database 
      * 
-     * @param array $options
-     * - [optional] Database configuration options
+     * @param string $key
+     * - key of already defined connections
+     * [dir]/config/database.php
      * 
      * @return object\builder\Database\DB
      */
-    function db(?array $options = [])
+    function db(?string $key = 'default---')
     {
-        return new DB($options);
-    }
-}
-
-if (! function_exists('db_query')) {
-    /**
-     * Get Database Query
-     * 
-     * @return mixed
-     */
-    function db_query()
-    {
-        // get query
-        return isDatabaseConnectionDefined() 
-                ? DATABASE_CONNECTION->dbQuery()
-                : (new MySqlExec)->dbQuery();
-    }
-}
-
-if (! function_exists('db_config')) {
-    /**
-     * Database Configuration
-     * 
-     * @param array $options
-     * - [optional] Database configuration options
-     * - Same as `Direct DB Connection
-     * 
-     * @return void
-     * - You now have access to a new Constant created for you
-     * DATABASE_CONNECTION
-     */
-    function db_config(?array $options = [])
-    {
-        if ( ! isDatabaseConnectionDefined() ) {
-            define('DATABASE_CONNECTION', db($options));
-        }
+        return DB::connection($key);
     }
 }
 
@@ -86,37 +88,7 @@ if (! function_exists('db_connection')) {
      */
     function db_connection(?string $type = null)
     {
-        // get database connection
-        $connection = isDatabaseConnectionDefined() 
-                    ? DATABASE_CONNECTION->dbConnection()
-                    : db()->dbConnection();
-        
-        return $connection[$type] ?? (object) $connection;
-    }
-}
-
-if (! function_exists('db_driver')) {
-    /**
-     * Get Database `PDO` Driver
-     * 
-     * @return mixed\builder\Database\getDriver
-     */
-    function db_driver()
-    {
-        // get database connection
-        return db_connection('driver');
-    }
-}
-
-if (! function_exists('import')) {
-    /**
-     * Get Database Import Instance
-     * 
-     * @return object\builder\Database\DBImport
-     */
-    function import()
-    {
-        return new DBImport();
+        return db()->dbConnection($type);
     }
 }
 
@@ -129,20 +101,43 @@ if (! function_exists('env')) {
      * @param string $key
      * - [optional] ENV KEY or APP Configuration Key
      * 
+     * @param mixed $value
+     * - [optional] Default value if key not found
+     * 
      * @return mixed
      */
-    function env(?string $key = null)
+    function env(?string $key = null, mixed $value = null)
     {
-        // get Config data from ENV file
-        $envData = (new MySqlExec)->env();
-
         // Convert all keys to lowercase
-        $envData = array_change_key_case($envData, CASE_UPPER);
+        $envData = array_change_key_case($_ENV, CASE_UPPER);
 
         // convert to upper-case
         $key = strtoupper(trim((string) $key));
 
-        return $envData[$key] ?? $envData;
+        return $envData[$key] ?? $value;
+    }
+}
+
+if (! function_exists('env_update')) {
+    /**
+     * Update Environment [path .env] variables
+     * 
+     * @param string $key \Environment key you want to update
+     * 
+     * 
+     * @param string|bool $value \Value of Variable to update
+     * 
+     * @param bool $allow_quote \Default is true
+     * [optional] Allow quotes around values
+     * 
+     * @param bool $allow_space \Default is false
+     * [optional] Allow space between key and value
+     * 
+     * @return bool
+     */
+    function env_update(?string $key = null, string|bool $value = null, ?bool $allow_quote = true, ?bool $allow_space = false)
+    {
+        return env_orm()->updateENV($key, $value, $allow_quote, $allow_space);
     }
 }
 
@@ -150,29 +145,23 @@ if (! function_exists('env_orm')) {
     /**
      * Get Dot Env
      * 
-     * @return object\builder\Database\Schema\EnvOrm
+     * @return object\builder\Database\Env
      */
     function env_orm()
     {
-        return (new EnvOrm);
+        return (new Env);
     }
 }
 
-if (! function_exists('env_start')) {
+if (! function_exists('import')) {
     /**
-     * Configure Instance of EnvAutoLoad `Environment`
+     * Get Database Import Instance
      * 
-     * @param array $options
-     * - [optional] path \You can specify custom project path
-     * - By default path, is your project directory root
-     * 
-     * - [optional] dump_bg_color \(default | main | dark | red | blue)
-     * 
-     * @return void
+     * @return object\builder\Database\DBImport
      */
-    function env_start(?array $options = [])
+    function import()
     {
-        (new EnvAutoLoad)->start($options);
+        return new DBImport();
     }
 }
 
@@ -237,23 +226,6 @@ if (! function_exists('asset_config')) {
     }
 }
 
-if (! function_exists('autoload_register')) {
-    /**
-     * Autoload function to load class and files in a given folder
-     *
-     * @param string|array $baseDirectory 
-     * - The directory path to load
-     * - Do not include the root path, as The Application already have a copy of your path
-     * - e.g 'classes' or ['app/main', 'includes']
-     * 
-     * @return void\builder\Database\AutoloadRegister
-     */
-    function autoload_register(string|array $directory)
-    {
-        return (new AutoloadRegister)::load($directory);
-    }
-}
-
 if (! function_exists('config_pagination')) {
     /**
      * Configure Pagination
@@ -277,7 +249,7 @@ if (! function_exists('config_pagination')) {
      */
     function config_pagination(?array $options = [])
     {
-        (new EnvAutoLoad)->configPagination($options);
+        (new AutoLoader)->configPagination($options);
     }
 }
 
@@ -324,41 +296,6 @@ if (! function_exists('domain')) {
     function domain(?string $path = null)
     {
         return env_orm()->formatWithDomainURI($path);
-    }
-}
-
-if (! function_exists('app_data')) {
-    /**
-     * Get All Application Data
-     * 
-     * - Array of
-     * - [keys] path|database|pagination
-     * 
-     * @return array
-     */
-    function app_data()
-    {
-        // get base root path
-        $getPath = defined('DOT_ENV_CONNECTION') 
-                    ? DOT_ENV_CONNECTION['server']
-                    : env_orm()->getDirectory();
-
-        // get database
-        $database = isDatabaseConnectionDefined()  
-                    ? DATABASE_CONNECTION
-                    : db();
-
-        // get pagination
-        $pagination = defined('PAGINATION_CONFIG') 
-                    && PAGINATION_CONFIG['allow'] === true
-                    ? PAGINATION_CONFIG
-                    : db()->pagination_settings;
-
-        return [
-            'path'          => $getPath,
-            'database'      => $database,
-            'pagination'    => $pagination,
-        ];
     }
 }
 

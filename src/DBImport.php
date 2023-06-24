@@ -25,7 +25,7 @@ class DBImport extends DB{
      */
     public function __construct() {
         parent::__construct();
-        $this->error = self::ERROR_404;
+        $this->error = Constant::STATUS_404;
         $this->db_connection = $this->dbConnection();
     }
 
@@ -58,7 +58,7 @@ class DBImport extends DB{
                 if($this->DBConnect()){
                     try{
                         // connection driver
-                        $Driver = $this->connection['driver'];
+                        $Driver = $this->db_connection['driver'];
 
                         // get content
                         $sql = file_get_contents($this->realpath);
@@ -93,11 +93,11 @@ class DBImport extends DB{
                         // execute query
                         $Driver->exec($sql);
 
-                        $this->error    = self::ERROR_200;
+                        $this->error    = Constant::STATUS_200;
                         $this->message  = "- Database has been imported successfully.";
                     } catch(PDOException $e){
                         $this->message  = "- Performing query: <strong style='color: #000'>{$e->getMessage()}</strong>";
-                        $this->error    = self::ERROR_400;
+                        $this->error    = Constant::STATUS_400;
                     }
                 } else{
                     $this->message  = $this->db_connection['message'];
@@ -130,7 +130,7 @@ class DBImport extends DB{
     private function DBConnect()
     {
         // status
-        if($this->db_connection['status'] != self::ERROR_200){
+        if($this->db_connection['status'] != Constant::STATUS_200){
             return false;
         }
 

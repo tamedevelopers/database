@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace builder\Database\Traits;
 
 use ReflectionClass;
-use builder\Database\Schema\EnvOrm;
-
+use builder\Database\Env;
 
 trait ServerTrait{
     
@@ -14,7 +13,7 @@ trait ServerTrait{
      * server base dir
      * @var mixed
      */
-    static protected $base_dir;
+    protected static $base_dir;
 
 
     /**
@@ -24,7 +23,7 @@ trait ServerTrait{
      * 
      * @return string
      */
-    static public function setDirectory(?string $path = null)
+    public static function setDirectory(?string $path = null)
     {
         // if base path was presented
         if(!empty($path)){
@@ -41,7 +40,7 @@ trait ServerTrait{
      * 
      * @return mixed
      */
-    static public function getDirectory()
+    public static function getDirectory()
     {
         if(empty(self::$base_dir)){
             // get default project root path
@@ -62,7 +61,7 @@ trait ServerTrait{
      * 
      * @return string
      */
-    static private function serverRoot()
+    private static function serverRoot()
     {
         return self::getServers('server');
     }
@@ -76,7 +75,7 @@ trait ServerTrait{
      * 
      * @return string
      */
-    static public function formatWithBaseDirectory(?string $path = null)
+    public static function formatWithBaseDirectory(?string $path = null)
     {
         $server = rtrim(
             self::getDirectory(),
@@ -96,7 +95,7 @@ trait ServerTrait{
      * 
      * @return string
      */
-    static public function formatWithDomainURI(?string $path = null)
+    public static function formatWithDomainURI(?string $path = null)
     {
         $server = rtrim(
             self::getServers('domain'),
@@ -117,7 +116,7 @@ trait ServerTrait{
      * @return mixed
      * - An associative array containing\ server|domain|protocol
      */
-    static public function getServers(?string $mode = null)
+    public static function getServers(?string $mode = null)
     {
         // Only create Base path when `DOT_ENV_CONNECTION` is not defined
         // - The Constant holds the path setup information
@@ -148,7 +147,7 @@ trait ServerTrait{
             */
             define('DOT_ENV_CONNECTION', array_merge($data, [
                 'env_path'  => $data['server'],
-                'env'       => new EnvOrm($data['server']),
+                'env'       => new Env($data['server']),
             ]));
         } else{
             // Data
@@ -168,7 +167,7 @@ trait ServerTrait{
      * 
      * @return string
      */
-    static private function createAbsolutePath()
+    private static function createAbsolutePath()
     {
         // get direct root path
         $projectRootPath = self::getDirectRootPath();
@@ -188,7 +187,7 @@ trait ServerTrait{
      * 
      * @return array
      */
-    static private function createAbsoluteDomain(?string $serverPath = null)
+    private static function createAbsoluteDomain(?string $serverPath = null)
     {
         // Determine the protocol (http or https)
         $protocol = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' 
@@ -219,7 +218,7 @@ trait ServerTrait{
      * 
      * @return string
      */
-    static private function getVendorRootPath()
+    private static function getVendorRootPath()
     {
         $reflection = new ReflectionClass(\Composer\Autoload\ClassLoader::class);
         $vendorPath = dirname($reflection->getFileName(), 2);
@@ -232,7 +231,7 @@ trait ServerTrait{
      * 
      * @return string
      */
-    static private function getDirectRootPath()
+    private static function getDirectRootPath()
     {
         $documentRoot   = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
         $currentScript  = str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']);
@@ -260,7 +259,7 @@ trait ServerTrait{
      * 
      * @return string|null
      */
-    static private function clean_path(?string $path = null)
+    public static function clean_path(?string $path = null)
     {
         $path = str_replace(
             '\\', 
@@ -279,7 +278,7 @@ trait ServerTrait{
      * 
      * @return string
      */
-    static public function pathReplacer(?string $path, $replacer = '/')
+    public static function pathReplacer(?string $path, $replacer = '/')
     {
         return str_replace(
             ['\\', '/'], 

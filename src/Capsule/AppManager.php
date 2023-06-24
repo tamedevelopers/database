@@ -4,36 +4,28 @@ declare(strict_types=1);
 
 namespace builder\Database\Capsule;
 
-use builder\Database\Constants;
-use builder\Database\Capsule\Manager;
+use builder\Database\DB;
+use builder\Database\AutoLoader;
+use builder\Database\Capsule\FileCache;
+use builder\Database\Capsule\DebugManager;
 
-
-class AppManager extends Constants{
+class AppManager{
     
-    static private $year;
-
-    /**
-     * initialize
-     */
-    public function __construct() {
-        self::$year = date('Y', time());
-    }
-
     /**
      * Sample copy of env file
      * 
      * @return string
      */
-    static public function envDummy()
+    public static function envDummy()
     {
-        return preg_replace("/^[ \t]+|[ \t]+$/m", "", 'APP_NAME="ORM Model"
+        return preg_replace("/^[ \t]+|[ \t]+$/m", "", 'APP_NAME="PHP ORM Database"
             APP_ENV=local
-            APP_KEY='. self::generateAppKey() .'
+            APP_KEY='. self::generate() .'
             APP_DEBUG=true
             SITE_EMAIL=
             
-            DRIVER_NAME=mysql
-            DB_HOST="localhost"
+            DB_CONNECTION=mysql
+            DB_HOST="127.0.0.1"
             DB_PORT=3306
             DB_USERNAME="root"
             DB_PASSWORD=
@@ -65,7 +57,7 @@ class AppManager extends Constants{
             PUSHER_SCHEME=https
             PUSHER_APP_CLUSTER=mt1
             
-            #©Copyright '. self::$year .'
+            #©Copyright '. date('Y', time()) .'
             APP_DEVELOPER=
             APP_DEVELOPER_EMAIL=
         ');
@@ -76,7 +68,7 @@ class AppManager extends Constants{
      * 
      * @return string
      */
-    static public function generateAppKey($length = 32)
+    public static function generate($length = 32)
     {
         $randomBytes = random_bytes($length);
         $appKey = 'base64:' . rtrim(strtr(base64_encode($randomBytes), '+/', '-_'), '=');
@@ -90,6 +82,56 @@ class AppManager extends Constants{
         $appKey .= '=';
 
         return $appKey;
+    }
+
+    /**
+     * Starting our Application
+     * 
+     * @return void
+     */
+    public static function bootLoader()
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Auto start debug manager
+        |--------------------------------------------------------------------------
+        */
+        DebugManager::boot();
+
+        /*
+        |--------------------------------------------------------------------------
+        | To Disable/Enable Error Resporting
+        | Update the .env and set `APP_DEBUG` to true|false
+        | 
+        | Error report is saved into the below path to file
+        | path => \storage\logs\orm.log
+        |--------------------------------------------------------------------------
+        */
+        env_orm()->bootLogger();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Mainly for Database Connections Cache
+        | Here we defined cache path for easy connection
+        |--------------------------------------------------------------------------
+        */
+        FileCache::setCachePath();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Start env configuration
+        | You can configura your pagination text data here if you like
+        |--------------------------------------------------------------------------
+        */
+        AutoLoader::start();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default connection driver is `mysql`
+        | use DB::connection() \to connection to other connection instance
+        |--------------------------------------------------------------------------
+        */
+        DB::connection();
     }
 
 }

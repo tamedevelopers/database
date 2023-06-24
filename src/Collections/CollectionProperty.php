@@ -60,7 +60,7 @@ class CollectionProperty
      *
      * @var array
      */
-    static protected $proxies = [
+    protected static $proxies = [
         'first',
         'firstorcreate',
         'firstorfail',

@@ -1,5 +1,5 @@
 {
-    "name": "peterson/php-orm-database",
+    "name": "peterson/database",
     "type": "library",
     "description": "Lightweight PHP ORM Database Model.",
     "keywords": ["php orm database", "orm database", "php database", "php orm github"],
@@ -21,7 +21,8 @@
         "vlucas/phpdotenv": "^5.3",
         "ezyang/htmlpurifier": "^4.16.0",
         "filp/whoops": "^2.15",
-        "kint-php/kint": "^5.0"
+        "symfony/var-dumper": "3.4.*",
+        "illuminate/database": "^10.13"
     },
     "autoload": {
         "files": [
@@ -39,7 +40,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.2.1-dev"
+            "dev-main": "4.3.0-dev"
         }
     },
     "minimum-stability": "stable",

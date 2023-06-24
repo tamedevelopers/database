@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace builder\Database\Migrations\Traits;
 
-use builder\Database\Schema\EnvOrm;
+use builder\Database\Env;
 
 /**
  * 
@@ -12,16 +12,16 @@ use builder\Database\Schema\EnvOrm;
  */
 trait MigrationTrait{
 
-    static private $database;
-    static private $migrations;
-    static private $seeders;
+    private static $database;
+    private static $migrations;
+    private static $seeders;
     
     /**
      * Run Migrations
      * 
      * @return mixed
      */
-    static private function runMigration(?string $table_name, ?string $type = null) 
+    private static function runMigration(?string $table_name, ?string $type = null) 
     {
         // table name
         $case_table = self::toSnakeCase($table_name);
@@ -33,16 +33,16 @@ trait MigrationTrait{
         $realPath   = str_replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
 
         // get directory
-        $dummyPath = "{$realPath}/../../Dummy/dummyMigration.php";
+        $dummyPath = "{$realPath}/../../Dummy/dummyMigration.dum";
 
 
         // If type creation passed
         if(!empty($type) && in_array(strtolower($type), ['job', 'jobs'])){
             // create a jobs table
-            $dummyPath = "{$realPath}/../../Dummy/dummyJobsMigration.php";
+            $dummyPath = "{$realPath}/../../Dummy/dummyJobsMigration.dum";
         } elseif(!empty($type) && in_array(strtolower($type), ['session', 'sessions'])){
             // create a sessions table
-            $dummyPath = "{$realPath}/../../Dummy/dummySessionsMigration.php";
+            $dummyPath = "{$realPath}/../../Dummy/dummySessionsMigration.dum";
         }
 
         // dummy content
@@ -87,7 +87,7 @@ trait MigrationTrait{
      * 
      * @return mixed
      */
-    static private function initBaseDirectory() 
+    private static function initBaseDirectory() 
     {
         self::initStatic();
 
@@ -136,11 +136,11 @@ trait MigrationTrait{
      * 
      * @return void
      */
-    static private function initStatic() 
+    private static function initStatic() 
     {
         // if not defined
         if ( ! defined('DOT_ENV_CONNECTION') ) {
-            self::$database = (new EnvOrm)->getDirectory();
+            self::$database = (new Env)->getDirectory();
         } else{
             // once we run env autoloader
             // we have access to global Constant DOT_ENV_CONNECTION
@@ -159,7 +159,7 @@ trait MigrationTrait{
      * @return string 
      * - String toSnakeCase
      */
-    static private function toSnakeCase(?string $input)
+    private static function toSnakeCase(?string $input)
     {
         $output = preg_replace_callback(
             '/[A-Z]/',
@@ -178,7 +178,7 @@ trait MigrationTrait{
      * 
      * @return array|string
      */
-    static private function directoryfiles(?string $directory)
+    private static function directoryfiles(?string $directory)
     {
         // read file inside folders
         $readDir = scandir($directory);

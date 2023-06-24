@@ -19,6 +19,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Installation](#installation)
 * [Instantiate](#instantiate)
 * [Database Connection](#database-connection)
+* [App Debug ENV](#app-debug-env)
 * [More Database Connection Keys](#more-database-connection-keys)
 * [Usage](#usage)
   * [Table](#table)
@@ -95,7 +96,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Get Database Connection](#get-database-connection)
 * [Database Import](#database-import)
 * [Update Env Variable](#update-env-variable)
-* [EnvOrm Servers](#EnvOrm-servers)
+* [Env Servers](#Env-servers)
 * [Autoload Register](#autoload-register)
 * [Collation And Charset](#collation-and-charset)
 * [Extend DB Class](#extend-db-class)
@@ -116,7 +117,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.2.1"
+    "peterson/php-orm-database": "^4.3.0"
 }
 ```
 
@@ -155,68 +156,48 @@ $db = new DB();
 | When done running the code first time, Then remove code and include `init.php` file anywhere in your project | 
 
 ```
-use builder\Database\EnvAutoLoad;
+use builder\Database\AutoLoader;
 
-EnvAutoLoad::start([
+AutoLoader::start([
     'path' => 'define root path or ignore'
 ]);
 ```
 
 - or -- `Helpers Function`
 ```
-env_start([
+autoloader_start([
     'path' => 'define root path or ignore'
 ]);
 ```
 
-### Direct DB Connection - `Supported but ![Recommended]`
-<details><summary>Read more...</summary>
+## App Debug Env
+- The `.env` file contains a key called `APP_DEBUG`
+    - It's mandatory to set to false in Production environment
+    - This helps to secure your applicaiton and exit error 404
+    - instead of displaying entire server errors.
 
-- When initializing the class
-    - Pass an array as a param to the class
-        - Why not recommended? Because you must use thesame varaible name `$db` everywhere in your app
-        - Working but not supported, use `ENV autoloader` recommended
-```
-$db = new DB([
-    'DB_USERNAME' => '',
-    'DB_PASSWORD' => '',
-    'DB_DATABASE' => '',
-]);
-```
+| key               |  Type     |  Default Value        |
+|-------------------|-----------|-----------------------|
+| APP_DEBUG         |  boolean  |  `true`               |
 
-- or -- `Helpers Function`
-    - You'll then have access to annonymous constant `DATABASE_CONNECTION`
-```
-db_config([
-    'DB_USERNAME' => 'root',
-    'DB_PASSWORD' => '',
-    'DB_DATABASE' => '',
-]);
-
-$db = DATABASE_CONNECTION;
-
-$db->table('users')
-    ->limit(10),
-    ->get();
-```
-</details>
 
 ## More Database Connection Keys
 - All available connection keys
-    - The DRIVER_NAME uses only `mysql`
+    - The DB_CONNECTION uses only `mysql`
     - No other connection type is supported for now.
 
 | key               |  Type     |  Default Value        |
 |-------------------|-----------|-----------------------|
-| DRIVER_NAME       |  string   |  mysql                |
-| APP_DEBUG         |  boolean  |  true                 |
-| DB_HOST           |  string   |  `localhost`          |
-| DB_USERNAME       |  string   |                       |
-| DB_PASSWORD       |  string   |                       |
-| DB_DATABASE       |  string   |                       |
-| DB_PORT           |  int      |  `3306`               |
-| DB_CHARSET        |  string   |  `utf8mb4_unicode_ci` |
-| DB_COLLATION      |  string   |  `utf8mb4`            |
+| driver            |  string   |  `mysql`              |
+| host              |  string   |  `localhost`          |
+| port              |  int      |  `3306`               |
+| database          |  string   |                       |
+| username          |  string   |                       |
+| password          |  string   |                       |
+| charset           |  string   |  `utf8mb4`            |
+| collation         |  string   |  `utf8mb4_unicode_ci` |
+| prefix            |  string   |                       |
+| prefix_indexes    |  bool     |  `false`              |
 
 ## Usage 
 - All Methods of usage 
@@ -574,7 +555,7 @@ http://domain.com/storage/[asset_file]?v=111111111
 |  toArray()        |  `array` Convert items to array               |
 |  toObject()       |  `object` Convert items to object             |
 |  toJson()         |  `string` Convert items to json               |
-|  toSql()          |  `string` Sql Query String without execution  |
+|  toSql()          |  `string` Sql Query String only               |
 |  dd()             |  `object` Returns dbQuery and exit the script |
  
 
@@ -584,7 +565,7 @@ http://domain.com/storage/[asset_file]?v=111111111
     - If no data found then it returns null on `->first()` method only
 
 ```
-$user = $db->tableExist('users')
+$user = $db->tableExists('users')
             ->first();
 
 if($user){
@@ -599,7 +580,7 @@ $user->getAttributes()
 - Example two(2) `->get() \| ->paginate()` Request
 
 ```
-$users = $db->tableExist('users')
+$users = $db->tableExists('users')
             ->where('is_active', 1),
             ->random(),
             ->get();
@@ -621,7 +602,7 @@ if($users->isNotEmpty()){
 |-----------|-------------------------|-----------------|
 | allow     | `true` \| `false`       | Default `false` Setting to true will allow the system use this settings across app|
 | class     | string                  | Css `selector` For pagination ul tag in the browser |
-| span      | string                  | Default `.pagination-highlight` Css `selector` For pagination Showing Span tags in the browser |
+| span      | string                  | Default `.page-span` Css `selector` For pagination Showing Span tags in the browser |
 | view      | `bootstrap` \| `simple` | Default `simple` - For pagination design |
 | first     | string                  | Change the letter `First` |
 | last      | string                  | Change the letter `Last` |
@@ -635,7 +616,7 @@ if($users->isNotEmpty()){
 ### Global Configuration 
 - 1 Setup global pagination on ENV autostart `most preferred` method
 ```
-EnvAutoLoad::configPagination([
+AutoLoader::configPagination([
     'allow' => true, 
     'prev'  => 'Prev Page', 
     'last'  => 'Last Page', 
@@ -654,7 +635,7 @@ config_pagination([
 
 <details><summary>Read more...</summary>
 
-- 2 Can also be called using the `$db->configPagination` method
+- 2 Can also be called using the `instance of DB` method
 ```
 $db->configPagination([
     'allow' => true, 
@@ -714,7 +695,7 @@ $users->links([
 $users->showing();
 
 // This will create a span html element with text
-<span class='pagination-highlight'>
+<span class='page-span'>
     Showing 0-40 of 500 results
 </span>
 ```
@@ -1295,9 +1276,9 @@ $db->repair('tb_wallet');
 
 ## Get Database Query
 
-| object            | Helpers       |
-|-------------------|---------------|
-| $db->dbQuery()    | db_query()    |
+| object            |
+|-------------------|
+| $db->dbQuery()    |
 
 
 ## Get Database Config Data
@@ -1346,11 +1327,11 @@ import()->DatabaseImport('orm.sql');
 | allow_space   | `true` \| `false`  - Default is false (Allow space between key and value)|
 
 ```
-use builder\Database\Methods\EnvOrm;
+use builder\Database\Methods\Env;
 
-EnvOrm::updateENV('DB_PASSWORD', 'newPassword');
-EnvOrm::updateENV('APP_DEBUG', false);
-EnvOrm::updateENV('DB_CHARSET', 'utf8', false);
+Env::updateENV('DB_PASSWORD', 'newPassword');
+Env::updateENV('APP_DEBUG', false);
+Env::updateENV('DB_CHARSET', 'utf8', false);
 
 Returns - Boolean
 true|false
@@ -1358,18 +1339,19 @@ true|false
 
 - or -- `Helpers Function`
 ```
+env_update('DB_CHARSET', 'utf8', false);
 env_orm()->updateENV('DB_CHARSET', 'utf8', false);
 ```
 
 
-## EnvOrm Servers
+## Env Servers
 - Returns assoc arrays of Server
     - `server\|domain\|protocol`
 
 ```
-use builder\Database\EnvOrm;
+use builder\Database\Env;
 
-EnvOrm::getServers();
+Env::getServers();
 ```
 
 - or -- `Helpers Function`
@@ -1412,8 +1394,8 @@ autoload_register(['folder', 'folder2]);
 ## Extend DB Class
 <details><summary>Read more...</summary>
 
-- You can as well extends the DB class and use along 
-    - If inherited class must use a __construct, Then you must use `parent::__construct();`
+- You can as well extends the DB class directly from other class
+    - Do not use `parent::__construct();` on class that inherit
 ```
 use builder\Database\DB;
 
@@ -1440,16 +1422,13 @@ class PostClass extends DB{
 | function name             | Description                                   |
 |---------------------------|-----------------------------------------------|
 | db()                      | Return instance of `new DB($options)` class   |
-| db_driver()               | Returns instance of Database `PDO` Driver     |
-| db_config()               | Same as `Direct DB Connection` get access to `DATABASE_CONNECTION` Constant after you call function   |
 | db_connection()           | Same as `$db->dbConnection()`                 |
-| db_query()                | Same as `$db->dbQuery()`                      |
-| config_pagination()       | Same as `$db->configPagination()` or `EnvAutoLoad::configPagination`  |
+| config_pagination()       | Same as `$db->configPagination()` or `AutoLoader::configPagination`  |
+| autoloader_start()        | Same as `AutoLoader::start()`                 |
 | autoload_register()       | Same as `AutoloadRegister::load()`            |
-| app_data()                | Get `path\|database\|pagination` info         |
 | env()                     | Same as `$db->env()`                          |
-| env_orm()                 | Return instance of `(new EnvOrm)` class       |
-| env_start()               | Same as `EnvAutoLoad::start()`                |
+| env_update()              | Same as `Env::updateENV` method            |
+| env_orm()                 | Return instance of `(new Env)` class       |
 | import()                  | Return instance of `(new DBImport)` class     |
 | migration()               | Return instance of `(new Migration)` class    |
 | schema()                  | Return instance of `(new Schema)` class       |

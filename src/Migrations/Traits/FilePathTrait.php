@@ -17,7 +17,7 @@ trait FilePathTrait{
      * 
      * @return string|null\traceable
      */
-    public function traceable(?string $table = null)
+    public function traceableTableFileName(?string $table = null)
     {
         // exception trace
         $exception = (new Exception)->getTrace();
