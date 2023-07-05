@@ -16,14 +16,14 @@ namespace builder\Database\Collections;
 class CollectionProperty
 {
     /**
-     * The items contained in the collection.
+     * The items of collections.
      *
      * @var mixed
      */
     protected $items = [];
 
     /**
-     * Check if is object without array
+     * Check if data is proxy set
      *
      * @var bool
      */
@@ -34,26 +34,19 @@ class CollectionProperty
      * @var mixed
      */
     protected $isPaginate = false;
+    
+    /**
+     * Instance of ORM Database Class
+     *
+     * @var \builder\Database\Schema\Builder
+     */
+    protected $builder;
 
     /**
      * If Instance of \builder\Database\DB is true
      * @var bool
      */
-    protected $isDBInstance = false;
-
-    /**
-     * Get pagination items
-     *
-     * @var mixed\builder\Database\DB
-     */
-    protected $pagination;
-    
-    /**
-     * Instance of ORM Database Class
-     *
-     * @var mixed\builder\Database\DB
-     */
-    protected $database;
+    protected static $isBuilder = false;
 
     /**
      * The methods that can be proxied.
@@ -61,6 +54,7 @@ class CollectionProperty
      * @var array
      */
     protected static $proxies = [
+        'find',
         'first',
         'firstorcreate',
         'firstorfail',

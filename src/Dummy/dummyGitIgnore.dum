@@ -1,12 +1,7 @@
 /upload
 /vendor
-/config
-/storage
 /.idea
 /.vscode
 /.github
-.env
-.htaccess
 .gitignore
-.user.ini
 composer.lock

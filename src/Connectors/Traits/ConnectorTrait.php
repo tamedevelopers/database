@@ -55,7 +55,7 @@ trait ConnectorTrait{
         // check if child class is instance of builder\Database\Model
         if(self::isModelExtended()){
             // Convert camel case to snake case
-            $snakeCase = Str::camelCase(get_called_class());
+            $snakeCase = Str::snakeCase(get_called_class());
 
             return Str::pluralize(
                 strtolower($snakeCase)

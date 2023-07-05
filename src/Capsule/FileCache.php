@@ -14,15 +14,15 @@ class FileCache
      * @param string $path
      * @return void
      */
-    public static function setCachePath(string $path = "storage/cache"): void
+    public static function setCachePath(string $path): void
     {
         // if \storage folder not found
-        $absolutePath = directory($path);
-        if (!is_dir($absolutePath)) {
-            @mkdir($absolutePath, 0777);
+        $path = storage_path($path);
+        if (!is_dir($path)) {
+            @mkdir($path, 0777);
         }
 
-        self::$cachePath = rtrim($absolutePath, '/\\');
+        self::$cachePath = rtrim($path, '/\\');
     }
 
     /**

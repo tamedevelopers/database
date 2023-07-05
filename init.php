@@ -33,7 +33,7 @@ AppManager::bootLoader();
 | in your application
 |--------------------------------------------------------------------------
 */
-// $db = db();
+$db = db();
 
 
 /*
@@ -46,7 +46,7 @@ AppManager::bootLoader();
 |   Helpers
 |   config_pagination([])
 |   or
-|   EnvAutoLoad::configPagination()
+|   AutoLoader::configPagination()
 |
 | key       | Data Type          |  Description                                                                           |
 |-----------|--------------------|----------------------------------------------------------------------------------------|
@@ -61,11 +61,26 @@ AppManager::bootLoader();
 | showing   | string             | Change the letter of `Showing`
 | of        | string             | Change the letter `of`
 | results   | string             | Change the letter `results`
+| buttons   | int                | Numbers of pagination links to generate. Default is 5 and limit is 20
 |--------------------------------------------------------------------------
 */
-// $db->configPagination([
-//    'allow'  => false,
-//    'view'   => 'simple',
-// ]);
+$db->configPagination([
+   'allow'  => false,
+   'view'   => 'simple',
+]);
 
 
+/*
+|--------------------------------------------------------------------------
+| Configure Assets Default Directory
+|
+| @param string $base_path
+| [optional] Default has been set to `/` which is your project base directory
+|
+| @param string $cache
+| [optional] Default is true
+| The Cache when true, works like a PWA application, that automatically
+| expire old cache whenever a change has been made to the file
+|--------------------------------------------------------------------------
+*/
+asset_config('/', true);

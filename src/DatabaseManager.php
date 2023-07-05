@@ -12,15 +12,6 @@ use builder\Database\Traits\ReusableTrait;
 class DatabaseManager extends DatabaseConnector {
 
     use ReusableTrait;
-
-    /**
-     * @var string|null
-     * 
-     * Used to define access level for users override only
-     * Else we never used this in entire project apart from
-     * Model Class Table Initialization alone
-     */
-    protected $table;
     
     /**
      * Database Storage Cache Key
@@ -36,24 +27,27 @@ class DatabaseManager extends DatabaseConnector {
      * @param string $name
      * - [name] of connections in [config/database.php] file
      * 
-     * @param mixed $default 
+     * @param array $default 
      * [optional] The default value to return if the configuration option is not found
      * 
-     * @return object
+     * @return $this
      */
-    public static function connection(?string $name = null, mixed $default = null)
+    public static function connection(?string $name = null, ?array $default = [])
     {
         $config = self::driverValidator($name);
-        if (!FileCache::has($config['name'])) {
+        if (!FileCache::has($config['key'])) {
             // create data
             $data = self::getDriverData(
-                config("database.connections.{$config['name']}", $default)
+                config("database.connections.{$config['name']}")
             );
 
+            // merge data
+            $mergeData = array_merge($data ?? [], $default);
+            
             // Cache the connection
             FileCache::put(
                 $config['key'], 
-                self::createDriverData($data)
+                self::createDriverData($mergeData)
             );
         }
 

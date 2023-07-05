@@ -18,7 +18,9 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Instantiate](#instantiate)
+* [Init.php File](#init.php-file)
 * [Database Connection](#database-connection)
+* [Database Disconnect](#database-disconnect)
 * [App Debug ENV](#app-debug-env)
 * [More Database Connection Keys](#more-database-connection-keys)
 * [Usage](#usage)
@@ -30,8 +32,6 @@ was pretty tough. So i decided to create a much more easier way of communicating
   * [Delete](#delete)
   * [Increment](#increment)
   * [Decrement](#decrement)
-  * [Query](#query)
-  * [Remove Tags](#remove-tags)
 * [Fetching Data](#fetching-data)
     * [Get](#get)
     * [First](#first)
@@ -60,6 +60,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Clause](#clause)
   * [Raw](#raw)
   * [select](#select)
+  * [selectRaw](#selectRaw)
   * [orderBy](#orderby)
   * [orderByRaw](#orderbyraw)
   * [latest](#latest)
@@ -71,10 +72,13 @@ was pretty tough. So i decided to create a much more easier way of communicating
   * [join](#join)
   * [leftJoin](#leftJoin)
   * [where](#where)
+  * [where](#where)
   * [orWhere](#orwhere)
   * [whereColumn](#wherecolumn)
   * [whereNull](#wherenull)
+  * [orWhereNull](#orWhereNull)
   * [whereNotNull](#wherenotnull)
+  * [orWhereNotNull](#orWhereNotNull)
   * [whereBetween](#wherebetween)
   * [whereNotBetween](#wherenotbetween)
   * [whereIn](#wherein)
@@ -87,11 +91,6 @@ was pretty tough. So i decided to create a much more easier way of communicating
   * [Run Migration](#run-migration)
   * [Drop Table](#drop-table)
   * [Drop Column](#drop-column)
-* [Optimize Table](#optimize-table)
-    * [Optimize](#optimize)
-    * [Analize](#analize)
-    * [Repair](#repair)
-* [Get Database Query](#get-database-query)
 * [Get Database Config Data](#get-database-config-data)
 * [Get Database Connection](#get-database-connection)
 * [Database Import](#database-import)
@@ -99,7 +98,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Env Servers](#Env-servers)
 * [Autoload Register](#autoload-register)
 * [Collation And Charset](#collation-and-charset)
-* [Extend DB Class](#extend-db-class)
+* [Extend Model Class](#extend-model-class)
 * [Helpers Functions](#helpers-functions)
 * [Error Dump](#error-dump)
 * [Error Status](#error-status)
@@ -133,27 +132,19 @@ composer require peterson/php-orm-database
 
 ## Instantiate
 
-**Step 1** — `Instantiate class using`:
+**Step 1** — `Require composer autoload`:
 ```
 require_once __DIR__ . '/vendor/autoload.php';
-
-use builder\Database\DB;
-
-$db = new DB();
 ```
 
-## Database Connection
-
-### Env Auto Loader  - `Most preferred`
+**Step 2** — `Run once in browser`
 - This will auto setup your entire application on a `go!`
 
 |  Description                                                                                  | 
 |-----------------------------------------------------------------------------------------------|
 | It's important to install vendor in your project root. We use this to get your root  [dir]    | 
 | By default you don't need to define any path again                                            |
-| Files you'll see `.env` `.gitignore` `.htaccess` `.user.ini` `php.ini` `init.php`             |
-| The below code should be called before using the database model                               | 
-| When done running the code first time, Then remove code and include `init.php` file anywhere in your project | 
+| Files you'll see `.env` `.gitignore` `.htaccess` `.user.ini` `init.php`                       |
 
 ```
 use builder\Database\AutoLoader;
@@ -168,6 +159,40 @@ AutoLoader::start([
 autoloader_start([
     'path' => 'define root path or ignore'
 ]);
+```
+
+## Init.php File
+- This will extends the `composer autoload` and other setup
+
+|  Description                                                                                  | 
+|-----------------------------------------------------------------------------------------------|
+| After you hav `AutoLoader::start` your application! you can choose to include the init.php    | 
+| Everywhere in your project, instead of the `vendor/autoload.php` file.                        |
+| This is totally optional.  |
+
+
+## Database Connection
+- You have the options to connect to multiple database 
+    - First navigate to [config/database.php] file and add a configuration
+    - Takes two (2) params `key` as `string` and `array` [optional]
+
+```
+DB::connection('connName', [optional]);
+```
+
+## Database Disconnect
+- If you want to connect to already connected database, You first need to disconnect
+    - Takes one param as `string`
+
+```
+DB::disconnect('connName');
+```
+
+## Database Reconnect
+- same as `Database Connection`
+
+```
+DB::reconnect('connName', [optional]);
 ```
 
 ## App Debug Env
@@ -300,11 +325,6 @@ $db->table('users')
         'first_name' => 'F. Peterson',
         'status'     => 1,
     ]);
-
--- Query
-UPDATE `users` 
-    SET wallet_bal=wallet_bal + :wallet_bal, first_name=:first_name, status=:status
-    WHERE user_id=:user_id
 ```
 
 - You can ommit the second param and it'll be automatically seen as update param (If an array)
@@ -328,54 +348,15 @@ $db->table('users')
     ]);
 ```
 
-### Query
-<details><summary>Read more...</summary>
-
-- Allows you to use direct `SQL query syntax`
-
-- 1 usage
-```
-$db->query('SHOW COLUMNS FROM users')->get();
-$db->query('DROP TABLE users')->execute();
-```
-
-- 2 usage
-```
-$db->query('SELECT count(*) FROM users WHERE status=:status');
-$db->bind('status', 1);
-$db->get();
-
--- Query
-SELECT count(*) FROM users WHERE status=:status
-```
-</details>
-
-### Remove Tags
-- Takes one param as `bool` Default is `false`
-    - Helps against `XSS attacks` 
-    - By default we did not handle `XSS attacks`. As we assume this should be done by `Forms Validation` before sending to Database
-    - Applies to `insert` `update` `increment` `decrement` methods.
-
-- 1 usage
-```
-$db->table('post')
-    ->removeTags(true)
-    ->insert([
-        'description' => "<script> alert(2); console.log('Blossom');</script>",
-        'user_id' => 
-    ])
-
-- If param set to true, then this will allow all possible tags
-- If false, it will allow few supported HTML5 tags
-```
-
 ## Fetching Data
 
 | object name       |  Returns                          |
 |-------------------|-----------------------------------|
 | get()             |  array of objects                 |
-| first()           |  object                           |
-| FirstOrCreate()   |  object or exit with 404 status   |
+| find()            |  `object` \| `null`               |
+| first()           |  `object` \| `null`               |
+| FirstOrIgnore()   |  `object` \| `null`               |
+| FirstOrCreate()   |  object                           |
 | firstOrFail()     |  object or exit with 404 status   |
 | count()           |  int                              |
 | paginate()        |  array of objects                 |
@@ -385,19 +366,11 @@ $db->table('post')
 ### GET
 ```
 $db->table('users')->get();
-
--- Query
-SELECT * 
-    FROM `users`
 ```
 
 ### First
 ```
 $db->table('users')->first();
-
--- Query
-SELECT * 
-    FROM `users` LIMIT 1
 ```
 
 ### First or Create
@@ -454,11 +427,6 @@ $users = $db->table('users')
 $users // this will return the data objects
 $users->links() // this will return the paginations links view
 $users->showing() // Display items of total results
-
-
--- Query
-SELECT * FROM `users` 
-    LIMIT 0, 40 
 ```
 
 ### Exists
@@ -537,7 +505,9 @@ http://domain.com/storage/[asset_file]?v=111111111
 - You can directly use `methods` of `Collections Instance` on any of the below
     - All the below `methods` are received by Collection `class`
     1. get()
+    2. find()
     2. first()
+    3. firstOrIgnore()
     3. firstOrCreate()
     4. firstOrFail()
     5. insert()
@@ -555,8 +525,6 @@ http://domain.com/storage/[asset_file]?v=111111111
 |  toArray()        |  `array` Convert items to array               |
 |  toObject()       |  `object` Convert items to object             |
 |  toJson()         |  `string` Convert items to json               |
-|  toSql()          |  `string` Sql Query String only               |
-|  dd()             |  `object` Returns dbQuery and exit the script |
  
 
 ### Collection Usage
@@ -598,19 +566,20 @@ if($users->isNotEmpty()){
 ## Pagination
 - Configuring Pagination
 
-| key       | Data Type               |  Description    |
-|-----------|-------------------------|-----------------|
-| allow     | `true` \| `false`       | Default `false` Setting to true will allow the system use this settings across app|
-| class     | string                  | Css `selector` For pagination ul tag in the browser |
-| span      | string                  | Default `.page-span` Css `selector` For pagination Showing Span tags in the browser |
-| view      | `bootstrap` \| `simple` | Default `simple` - For pagination design |
-| first     | string                  | Change the letter `First` |
-| last      | string                  | Change the letter `Last` |
-| next      | string                  | Change the letter `Next` |
-| prev      | string                  | Change the letter `Prev` |
-| showing   | string                  | Change the letter `Showing` |
-| of        | string                  | Change the letter `of`      |
-| results   | string                  | Change the letter `results` |
+| key       | Data Type                 |  Description    |
+|-----------|---------------------------|-----------------|
+| allow     | `true` \| `false`         | Default `false` Setting to true will allow the system use this settings across app|
+| class     | string                    | Css `selector` For pagination ul tag in the browser |
+| span      | string                    | Default `.page-span` Css `selector` For pagination Showing Span tags in the browser |
+| view      | `bootstrap` \| `simple` \| `cursor` | Default `simple` - For pagination design |
+| first     | string                    | Change the letter `First` |
+| last      | string                    | Change the letter `Last` |
+| next      | string                    | Change the letter `Next` |
+| prev      | string                    | Change the letter `Prev` |
+| showing   | string                    | Change the letter `Showing` |
+| of        | string                    | Change the letter `of`      |
+| results   | string                    | Change the letter `results` |
+| buttons   | int                       | Numbers of pagination links to generate. Default is 5 and limit is 20 |
 
 
 ### Global Configuration 
@@ -633,33 +602,9 @@ config_pagination([
 ]);
 ```
 
-<details><summary>Read more...</summary>
-
-- 2 Can also be called using the `instance of DB` method
-```
-$db->configPagination([
-    'allow' => true, 
-    'view'  => 'bootstrap',
-]);
-```
-
-- 3 Can be called same time initializing the DB 
-```
-$db = new DB([
-    'allow' => true, 
-    'prev'  => 'Prev Page', 
-]);
-```
-</details>
-
 ### Pagination Query
 ```
 $users = $db->table('users')->paginate(40);
-
--- Query
-SELECT * 
-    FROM `users` 
-    LIMIT 0, 40
 ```
 
 ### Pagination Data
@@ -755,22 +700,13 @@ $users->getPagination();
 $date = strtotime('next week');
 
 $db->table("tb_wallet")
-    ->raw("date >= $date")
-    ->raw("NOW() > created_at")
-    ->raw("YEAR(created_at) = 2022")
+    ->whereRaw("NOW() > created_at")
+    ->whereRaw("date >= ?", [$date])
+    ->where(DB::raw("YEAR(created_at) = 2022"))
     ->where('email', 'email@gmail.com')
     ->limit(10)
     ->random()
     ->get();
-
-
--- Query
-SELECT * FROM `tb_wallet` 
-        WHERE date >= 1681178855 
-        AND NOW() > created_at 
-        AND YEAR(created_at) = 2022
-        AND email=:email
-        ORDER BY RAND() LIMIT 10
 ```
 
 ### Select
@@ -780,13 +716,8 @@ SELECT * FROM `tb_wallet`
 $db->table('users')
     ->where('user_id', 10000001)
     ->select(['first_name', 'email'])
+    ->select('email, 'name')
     ->first();
-
--- Query
-SELECT first_name, email 
-    FROM `users` 
-    WHERE user_id=:user_id 
-    LIMIT 1
 ```
 
 ### orderBy
@@ -797,11 +728,6 @@ SELECT first_name, email
 $db->table('wallet')
     ->orderBy('date', 'DESC')
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    ORDER By date DESC
 ```
 
 ### orderByRaw
@@ -811,11 +737,6 @@ SELECT *
 $db->table('wallet')
     ->orderByRaw('CAST(`amount` AS UNSIGNED) DESC')
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    ORDER By CAST(`amount` AS UNSIGNED) DESC
 ```
 
 
@@ -825,11 +746,6 @@ SELECT *
 $db->table('wallet')
     ->latest('date')
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    ORDER By date DESC
 ```
 
 ### Oldest
@@ -838,11 +754,6 @@ SELECT *
 $db->table('wallet')
     ->oldest()
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    ORDER By id ASC
 ```
 
 ### inRandomOrder
@@ -850,11 +761,6 @@ SELECT *
 $db->table('wallet')
     ->inRandomOrder()
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    ORDER BY RAND()
 ```
 
 ### random
@@ -874,11 +780,6 @@ $db->table('wallet')
 $db->table('wallet')
     ->limit(10)
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    LIMIT 10
 ```
 
 ### offset
@@ -890,11 +791,6 @@ $db->table('wallet')
     ->limit(3)
     ->offset(2)
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    LIMIT 2, 3
 ```
 
 - Example 2 (Providing only offset will return as LIMIT without error)
@@ -902,16 +798,11 @@ SELECT *
 $db->table('wallet')
     ->offset(2)
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    LIMIT 2
 ```
 </details>
 
 ### join
-- When using clauses, Make sure `join`|`leftJoin` comes first, Before the clauses
+- Includes `join`|`leftJoin`|`rightJoin`|`crossJoin`
 
 | Params        |  Description      |
 |---------------|-------------------|
@@ -933,13 +824,6 @@ $db->table('wallet')
     ->where('wallet.email', 'example.com')
     ->orWhere('wallet.user_id', 10000001)
     ->paginate(10);
-
--- Query
-SELECT * 
-    FROM `wallet`
-    INNER JOIN `users` ON users.user_id = wallet.user_id
-    WHERE wallet.email =:email OR wallet.user_id =:user_id 
-    LIMIT 0, 10
 ```
 
 ### leftJoin
@@ -967,11 +851,6 @@ $db->table('wallet')
     ->where('amount', '>', 10)
     ->where('balance', '>=', 100)
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    WHERE user_id=:user_id AND amount >: amount AND balance >= : balance
 ```
 
 ### orWhere
@@ -985,12 +864,6 @@ $db->table('wallet')
     ->orWhere('first_name', 'like', '%Peterson%')
     ->where('amount', '<=', 10)
     ->get();
-
--- Query
-SELECT * 
-    FROM `wallet`
-    WHERE user_id=:user_id AND amount > :amount
-    OR first_name like :first_name AND amount <= :amount
 ```
 </details>
 
@@ -1002,12 +875,6 @@ $db->table('wallet')
     ->whereColumn('amount', 'tax')
     ->whereColumn('amount', '<=', 'balance')
     ->get();
-    
--- Query
-SELECT * 
-    FROM `wallet`
-    WHERE user_id=:user_id AND amount=tax
-    AND amount <= balance
 ```
 
 ### whereNull
@@ -1017,11 +884,6 @@ $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereNull('email_status')
     ->get();
-    
--- Query
-SELECT * 
-    FROM `wallet`
-    WHERE user_id=:user_id AND email_status IS NULL
 ```
 
 ### whereNotNull
@@ -1033,11 +895,6 @@ $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereNotNull('email_status')
     ->get();
-    
--- Query
-SELECT * 
-    FROM `wallet`
-    WHERE user_id=:user_id AND email_status IS NOT NULL
 ```
 </details>
 
@@ -1055,11 +912,6 @@ $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereBetween('amount', [0, 100])
     ->get();
-    
--- Query
-SELECT * 
-    FROM `wallet`
-    WHERE user_id=:user_id AND amount BETWEEN :0 AND :100
 ```
 
 ### whereNotBetween
@@ -1072,11 +924,6 @@ $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereNotBetween('amount', [0, 100])
     ->get();
-    
--- Query
-SELECT * 
-    FROM `wallet`
-    WHERE user_id=:user_id AND amount NOT BETWEEN :0 AND :100
 ```
 </details>
 
@@ -1094,11 +941,6 @@ $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereIn('amount', [10, 20, 40, 100])
     ->get();
-    
--- Query
-SELECT * 
-    FROM `wallet`
-    WHERE user_id=:user_id AND amount IN (:10, :20, :40, :100)
 ```
 
 ### whereNotIn
@@ -1110,12 +952,6 @@ $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereNotIn('amount', [10, 20, 40, 100])
     ->get();
-    
--- Query
-SELECT * 
-    FROM `wallet`
-    WHERE user_id=:user_id AND amount NOT IN (:10, :20, :40, :100)
-```
 </details>
 
 ### groupBy
@@ -1125,11 +961,6 @@ $db->table('wallet')
     ->where('user_id', 10000001)
     ->groupBy('amount')
     ->get();
-    
--- Query
-SELECT * 
-    FROM `wallet`
-    WHERE user_id=:user_id GROUP BY amount
 ```
 
 ## Database Migration
@@ -1237,50 +1068,6 @@ Migration::run('column', 'column_name);
 ```
 </details>
 
-## Optimize-table 
-- Database table optimization
-
-### Optimize
-<details><summary>Read more...</summary>
-
-- Optimize Multiple Tables
-    - Takes a param as an `array` table_name
-        - This will automatically `Analize` and `Repair` each tables
-        
-```
-$db->optimize(['tb_wallet', 'tb_user']);
-```
-</details>
-
-### Analize
-<details><summary>Read more...</summary>
-
-- Analize Single Table
-    - Takes a param as an `string` table_name
-
-```
-$db->analize('tb_wallet');
-```
-</details>
-
-### Repair
-<details><summary>Read more...</summary>
-
-- Repair Single Table
-    - Takes a param as an `string` table_name
-
-```
-$db->repair('tb_wallet');
-```
-</details>
-
-## Get Database Query
-
-| object            |
-|-------------------|
-| $db->dbQuery()    |
-
-
 ## Get Database Config Data
 
 | object            | Helpers       |
@@ -1300,10 +1087,10 @@ $db->repair('tb_wallet');
 ```
 use builder\Database\DBImport;
 
-$import = new DBImport();
+$database = new DBImport();
 
 // needs absolute path to database file
-$status = $import->DatabaseImport('orm.sql');
+$status = $database->import('path_to/orm.sql');
 
 - Status code
 ->status == 404 (Failed to read file or File does'nt exists
@@ -1313,7 +1100,7 @@ $status = $import->DatabaseImport('orm.sql');
 
 - or -- `Helpers Function`
 ```
-import()->DatabaseImport('orm.sql');
+import('path_to/orm.sql');
 ```
 
 ## Update Env Variable
@@ -1391,27 +1178,21 @@ autoload_register(['folder', 'folder2]);
 - utf8mb4
 - latin1
 
-## Extend DB Class
+## Extend Model Class
 <details><summary>Read more...</summary>
 
-- You can as well extends the DB class directly from other class
-    - Do not use `parent::__construct();` on class that inherit
+- You can as well extends the DB Model class directly from other class
 ```
-use builder\Database\DB;
+use builder\Database\Model;
 
-class PostClass extends DB{
+class Post extends Model{
     
-    // needed only if the class has a construct
-    // else ignore without adding
-    public function __construct() {
-        parent::__construct();
-    }
+    // define your custom model table name
+    protected $table = 'posts';
 
     -- You now have access to the DB public instances
     public function getPost(){
-        return $this->table('posts')
-            ->select(['images', 'title', 'description'])
-            ->get();
+        return $this->select(['images', 'title', 'description'])->get();
     }
 }
 ```
@@ -1429,7 +1210,7 @@ class PostClass extends DB{
 | env()                     | Same as `$db->env()`                          |
 | env_update()              | Same as `Env::updateENV` method            |
 | env_orm()                 | Return instance of `(new Env)` class       |
-| import()                  | Return instance of `(new DBImport)` class     |
+| import()                  | Return instance of `(new DBImport)->import()` method      |
 | migration()               | Return instance of `(new Migration)` class    |
 | schema()                  | Return instance of `(new Schema)` class       |
 | asset()                   | Return Absolute path of asset. Same as `Asset::asset()`   |

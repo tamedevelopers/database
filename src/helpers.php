@@ -1,11 +1,11 @@
 <?php 
 
 use builder\Database\DB;
+use builder\Database\Env;
 use builder\Database\Asset;
 use builder\Database\DBImport;
 use builder\Database\AutoLoader;
 use builder\Database\AutoloadRegister;
-use builder\Database\Env;
 use builder\Database\Migrations\Schema;
 use builder\Database\Migrations\Migration;
 
@@ -38,7 +38,7 @@ if (! function_exists('autoload_register')) {
      */
     function autoload_register(string|array $directory)
     {
-        (new AutoloadRegister)::load($directory);
+        (new AutoloadRegister)->load($directory);
     }
 }
 
@@ -69,9 +69,9 @@ if (! function_exists('db')) {
      * - key of already defined connections
      * [dir]/config/database.php
      * 
-     * @return object\builder\Database\DB
+     * @return \builder\Database\Connectors\Connector
      */
-    function db(?string $key = 'default---')
+    function db(?string $key = 'default')
     {
         return DB::connection($key);
     }
@@ -145,7 +145,7 @@ if (! function_exists('env_orm')) {
     /**
      * Get Dot Env
      * 
-     * @return object\builder\Database\Env
+     * @return \builder\Database\Env
      */
     function env_orm()
     {
@@ -155,13 +155,16 @@ if (! function_exists('env_orm')) {
 
 if (! function_exists('import')) {
     /**
-     * Get Database Import Instance
+     * Database Importation
      * 
-     * @return object\builder\Database\DBImport
+     * @param string $path_to_sql
+     * 
+     * @return object
+     * [status, message]
      */
-    function import()
+    function import($path_to_sql = null)
     {
-        return new DBImport();
+        return (new DBImport)->import($path_to_sql);
     }
 }
 
@@ -169,7 +172,7 @@ if (! function_exists('migration')) {
     /**
      * Get Instance of Migration
      * 
-     * @return object\builder\Database\Migration
+     * @return \builder\Database\Migration
      */
     function migration()
     {
@@ -181,7 +184,7 @@ if (! function_exists('schema')) {
     /**
      * Get Instance of Migration Schema
      * 
-     * @return object\builder\Database\Migration\Schema
+     * @return \builder\Database\Migration\Schema
      */
     function schema()
     {
@@ -250,6 +253,36 @@ if (! function_exists('config_pagination')) {
     function config_pagination(?array $options = [])
     {
         (new AutoLoader)->configPagination($options);
+    }
+}
+
+if (! function_exists('storage_path')) {
+    /**
+     * Get Storage Directory `Path`
+     * @param string $path
+     * - [optional] You can pass a path to include with the base directory
+     * - Final result: i.e C:/server_path/path
+     * 
+     * @return string
+     */
+    function storage_path(?string $path = null)
+    {
+        return base_path("storage/{$path}");
+    }
+}
+
+if (! function_exists('config_path')) {
+    /**
+     * Get Config Directory `Path`
+     * @param string $path
+     * - [optional] You can pass a path to include with the base directory
+     * - Final result: i.e C:/server_path/path
+     * 
+     * @return string
+     */
+    function config_path(?string $path = null)
+    {
+        return base_path("config/{$path}");
     }
 }
 

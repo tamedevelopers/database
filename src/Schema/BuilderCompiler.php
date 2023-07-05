@@ -66,7 +66,7 @@ class BuilderCompiler{
         // can build the query and concatenate all the pieces together as one.
         $original = $query->columns;
 
-        if (is_null($query->columns)) {
+        if (empty($query->columns)) {
             $query->columns = ['*'];
         }
 
@@ -634,9 +634,19 @@ class BuilderCompiler{
      */
     protected function compileHavings(Builder $query)
     {
-        return 'having '.$this->removeLeadingBoolean(collect($query->havings)->map(function ($having) {
-            return $having['boolean'].' '.$this->compileHaving($having);
-        })->implode(' '));
+        $havings = $query->havings;
+        if (empty($havings)) {
+            return '';
+        }
+
+        $compiledHavings = [];
+        foreach ($havings as $having) {
+            $boolean = $having['boolean'];
+            $compiledHaving = $this->compileHaving($having);
+            $compiledHavings[] = "$boolean $compiledHaving";
+        }
+
+        return 'having ' . $this->removeLeadingBoolean(implode(' ', $compiledHavings));
     }
 
     /**
@@ -696,9 +706,9 @@ class BuilderCompiler{
 
         $column = $this->wrap($having['column']);
 
-        $min = $this->parameter(head($having['values']));
+        $min = $this->parameter(Forge::head($having['values']));
 
-        $max = $this->parameter(last($having['values']));
+        $max = $this->parameter(Forge::last($having['values']));
 
         return $column.' '.$between.' '.$min.' and '.$max;
     }
@@ -935,7 +945,7 @@ class BuilderCompiler{
      */
     protected function compileDeleteWithJoins(Builder $query, $table, $where)
     {
-        $alias = last(explode(' as ', $table));
+        $alias = Forge::last(explode(' as ', $table));
 
         $joins = $this->compileJoins($query, $query->joins);
 

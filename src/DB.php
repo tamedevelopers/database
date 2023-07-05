@@ -55,15 +55,4 @@ class DB extends DatabaseManager{
     
     use DBSetupTrait, ExpressionTrait;
     
-    /**
-     * Extending Constructor options if Available
-     * 
-     * @param mixed $options
-     */
-    public function __construct(mixed $options = null) 
-    {
-        // pagination config
-        // self::initConfiguration($options);
-    }
-
 }

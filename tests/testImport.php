@@ -13,7 +13,12 @@ AutoLoader::start();
 
 $import = new DBImport();
 
-$response = $import->DatabaseImport('orm.sql');
+
+// do this 
+$response = $import->import('orm.sql');
+
+// of function helper
+$same = import('orm.sql');
 
 
 $import->dump( 

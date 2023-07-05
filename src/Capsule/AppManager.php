@@ -112,10 +112,10 @@ class AppManager{
         /*
         |--------------------------------------------------------------------------
         | Mainly for Database Connections Cache
-        | Here we defined cache path for easy connection
+        | Here we defined cache path for easy connection storage
         |--------------------------------------------------------------------------
         */
-        FileCache::setCachePath();
+        FileCache::setCachePath("cache"); 
 
         /*
         |--------------------------------------------------------------------------

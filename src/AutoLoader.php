@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace builder\Database;
 
 use builder\Database\Env;
-use builder\Database\DatabaseConnector;
 use builder\Database\Traits\AutoLoaderTrait;
+use builder\Database\Schema\Pagination\PaginatorAsset;
 
 class AutoLoader{
 
@@ -106,8 +106,8 @@ class AutoLoader{
         | Create default path and bg for errors
         |--------------------------------------------------------------------------
         */
-        $text       = DatabaseConnector::paginationText();
-        $getViews   = DatabaseConnector::paginationViews();
+        $text       = PaginatorAsset::texts();
+        $getViews   = PaginatorAsset::views();
         
         $default = array_merge([
             'allow'     => 'disallow',
@@ -121,6 +121,7 @@ class AutoLoader{
             'showing'   => $text['showing'],
             'of'        => $text['of'],
             'results'   => $text['results'],
+            'buttons'   => $text['buttons'],
         ], $options);
 
         // get actual view

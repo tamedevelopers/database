@@ -6,57 +6,12 @@ namespace builder\Database\Collections\Traits;
 
 
 /**
- * @property mixed $pagination
- * @property mixed $database
- * @property bool $isPaginate
  * @property bool $isProxyAllowed
- * @property bool $isDBInstance
+ * @property bool $isPaginate
+ * @property bool $isBuilder
+ * @property mixed $builder
  */
 trait RelatedTrait{
-
-    /**
-     * Get Pagination Object
-     * 
-     * @return mixed
-     */
-    public function getPagination()
-    {
-        if($this->pagination){
-            $pagination = $this->pagination->pagination;
-            return (object) [
-                'limit'         => (int) $pagination->limit,
-                'offset'        => (int) $pagination->offset,
-                'page'          => (int) $pagination->page,
-                'pageCount'     => (int) $pagination->pageCount,
-                'perPage'       => (int) $pagination->perPage,
-                'totalCount'    => (int) $pagination->totalCount,
-            ];
-        }
-    }
-
-    /**
-     * Dump SQL Query
-     *
-     * @return void
-     */
-    public function toSql()
-    {
-        if($this->isDBInstance){
-            dump( $this->database->dbQuery()->stmt->queryString );
-        }
-    }
-
-    /**
-     * Dumb and Die\DbQuery
-     *
-     * @return void
-     */
-    public function dd()
-    {
-        if($this->isDBInstance){
-            dd( $this->database->dbQuery() );
-        }
-    }
 
     /**
      * Determine if an item exists at an offset.
@@ -228,9 +183,10 @@ trait RelatedTrait{
      */
     public function count(): int
     {
-        return  $this->isArray()
-                ? count($this->items)
-                : 0;
+        if($this->isProxyAllowed){
+            return 0;
+        }
+        return  $this->isArray() ? count($this->items) : 0;
     }
     
     /**
@@ -247,21 +203,21 @@ trait RelatedTrait{
      * Convert data to an array on Initializaiton
      * @param mixed $items
      * 
-     * @return array
+     * @return void
      */ 
     private function convertOnInit(mixed $items = null)
     {
         // For ORM Database Proxies and Paginate Data
         // Convert to an array
-        if($this->isDBInstance){
-            return json_decode(json_encode($items), true);
+        if(self::$isBuilder){
+            $this->items = $items;
         } elseif($this->isValidJson($items)) {
-            return json_decode($items, true);
+            $this->items = json_decode($items, true);
         } elseif($this->isNotValidArray($items)){
-            return json_decode(json_encode($items), true);
+            $this->items = json_decode(json_encode($items), true);
         } 
 
-        return $items;
+        $this->items = $items;
     }
 
     /**

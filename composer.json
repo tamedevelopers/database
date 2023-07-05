@@ -19,10 +19,8 @@
         "php": ">=7.2.5",
         "psr/log": "^1.0 || ^1.1.4",
         "vlucas/phpdotenv": "^5.3",
-        "ezyang/htmlpurifier": "^4.16.0",
         "filp/whoops": "^2.15",
-        "symfony/var-dumper": "3.4.*",
-        "illuminate/database": "^10.13"
+        "symfony/var-dumper": "4.4.*"
     },
     "autoload": {
         "files": [

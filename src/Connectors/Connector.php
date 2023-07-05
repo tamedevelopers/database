@@ -9,6 +9,7 @@ use builder\Database\Schema\Builder;
 use builder\Database\Capsule\Manager;
 use builder\Database\DatabaseManager;
 use builder\Database\Capsule\FileCache;
+use builder\Database\Schema\Pagination\Paginator;
 use builder\Database\Connectors\ConnectionBuilder;
 use builder\Database\Schema\Traits\ExpressionTrait;
 use builder\Database\Connectors\Traits\ConnectorTrait;
@@ -70,6 +71,27 @@ class Connector {
         return $this->table('')->tableExists($table);
     }
 
+    /**
+     * Configuring pagination settings 
+     * @param array $options
+     * [optional]
+     * 
+     * @return void
+     */
+    public function configPagination(array $options = []) 
+    {
+        // create a new instance of Paginator
+        $paginator = new Paginator();
+
+        // Only if the Global Constant is not yet defined
+        // If set to allow global use of ENV Autoloader Settings
+        if(defined('PAGINATION_CONFIG') && Manager::isEnvBool(PAGINATION_CONFIG['allow']) === true){
+            $paginator->configPagination(PAGINATION_CONFIG);
+        } else{
+            $paginator->configPagination($options);
+        }
+    }
+    
     /**
      * Build Table Instance
      * @param string $table

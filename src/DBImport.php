@@ -33,9 +33,10 @@ class DBImport extends DB{
      * Database Importation
      * @param string path_to_sql
      * 
-     * @return object\builder\Database\DatabaseImport
+     * @return object
+     * [status, message]
      */
-    public function DatabaseImport($path_to_sql = NULL)
+    public function import($path_to_sql = NULL)
     {
         $this->realpath = self::formatWithBaseDirectory($path_to_sql);
         

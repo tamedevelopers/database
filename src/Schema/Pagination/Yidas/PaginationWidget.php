@@ -1,6 +1,6 @@
 <?php
 
-namespace builder\Database\Pagination\Yidas;
+namespace builder\Database\Schema\Pagination\Yidas;
 
 /**
  * Pagination Widget
@@ -14,6 +14,13 @@ namespace builder\Database\Pagination\Yidas;
  */
 class PaginationWidget
 {
+    /**
+     * Maximum numbers of page button software can generate
+     *
+     * @var int
+     */    
+    const MAX_PAGE_BUTTON = 20;
+
     /**
      * Set the Widget pager is center align or not
      *
@@ -31,7 +38,7 @@ class PaginationWidget
     /**
      * The data pagination object that this pager is associated with.
      *
-     * @var yidas\data\Pagination
+     * @var \builder\Database\Schema\Pagination\Yidas\PaginationLoader
      */
     public $pagination;
 
@@ -144,7 +151,13 @@ class PaginationWidget
      */
     protected static $_instance;
 
-    public static function widget($options=[])
+    /**
+     * Widget 
+     * @param array $options
+     * 
+     * @return mixed
+     */
+    public static function widget($options = [])
     {
         // Create an instance for each call
         $widgetClass = get_called_class();
@@ -152,10 +165,21 @@ class PaginationWidget
 
         $options = array_merge(self::$defaultOpt, $options);
 
+
         // Configuration for each call
         foreach ($options as $property => $value) {
-            
+            // Limit the number of page buttons that can be displayed
+            if($property === 'buttonCount'){
+                if($value > self::MAX_PAGE_BUTTON){
+                    $value = self::MAX_PAGE_BUTTON;
+                }
+            }
             self::$_instance->$property = $value;
+        }
+
+        // change button count for cursor view type
+        if(self::$_instance->view === 'cursor'){
+            self::$_instance->buttonCount = 0;
         }
         
         return self::$_instance->run();
@@ -242,8 +266,9 @@ class PaginationWidget
 
         // Choose view
         $viewFile = (in_array(substr($this->view, 0, 1), [DIRECTORY_SEPARATOR, '/']))
-            ? $this->view
-            : __DIR__ . "/views/{$this->view}.php";
+                    ? $this->view
+                    : __DIR__ . "/views/{$this->view}.php";
+
         // Render view
         include $viewFile;
 

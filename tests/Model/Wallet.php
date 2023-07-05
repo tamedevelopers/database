@@ -4,9 +4,17 @@ use builder\Database\Model;
 
 class Wallet extends Model{
 
-    // defining a table name will override 
-    // the default pluralization name handling
+
+    /**
+     * The table associated with the model.
+     * 
+     * @var string|null
+     * 
+     * Now we have override the systems default model name of `wallets`
+     * to `tb_wallet`
+     */
     protected $table = 'tb_wallet';
+
 
     public function getWallets()
     {

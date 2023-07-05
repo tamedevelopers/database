@@ -14,14 +14,12 @@ use builder\Database\Capsule\Forge;
 use builder\Database\Schema\Builder;
 use builder\Database\Schema\Expression;
 use builder\Database\Schema\JoinClause;
+use builder\Database\Schema\Pagination\Paginator;
 use builder\Database\Collections\Collection;
 use builder\Database\Schema\BuilderCompiler;
 
 
 /**
- * 
- * @property-read mixed $instance
- * @property-read mixed $timer
  * @property mixed $connection
  * 
  * @see \builder\Database\Schema\Builder
@@ -40,11 +38,20 @@ trait BuilderTrait{
     }
 
     /**
+     * Set callback method
+     * @return void
+     */
+    protected function setMethod($method = null)
+    {
+        $this->method = $method;
+    }
+
+    /**
      * Builder Compiler Instance
      * 
      * @return \builder\Database\Schema\BuilderCompiler
      */
-    private function compile()
+    protected function compile()
     {
         $builder = new BuilderCompiler;
         $builder->tablePrefix = $this->connection->tablePrefix;
@@ -510,7 +517,7 @@ trait BuilderTrait{
      */
     protected function flattenValue($value)
     {
-        return is_array($value) ? head(Forge::flattenValue($value)) : $value;
+        return is_array($value) ? Forge::head( Forge::flattenValue($value) ) : $value;
     }
 
     /**
@@ -664,10 +671,10 @@ trait BuilderTrait{
             }
         }
 
-        // convert join quotation
-        // this will trigger for the join query
+        // This will trigger for the join queries only
+        // any future possible code will go in here
         if(count($wrappedSegments) === 2){
-            $wrappedSegments = str_replace(['`', "'"], "'", $wrappedSegments);
+            // 
         }
 
         return implode('.', $wrappedSegments);
@@ -886,13 +893,42 @@ trait BuilderTrait{
             $statement->execute();
         } catch (\PDOException $e) {
             if(!$ignore){
+                return $this->errorException($e);
             }
-            return $this->errorException($e);
         }
 
         $this->connection->statement = $statement ?? null;
         
         return $this;
+    }
+
+    /**
+     * Execute an SQL statement and return the boolean result.
+     *
+     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \builder\Database\Schema\Pagination\Paginator  $paginator
+     * @return $this
+     */
+    protected function paginateStatement(Builder $query, Paginator $paginator)
+    {
+        $pdo = $query->connection->pdo;
+        $sql = $query->limit($paginator->pagination->limit)
+                        ->offset($paginator->pagination->offset)
+                        ->compile()
+                        ->compileSelect($query);
+
+        try {
+            $statement = $pdo->prepare($sql);
+            $this->bindValues(
+                $statement, 
+                Forge::flattenValue($query->getBindings())
+            );
+            $statement->execute();
+
+            return $statement->fetchAll();
+        } catch (\PDOException $e) {
+            return $this->errorException($e);
+        }
     }
 
     /**
@@ -1034,28 +1070,54 @@ trait BuilderTrait{
         // save data before closing queries
         $this->close(false);
 
-        // get primary|unq key and lastinsertID
+        // get primary key and lastinsertID
         [$column, $col_value] = $this->connection->driver->describeColumn($this);
 
-        // fetch final data
-        $insert = $this->select(['*'])->where($column, $col_value)->firstOrIgnore();
-
-        // save data before closing queries
-        $this->close();
-
-        return $insert;
+        // get data using the first or ignore method
+        // with this no error is expected to be returned
+        // by default its impossible for an error to occur
+        // as the driver `describeColumn` method ensure to return the
+        // PRIMARY KEY column name and lastinsertID
+        return $this->select(['*'])->where($column, $col_value)->firstOrIgnore();
     }
 
     /**
      * Execute the query as a "select" statement.
      *
-     * @param array|string  $columns
+     * @param  string  $method
      * @param  bool  $close \By default we close queries 
      * @param  bool  $ignore
      * 
      * @return $this
      */
-    protected function getBuilder(array $columns, $close = true, $ignore = false)
+    protected function firstOrIgnoreBuilder($method = null, $close = true, $ignore = false)
+    {
+        $results = $this->limit(1)->getBuilder($close, $ignore, $method, false);
+
+        return  count($results) > 0
+                ? new Collection($results[0], $this)
+                : null;
+    }
+
+    /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  bool  $close \By default we close queries 
+     * [optional] Either to close query after execution
+     * 
+     * @param  bool  $ignore
+     * [optional] Either to ignore Exception error or not
+     * 
+     * @param  string $method
+     * [optional] Method it's being called from
+     * 
+     * @param  bool $collection
+     * [optional] By default method returns a collection.
+     * So we can ignore and return direct data
+     * 
+     * @return $this
+     */
+    protected function getBuilder($close = true, $ignore = false, $method = null, $collection = true)
     {
         $this->applyBeforeQueryCallbacks();
 
@@ -1066,7 +1128,7 @@ trait BuilderTrait{
         );
 
         // save data before closing queries
-        $data = new Collection($results->fetchAll());
+        $data = $results->fetchAll();
 
         // only close when allowed
         // this will help us in Pagination, so we can count the data and returned total count
@@ -1075,7 +1137,9 @@ trait BuilderTrait{
             $this->close();
         }
 
-        return $data;
+        $this->setMethod($method);
+
+        return $collection ? new Collection($data, $this) : $data;
     }
 
     /**
@@ -1110,14 +1174,33 @@ trait BuilderTrait{
     /**
      * Retrieve the "count" result of the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $columns
+     * @param  array|string  $columns
      * @param  bool  $close \By default we close queries 
      * 
      * @return int
      */
-    protected function countBuilder($columns = '*', $close = true)
+    protected function countBuilder($columns = ['*'], $close = true)
     {
-        return (int) $this->aggregate(__FUNCTION__, Forge::wrap($columns), $close);
+        $this->applyBeforeQueryCallbacks();
+        $this->selectRaw('count' . '(' . $this->columnize(Forge::wrap($columns)) . ') as aggregate');
+
+        $results = $this->statement(
+            $this->compile()->compileSelect($this),
+            $this->getBindings(),
+            false
+        );
+
+        // save data before closing queries
+        $data = $results->fetchAll();
+
+        // only close when allowed
+        // this will help us in Pagination, so we can count the data and returned total count
+        // before starting the [paginaion] request
+        if($close){
+            $this->close();
+        }
+
+        return (int) $data[0]['aggregate'] ?? 0;
     }
 
     /**
@@ -1132,7 +1215,7 @@ trait BuilderTrait{
     protected function aggregate($function, $columns = ['*'], $close = true)
     {
         $this->selectRaw($function . '(' . $this->columnize($columns) . ') as aggregate');
-        $results = $this->getBuilder($columns, $close);
+        $results = $this->getBuilder($close, false, $function);
 
         if (! $results->isEmpty()) {
             $result = (array) $results[0];
@@ -1237,27 +1320,6 @@ trait BuilderTrait{
 
     /**
      * Close all queries and restore back to default
-     *
-     * @return void
-     */
-    protected function closeTempQuery()
-    {
-        $this->columns  = null;
-        $this->distinct = false;
-        $this->from     = null;
-        $this->wheres   = [];
-        $this->joins    = null;
-        $this->orders   = null;
-        $this->havings  = null;
-        $this->groups   = null;
-        $this->limit    = null;
-        $this->offset   = null;
-        $this->runtime  = 0.00;
-        $this->beforeQueryCallbacks = [];
-    }
-
-    /**
-     * Close all queries and restore back to default
      * @param bool $table \Default is set to true
      * - Since sometimes we want to reset all connection 
      * leaving the table name alone
@@ -1275,8 +1337,9 @@ trait BuilderTrait{
             'having'    => [],
             'order'     => [],
         ];
-        $this->columns  = [];
         $this->wheres   = [];
+        $this->columns  = null;
+        $this->method   = null;
         $this->joins    = null;
         $this->orders   = null;
         $this->havings  = null;
@@ -1292,7 +1355,7 @@ trait BuilderTrait{
     /**
      * Get total query execution time
      * 
-     * @return int|float
+     * @return void
      */ 
     protected function totalQueryDuration()
     {
@@ -1327,45 +1390,6 @@ trait BuilderTrait{
             );
         } 
         exit(1);
-    }
-
-    /**
-     * Whitelist imput from cross-site scripting (XSS) attacks
-     * 
-     * @param string $html_value
-     * 
-     * @return string
-     */ 
-    protected function whitelistInput(mixed $string_value) 
-    {
-        if($this->removeTags){
-            if (is_array($string_value)) {
-                return array_map(array($this, 'whitelistInput'), $string_value)[0] ?? '';
-            }
-            
-            // Convert input to string
-            $html = (string) $string_value;
-
-            $allowedTags = null;
-            if ($this->allowAllTags) {
-                // Allow all HTML tags except those seen as attacks
-                $allowedTags = null;
-            } else {
-                // Allow only basic tags
-                $allowedTags = '<a><abbr><address><area><article><aside><audio><b><base><bdi><bdo><blockquote><body><br><button><canvas><caption><cite><code><col><colgroup><data><datalist><dd><del><details><dfn><dialog><div><dl><dt><em><embed><fieldset><figcaption><figure><footer><form><h1><h2><h3><h4><h5><h6><head><header><hr><html><i><iframe><img><input><ins><kbd><label><legend><li><link><main><map><mark><meta><meter><nav><noscript><object><ol><optgroup><option><output><p><param><picture><pre><progress><q><rp><rt><ruby><s><samp><script><section><select><small><source><span><strong><style><sub><summary><sup><svg><table><tbody><td><template><textarea><tfoot><th><thead><time><title><tr><track><u><ul><var><video><wbr>';
-            }
-            
-            // Use HTMLPurifier to remove any other potential XSS attacks
-            $config = \HTMLPurifier_Config::createDefault();
-            $config->set('HTML.Allowed', $allowedTags);
-            
-            // purify html
-            $purifier   = new HTMLPurifier($config);
-            $cleanHtml  = $purifier->purify($html);
-            return $cleanHtml;
-        }
-        
-        return $string_value;
     }
     
 }

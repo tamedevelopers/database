@@ -30,20 +30,17 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
      * Create a new collection.
      *
      * @param  mixed $items
-     * @param  mixed $database Instance of ORM Database \builder\Database\DB
+     * 
+     * @param  mixed $instance
      * - [optional] Used on ORM Database Only
      * Meant for easy manupulation of collection instance
      * This doesn't have affect on using this the Collection class on other projects
      */
-    public function __construct(mixed $items = [], mixed $database = null)
+    public function __construct(mixed $items = [], mixed $instance = null)
     {
-        $this->database         = $database;
-        $this->isProxyAllowed   = self::checkProxiesType();
-        $this->items            = $this->convertOnInit($items);
-        // if pagination request is `true`
-        if($this->isPaginate){
-            $this->pagination = $this->database;
-        }
+        $this->isBuilderOrPaginator($instance);
+        $this->isProxies();
+        $this->convertOnInit($items);
     }
     
     /**
@@ -53,28 +50,22 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
      */
     public function getIterator() : Traversable
     {
-        // On interation of (foreach) 
-        // Wrap items into instance of CollectionMapper
-        if(!$this->isProxyAllowed){
-            return new ArrayIterator(
-                $this->wrapArrayIntoNewCollections()
-            );
-        } else{
-            // disallow loop through Proxies items collections
-            return new ArrayIterator([]);
-        }
+        return new ArrayIterator(
+            $this->wrapArrayIntoNewCollections()
+        );
     }
 
     /**
      * Get Pagination Links
      * @param array $options
      *
-     * @return string\builder\Database\Pagination\links
+     * @return \builder\Database\Schema\Pagination\links()
      */
     public function links(?array $options = [])
     {
-        if($this->pagination){
-            $this->pagination->links($options);
+        if(isset($this->isPaginate)){
+            $this->paginationBuilder();
+            $this->builder->links($options);
         }
     }
 
@@ -82,12 +73,26 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
      * Format Pagination Data
      * @param array $options
      * 
-     * @return string\builder\Database\Pagination\showing
+     * @return \builder\Database\Schema\Pagination\showing()
      */
     public function showing(?array $options = [])
     {
-        if($this->pagination){
-            $this->pagination->showing($options);
+        if(isset($this->isPaginate)){
+            $this->builder->showing($options);
+        }
+    }
+
+    /**
+     * With this helper we're able to build support
+     * for multiple pagination on same page without conflicts
+     * 
+     * @return void
+     */
+    public function paginationBuilder()
+    {
+        if(isset($this->isPaginate)){
+            $this->builder->pagination->pageParam = $this->builder->pageParam;
+            $this->builder->pagination->perPageParam = $this->builder->perPageParam;
         }
     }
 

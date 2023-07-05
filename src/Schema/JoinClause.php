@@ -68,7 +68,7 @@ class JoinClause extends Builder
      * @param  string  $boolean
      * @return $this
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function on($first, $operator = null, $second = null, $boolean = 'and')
     {

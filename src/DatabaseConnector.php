@@ -12,42 +12,8 @@ use builder\Database\Capsule\Str;
 class DatabaseConnector{
 
     /**
-     * Pagination Default Texts
-     *
-     * @return array
-     */
-    public static function paginationText()
-    {
-        return [
-            'first'     => 'First',
-            'last'      => 'Last',
-            'next'      => 'Next',
-            'prev'      => 'Prev',
-            'span'      => 'page-span',
-            'showing'   => 'Showing',
-            'to'        => 'to',
-            'of'        => 'of',
-            'results'   => 'results',
-            'view'      => 'simple',
-        ];
-    }
-
-    /**
-     * Pagination Views Style
-     *
-     * @return array
-     */
-    public static function paginationViews()
-    {
-        return [
-            'bootstrap' => 'bootstrap',
-            'simple'    => 'simple',
-        ];
-    }
-
-    /**
      * Find Database Connection data
-     *
+     * @param mixed $data
      * @return array
      */
     protected static function getDriverData($data = null)
@@ -64,7 +30,7 @@ class DatabaseConnector{
 
     /**
      * Find Database Driver Name
-     *
+     * @param string $name
      * @return string
      */
     protected static function getDriverName(?string $name = null)

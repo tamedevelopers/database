@@ -11,6 +11,7 @@ use PDOException;
 use DateTimeInterface;
 use builder\Database\Constant;
 use builder\Database\Capsule\Forge;
+use builder\Database\Schema\Pagination\Paginator;
 use builder\Database\Collections\Collection;
 use builder\Database\Schema\Traits\BuilderTrait;
 use builder\Database\Schema\Traits\ExpressionTrait;
@@ -20,7 +21,7 @@ use builder\Database\Schema\Traits\MySqlProperties;
  * @property $manager \builder\Database\Capsule\Manager
  * @property $dbManager \builder\Database\DatabaseManager
  * 
- * @see \builder\Database\Schema\MySqlProperties
+ * @see \builder\Database\Schema\Traits\MySqlProperties
  * @see \builder\Database\Capsule\Manager
  * @see \builder\Database\DatabaseManager
 */
@@ -415,20 +416,6 @@ class Builder  {
         // we will begine nested query, adding Closure to the query and return back immediately.
         if ($this->isClosure($column) && is_null($operator)) {
             return $this->whereNested($column, $boolean);
-        }
-
-        // If the column is a Closure instance and there is an operator value, we will
-        // assume the developer wants to run a subquery and then compare the result
-        // of that subquery with the given value that was provided to the method.
-        if ($this->isQueryable($column) && ! is_null($operator)) {
-
-            dd(
-                'sub'
-            );
-            [$sub, $bindings] = $this->createSub($column);
-
-            return $this->addBinding($bindings, 'where')
-                ->where(self::raw('('.$sub.')'), $operator, $value, $boolean);
         }
 
         // If the given operator is not found in the list of valid operators
@@ -1323,34 +1310,56 @@ class Builder  {
     {
         $this->applyBeforeQueryCallbacks();
 
-        $sql = $this->compile()->compileSelect($this);
-
-        // closing temporary queries
-        $this->closeTempQuery();
-
-        return $sql;
+        return $this->compile()->compileSelect($this);
     }
 
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array|string  $columns
+     * @param  int $limit
      * @return \builder\Database\Collections\Collection
      */
-    public function get($columns = ['*'])
+    public function get($limit = null)
     {
-        return $this->getBuilder($columns);
+        return $this->limit($limit)->getBuilder(true, false, __FUNCTION__);
+    }
+
+    /**
+     * Paginate the given query into a simple paginator.
+     *
+     * @param  int|float|string $perPage
+     * - Supporting numeric string values, which will be internally converted to `int`
+     * 
+     * @param  string $pageParam
+     * [optional] parameter name on url
+     * 
+     * @return \builder\Database\Collections\Collection
+     */
+    public function paginate($perPage = 15, $pageParam = 'page')
+    {
+        // total page count from query builder
+        // passing false to the builder, means we do not want to close connection
+        // and queries after the count as aggregate
+        $totalCount = $this->countBuilder('*', false);
+
+        // new paginator class
+        $paginator = new Paginator($pageParam,);
+
+        $this->setMethod(__FUNCTION__);
+
+        // paginator data
+        $results =  $paginator->getPagination($totalCount, $perPage, $this);
+        
+        return new Collection($results['data'], $results['builder']);
     }
 
     /**
      * Retrieve the "count" result of the query.
-     *
-     * @param  \builder\Database\Schema\Expression|string  $columns
      * @return int
      */
-    public function count($columns = '*')
+    public function count()
     {
-        return $this->countBuilder($columns);
+        return $this->countBuilder();
     }
 
     /**
@@ -1359,7 +1368,7 @@ class Builder  {
      * @param int $value
      * [default column name is `id`]
      *
-     * @return mixed
+     * @return null\builder\Database\Collections\Collection
      */
     public function find(int $value)
     {
@@ -1368,43 +1377,29 @@ class Builder  {
 
     /**
      * Execute the query and get the first result.
-     *
-     * @param  array  $columns
-     * @return mixed
+     * @return null\builder\Database\Collections\Collection
      */
-    public function first($columns = ['*'])
+    public function first()
     {
-        $results = $this->limit(1)->get($columns);
-
-        return $results->count() > 0
-                ? new Collection($results[0])
-                : null;
+        return $this->firstOrIgnoreBuilder(__FUNCTION__);
     }
 
     /**
      * Execute the query and get the first result or throw an exception.
-     *
-     * @param  array  $columns
-     * @return mixed
+     * @return null\builder\Database\Collections\Collection
      */
-    public function firstOrIgnore($columns = ['*'])
+    public function firstOrIgnore()
     {
-        $results = $this->limit(1)->getBuilder([], true, true);
-
-        return $results->count() > 0
-                ? new Collection($results[0])
-                : null;
+        return $this->firstOrIgnoreBuilder(__FUNCTION__, true, true);
     }
 
     /**
      * Execute the query and get the first result or throw an exception.
-     *
-     * @param  array  $columns
-     * @return mixed
+     * @return void\builder\Database\Collections\Collection
      */
-    public function firstOrFail($columns = ['*'])
+    public function firstOrFail()
     {
-        if (! is_null($results = $this->first($columns))) {
+        if (! is_null($results = $this->first())) {
             return $results;
         }
 
@@ -1412,10 +1407,51 @@ class Builder  {
     }
 
     /**
+     * Get the first related record matching the attributes or create it.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \builder\Database\Collections\Collection
+     */
+    public function firstOrCreate(array $attributes = [], array $values = [])
+    {
+        // we run a query to the where method to get data where columns 
+        // is an array, and this is expected to return a Collection of data
+        // We also add limit by 1 to query
+        $results = $this->limit(1)->where($attributes)->getBuilder(false);
+
+        // if there's an item in collection then, we only get the index of 0
+        // as expected, either Collection is empty or always return only one item
+        // since we had already limit query by 1
+        $results =  $results->count() > 0 ? $results[0] : null;
+
+        if (is_null($instance = $results)) {
+
+            // close query instance and passing false will allow the table name to remain
+            // since we're still going to run an insert method, hereafter
+            $this->close(false);
+
+            // since insert returns a collection, then we convert to an array
+            $instance = $this->insert(array_merge($attributes, $values));
+
+            // since insert returns a collection, then we convert to an array.
+            // if the insert is succesful, then we convert data to an array 
+            // so we can only return a collection of data once
+            if($this->isCollection($instance)){
+                $instance = $instance->toArray();
+            }
+        }
+
+        $this->setMethod(__FUNCTION__);
+
+        return new Collection($instance);
+    }
+
+    /**
      * Insert new records into the database.
      *
      * @param  array  $values
-     * @return mixed
+     * @return \builder\Database\Collections\Collection
      */
     public function insert(array $values)
     {
@@ -1426,7 +1462,7 @@ class Builder  {
      * Insert new records into the database while ignoring errors.
      *
      * @param  array  $values
-     * @return mixed
+     * @return null\builder\Database\Collections\Collection
      */
     public function insertOrIgnore(array $values)
     {
@@ -1555,7 +1591,7 @@ class Builder  {
     {
         $result = $this->aggregate(__FUNCTION__, [$column]);
 
-        return $result ?: 0;
+        return $result ?? 0;
     }
 
     /**
@@ -1580,5 +1616,30 @@ class Builder  {
         return $this->avg($column);
     }
 
-    
+    /**
+     * Dump the current SQL and bindings.
+     *
+     * @return $this
+     */
+    public function dump()
+    {
+        dump($this->toSql(), $this->getBindings());
+
+        $this->totalQueryDuration();
+
+        return $this;
+    }
+
+    /**
+     * Die and dump the current SQL and bindings.
+     *
+     * @return never
+     */
+    public function dd()
+    {
+        $this->totalQueryDuration();
+
+        dd($this->toSql(), $this->getBindings(), $this);
+    }
+
 }

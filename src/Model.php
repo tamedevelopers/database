@@ -25,6 +25,17 @@ use builder\Database\Connectors\Traits\ConnectorTrait;
 abstract class Model extends DB{
 
     use ConnectorTrait;
+
+    /**
+     * The table associated with the model.
+     * 
+     * @var string|null
+     * 
+     * Used to define access level for users override only
+     * Else we never used this in entire project apart from
+     * Model Class Table Initialization alone
+     */
+    protected $table;
     
     /**
      * Handle the calls to non-existent instance methods.

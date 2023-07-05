@@ -1,6 +1,6 @@
 <?php
 
-namespace builder\Database\Pagination\Yidas;
+namespace builder\Database\Schema\Pagination\Yidas;
 
 use Exception;
 
@@ -108,7 +108,7 @@ class PaginationLoader
      */
     protected $defaultOpt = [];
 
-    function __construct($options=[]) 
+    function __construct($options = []) 
     {
         // Required options check
         foreach ($this->requireOptions as $key => $optionKey) {
@@ -125,7 +125,7 @@ class PaginationLoader
         }
 
         // Page fetching
-        if ($this->page===null) {
+        if ($this->page === null) {
             
             $this->page = isset($_GET[$this->pageParam]) ? (int) $_GET[$this->pageParam] : 1;
         }
@@ -179,16 +179,23 @@ class PaginationLoader
      * @param integer $perPage
      * @return string
      */
-    public function createUrl($page, $perPage=null)
+    public function createUrl($page, $perPage = null)
     {
         $requestUri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+
         // Add or reset page parameter
         $params[$this->pageParam] = (int) $page;
+
+        // build per-page param if not false
         if ($this->perPageParam) {
             $params[$this->perPageParam] = ($perPage) ? $perPage : $this->perPage;
         }
+
+        // Verify $this->params
+        $this->params = is_array($this->params) ? $this->params : [];
+
         // Build URL
-        $url = "//{$_SERVER['HTTP_HOST']}{$requestUri}?" . http_build_query(array_merge($_GET, $params, $this->params));
+        $url = "//{$_SERVER['HTTP_HOST']}{$requestUri}?" . http_build_query(array_merge($params, $this->params));
         
         return $url;
     }
@@ -200,6 +207,8 @@ class PaginationLoader
      */
     protected function _init()
     {
+        // should incase to avoid errors
+        // we convert to int before we start calculations
         $this->convertToIntegers();
 
         // Format
@@ -219,6 +228,8 @@ class PaginationLoader
         // Limit ignores (total - offset)
         $this->limit = $this->perPage;
 
+        // converting to interger values
+        // after calculations, so we are always left with an `int` values
         $this->convertToIntegers();
     }
 
@@ -227,7 +238,7 @@ class PaginationLoader
      *
      * @return void
      */
-    protected function convertToIntegers()
+    private function convertToIntegers()
     {
         // Format
         $this->limit        = (int) $this->limit;

@@ -5,16 +5,10 @@ use builder\Database\DB;
 include_once __DIR__ . "/../vendor/autoload.php";
 
 
-$model = new DB();
+$database = new DB();
 
-// configure pagination settings for entire application
-$model->configurePagination([
-    'allow' => true, 
-    'view'  => 'bootstrap', // default is (bootstrap)
-    'class' => 'Custom-UL__Class', //can add a custom css and style
-]);
 
-$wallets = $model->table('tb_wallet')
+$wallets = $database->table('tb_wallet')
                     ->where('amount', '>', 0)
                     ->join('tb_user', 'tb_user.user_id', '=', 'tb_wallet.user_id')
                     ->latest('date')

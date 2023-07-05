@@ -27,6 +27,32 @@ class Forge {
     }
 
     /**
+     * Get the first element of an array.
+     *
+     * @param  array  $array
+     * @return mixed|null
+     */
+    public static function head($array = null)
+    {
+        return isset($array[0]) ? $array[0] : null;
+    }
+
+    /**
+     * Get the last element of an array.
+     *
+     * @param array $array
+     * @return mixed|null
+     */
+    public static function last($array = null)
+    {
+        if (!is_array($array)) {
+            return null;
+        }
+
+        return end($array);
+    }
+
+    /**
      * Merge the binding arrays into a single array.
      *
      * @param array $bindings

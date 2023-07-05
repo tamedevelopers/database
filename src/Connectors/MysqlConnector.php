@@ -47,18 +47,18 @@ class MysqlConnector implements ConnectorInterface{
             
             // set charset
             if (isset($config['charset'])) {
-                $pdo->exec("SET NAMES {$config['charset']}");
-                $pdo->exec("SET COLLATION_CONNECTION = '{$config['charset']}_general_ci'");
+                $pdo->exec("set names {$config['charset']}");
+                $pdo->exec("set collation_connection = '{$config['charset']}_general_ci'");
             }
     
             // set database to use
             if (isset($config['database'])) {
-                $pdo->exec("USE {$config['database']}");
+                $pdo->exec("use {$config['database']}");
             }
     
             // set timezone if available
             if (isset($options['timezone'])) {
-                $pdo->exec("SET time_zone = '{$config['timezone']}'");
+                $pdo->exec("set time_zone = '{$config['timezone']}'");
             }
             
             $connection = [
@@ -94,7 +94,7 @@ class MysqlConnector implements ConnectorInterface{
 
         $columnName = 'id';
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $column) {
-            if ($column['Key'] === 'PRI' || $column['Key'] === 'UNI') {
+            if ($column['Key'] === 'PRI') {
                 $columnName = $column['Field'];
                 break;
             }

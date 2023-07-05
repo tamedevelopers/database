@@ -25,6 +25,11 @@ trait MySqlProperties{
      * @var \builder\Database\Capsule\Manager
      */
     public $manager;
+
+    /**
+     * @var string
+     */
+    public $method;
     
     /**
      * The current query value bindings.
