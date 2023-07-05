@@ -42,7 +42,7 @@ class DatabaseManager extends DatabaseConnector {
             );
 
             // merge data
-            $mergeData = array_merge($data ?? [], $default);
+            $mergeData = array_merge($data ?? [], $default ?? []);
             
             // Cache the connection
             FileCache::put(
@@ -80,7 +80,8 @@ class DatabaseManager extends DatabaseConnector {
      */
     public static function disconnect(?string $name = null)
     {
-        $key = self::getCacheKey($name);
+        $name = empty($name) ? 'default' : $name;
+        $key  = self::getCacheKey($name);
         if (FileCache::has($key)) {
             FileCache::forget($key);
         }
