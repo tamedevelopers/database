@@ -118,7 +118,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/php-orm-database": "^4.3.0"
+    "peterson/database": "^4.3.0"
 }
 ```
 
@@ -129,7 +129,7 @@ composer update
 
 **Or composer require**:
 ```
-composer require peterson/php-orm-database
+composer require peterson/database
 ```
 
 ## Instantiate
