@@ -1,6 +1,7 @@
 /upload
 /vendor
 /config
+/database
 /storage
 /.idea
 /.vscode
