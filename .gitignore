@@ -11,3 +11,4 @@
 .gitignore
 .user.ini
 composer.lock
+test.php
