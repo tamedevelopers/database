@@ -14,7 +14,7 @@ class FileCache
      * @param string $path
      * @return void
      */
-    public static function setCachePath(string $path): void
+    public static function setCachePath(string $path = "cache"): void
     {
         // if \storage folder not found
         $path = storage_path($path);

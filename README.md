@@ -19,6 +19,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Installation](#installation)
 * [Instantiate](#instantiate)
 * [Init.php File](#init.php-file)
+* [BootLoader](#bootLoader)
 * [Database Connection](#database-connection)
 * [Database Disconnect](#database-disconnect)
 * [App Debug ENV](#app-debug-env)
@@ -171,6 +172,19 @@ autoloader_start([
 | Everywhere in your project, instead of the `vendor/autoload.php` file.                        |
 | This is totally optional.  |
 
+## BootLoader
+- If you do not want to include or use the `Init.php` file
+    - All you need do is call the bootloader, to start your application.
+
+```
+use builder\Database\Capsule\AppManager;
+
+AppManager::bootLoader();
+
+or
+
+app_manager()->bootLoader();
+```
 
 ## Database Connection
 - You have the options to connect to multiple database 
@@ -1236,6 +1250,7 @@ class Post extends Model{
 | env()                     | Same as `$db->env()`                          |
 | env_update()              | Same as `Env::updateENV` method            |
 | env_orm()                 | Return instance of `(new Env)` class       |
+| app_manager()             | Return instance of `(new AppManager)` class       |
 | import()                  | Return instance of `(new DBImport)->import()` method      |
 | migration()               | Return instance of `(new Migration)` class    |
 | schema()                  | Return instance of `(new Schema)` class       |

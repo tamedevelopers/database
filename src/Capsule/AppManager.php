@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace builder\Database\Capsule;
 
 use builder\Database\DB;
+use builder\Database\Env;
 use builder\Database\AutoLoader;
 use builder\Database\Capsule\FileCache;
 use builder\Database\Capsule\DebugManager;
@@ -68,7 +69,7 @@ class AppManager{
      * 
      * @return string
      */
-    public static function generate($length = 32)
+    private static function generate($length = 32)
     {
         $randomBytes = random_bytes($length);
         $appKey = 'base64:' . rtrim(strtr(base64_encode($randomBytes), '+/', '-_'), '=');
@@ -82,6 +83,16 @@ class AppManager{
         $appKey .= '=';
 
         return $appKey;
+    }
+
+    /**
+     * Re-generate a new app KEY
+     * 
+     * @return void
+     */
+    public static function regenerate()
+    {
+        Env::updateENV('APP_KEY', self::generate(), false);
     }
 
     /**

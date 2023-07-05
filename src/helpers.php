@@ -7,6 +7,7 @@ use builder\Database\DBImport;
 use builder\Database\AutoLoader;
 use builder\Database\AutoloadRegister;
 use builder\Database\Migrations\Schema;
+use builder\Database\Capsule\AppManager;
 use builder\Database\Migrations\Migration;
 
 if (! function_exists('autoloader_start')) {
@@ -143,13 +144,25 @@ if (! function_exists('env_update')) {
 
 if (! function_exists('env_orm')) {
     /**
-     * Get Dot Env
+     * Get Instance of Dot Env
      * 
      * @return \builder\Database\Env
      */
     function env_orm()
     {
         return (new Env);
+    }
+}
+
+if (! function_exists('app_manager')) {
+    /**
+     * Get Instance of AppManager
+     * 
+     * @return \builder\Database\Capsule\AppManager
+     */
+    function app_manager()
+    {
+        return (new AppManager);
     }
 }
 
@@ -247,6 +260,7 @@ if (! function_exists('config_pagination')) {
      * - showing   | string             | Change the letter of `Showing`
      * - of        | string             | Change the letter `of`
      * - results   | string             | Change the letter `results`
+     * - buttons   | int                | Numbers of pagination links to generate. Default is 5 and limit is 20
      * 
      * @return void
      */
