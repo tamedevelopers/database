@@ -20,4 +20,40 @@ trait ManagerTrait{
      */
     protected $status_runned = false;
 
+    /**
+     * Start session if not started
+     * 
+     * @return void
+     */
+    private function sessionStart()
+    {
+        // header not sent
+        if (!headers_sent()) {
+            // Start the session has not already been started
+            if (session_status() == PHP_SESSION_NONE) {
+                @session_start();
+            }
+        }
+    }
+    
+    /**
+     * Creating Session Query
+     * - To hold each Migration Request
+     * @param mixed $query
+     * 
+     * @return void
+     */
+    private function tempMigrationQuery(mixed $query = null)
+    {
+        // header not sent
+        if (!headers_sent()) {
+            // Start the session has not already been started
+            if (session_status() == PHP_SESSION_NONE) {
+                @session_start();
+            }
+        }
+
+        $_SESSION[$this->session] = json_encode($query);
+    }
+
 }

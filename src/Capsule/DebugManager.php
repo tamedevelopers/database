@@ -39,8 +39,8 @@ class DebugManager{
         // if DEBUG MODE IS ON
         if(Manager::AppDebug()){
             // header not sent
-            // register error handler
             if (!headers_sent()) {
+                // register error handler
                 self::$whoops = new Run();
                 self::$whoops->pushHandler(new PrettyPageHandler());
                 self::$whoops->register();

@@ -89,6 +89,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
   * [Default String Length](#default-string-length)
   * [Update Column Default Value](#update-column-default-value)
   * [Run Migration](#run-migration)
+  * [Drop Migration](#drop-migration)
   * [Drop Table](#drop-table)
   * [Drop Column](#drop-column)
 * [Get Database Config Data](#get-database-config-data)
@@ -410,10 +411,6 @@ $db->table('users')->firstOrFail();
 ### Count
 ```
 $db->table('users')->count();
-
--- Query
-SELECT count(*) 
-    FROM `users` 
 ```
 
 ### Paginate
@@ -952,6 +949,7 @@ $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereNotIn('amount', [10, 20, 40, 100])
     ->get();
+```
 </details>
 
 ### groupBy
@@ -966,10 +964,11 @@ $db->table('wallet')
 ## Database Migration
 - Similar to Laravel DB Migration `Just to make database table creation more easier`
 
-| object name   |  Returns                                      |
-|---------------|-----------------------------------------------|
-| create()      |  Create table schema                          |
-| run()         |  Begin migration `up` \| `drop` \| `column`   |
+| object name   |  Returns                          |
+|---------------|---------------------------------- |
+| create()      |  Create table schema              |
+| run()         |  Begin migration                  |
+| drop()        |  Drop migration tables            |
 
 ```
 use builder\Database\Migrations\Migration;
@@ -1031,30 +1030,51 @@ use builder\Database\Migrations\Schema;
 
 Schema::updateColumnDefaultValue('users_table', 'email_column', 'NOT NULL);
 Schema::updateColumnDefaultValue('users_table', 'gender_column', []);
+
+or
+
+schema()->updateColumnDefaultValue('users_table', 'gender_column', []);
 ```
 
 ### Run Migration
-- You need to pass in `up` as a param
-    - This auto create folders/subfolder with read permission
-    - The code above execute all files located in [root/database/migrations]
+- This will execute and run migrations using files located at [root/database/migrations]
 
 ```
-Migration::run('up');
+Migration::run();
 
 or
-migration()->run('up');
+migration()->run();
 
 Migration runned successfully on `2023_04_19_1681860618_user` 
 Migration runned successfully on `2023_04_19_1681860618_user_wallet` 
 ```
 
-### Drop Table
+### Drop Migration
 <details><summary>Read more...</summary>
 
 - Be careful as this will execute and drop all files table `located in the migration`
 
 ```
-Migration::run('drop');
+Migration::drop();
+
+or
+migration()->drop();
+```
+</details>
+
+### Drop Table
+<details><summary>Read more...</summary>
+
+- Takes one param as `string` $table_name
+
+```
+use builder\Database\Migrations\Schema;
+
+Schema::dropTable('table_name');
+
+or 
+
+schema()->dropTable('table_name');
 ```
 </details>
 
@@ -1064,7 +1084,13 @@ Migration::run('drop');
 - To Drop Column `takes two param`
     - This will drop the column available
 ```
-Migration::run('column', 'column_name);
+use builder\Database\Migrations\Schema;
+
+Schema::dropColumn('table_name', 'column_name');
+
+or 
+
+schema()->dropColumn('table_name', 'column_name');
 ```
 </details>
 

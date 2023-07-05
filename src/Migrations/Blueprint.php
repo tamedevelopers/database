@@ -14,6 +14,7 @@ use builder\Database\Migrations\Traits\SchemaCollectionTrait;
 use builder\Database\MigrationTrait\Traits\TableStructureTrait;
 use builder\Database\Migrations\Traits\SchemaConfigurationTrait;
 
+
 class Blueprint{
     
     use SchemaTrait, 
@@ -30,27 +31,10 @@ class Blueprint{
      */
     public function __construct(?string $tableName = null) 
     {
-        $this->db           = new DB();
+        $this->db           = DB::connection();
         $this->tableName    = $tableName;
         $this->charSet      = $_ENV['DB_CHARSET'] ?? '';
         $this->collation    = $_ENV['DB_COLLATION'] ?? '';
-    }
-
-    /**
-     * Creating Session Query
-     * - To hold each Migration Request
-     * @param mixed $query
-     * 
-     * @return void
-     */
-    private function tempMigrationQuery(mixed $query = null)
-    {
-        // Start the session has not already been started
-        if (session_status() == PHP_SESSION_NONE) {
-            @session_start();
-        }
-
-        $_SESSION[$this->session] = json_encode($query);
     }
 
     /**
@@ -119,7 +103,7 @@ class Blueprint{
 
             // execute query
             if($this->status_runned){
-                $this->db->dbDriver()->exec($mysqlHandle['message']);
+                $this->db->getPDO()->exec($mysqlHandle['message']);
             }
 
             return [

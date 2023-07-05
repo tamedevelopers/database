@@ -32,23 +32,16 @@ return new class extends Migration
 
     /**
      * Drop database table
-     *
+     * 
+     * @param bool $force 
+     * [optional] Default is false
+     * Force drop all tables or throw an error on Foreign keys
+     * 
      * @return mixed
      */
-    public function drop()
+    public function drop($force = false)
     {
-        return Schema::dropTable('users_profile');
-    }
-
-    /**
-     * drop database column
-     * @param string $column 
-     *
-     * @return mixed
-     */
-    public function column(?string $column)
-    {
-        return Schema::dropColumn('users_profile', $column);
+        return Schema::dropTable('users_profile', $force);
     }
 
 };

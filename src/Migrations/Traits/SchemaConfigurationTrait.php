@@ -60,7 +60,7 @@ trait SchemaConfigurationTrait{
      * @param string $type
      * @param int|null $length
      * 
-     * @return object\addColumn
+     * @return $this
     */
     protected function addColumn($name, $type, $length = null)
     {
@@ -229,7 +229,11 @@ trait SchemaConfigurationTrait{
             if(isset($options['values'])){
                 $columnDef .= " DEFAULT \'{$options['default']}\'";
             }else{
-                $columnDef .= " DEFAULT {$options['default']}";
+                if(is_string($options['default'])){
+                    $columnDef .= " DEFAULT \'{$options['default']}\'";
+                } else{
+                    $columnDef .= " DEFAULT {$options['default']}";
+                }
             }
         }
 

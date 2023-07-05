@@ -9,7 +9,7 @@ trait SchemaCollectionTrait{
     /**
      * Creating column
      * 
-     * @return object\unsigned
+     * @return $this
      */
     public function unsigned()
     {
@@ -21,7 +21,7 @@ trait SchemaCollectionTrait{
      * Creating Default value
      * @param string $value 
      * 
-     * @return object\default
+     * @return $this
      */
     public function default($value)
     {
@@ -33,7 +33,7 @@ trait SchemaCollectionTrait{
      * Creating Nullable value
      * @param string $value 
      * 
-     * @return object\nullable
+     * @return $this
      */
     public function nullable()
     {
@@ -45,7 +45,7 @@ trait SchemaCollectionTrait{
      * Creating Indexs
      * @param string $name 
      * 
-     * @return object\id
+     * @return $this
      */
     public function id($name = 'id')
     {
@@ -62,7 +62,7 @@ trait SchemaCollectionTrait{
      * @param bool $autoIncrement \Default is true
      * @param bool $unsigned \Default is true
      * 
-     * @return object\primary
+     * @return $this
      */
     public function primary(?string $name, $autoIncrement = true, $unsigned = true)
     {
@@ -77,7 +77,7 @@ trait SchemaCollectionTrait{
      * Creating Indexs
      * @param string $name 
      * 
-     * @return object\index
+     * @return $this
      */
     public function index(?string $name = null)
     {
@@ -90,7 +90,7 @@ trait SchemaCollectionTrait{
      * Creating Indexs
      * @param string $name 
      * 
-     * @return object\unique
+     * @return $this
      */
     public function unique(?string $name = null)
     {
@@ -104,7 +104,7 @@ trait SchemaCollectionTrait{
      * @param string $column
      * - Child column name
      * 
-     * @return object\foreign
+     * @return $this
      */
     public function foreign($column)
     {
@@ -116,7 +116,7 @@ trait SchemaCollectionTrait{
      * @param string $column
      * - Child column name
      * 
-     * @return object\foreignId
+     * @return $this
      */
     public function foreignId($column)
     {
@@ -132,11 +132,11 @@ trait SchemaCollectionTrait{
      * @param string $column
      * - [optional] Default is `id`
      * 
-     * @return object\constrained
+     * @return $this
      */
     public function constrained(?string $table = null, $column = 'id')
     {
-        // we try to use defined tabled name, if no name is given to the method
+        // we try to use defined table name, if no name is given to the method
         $tableName = explode('_', $this->tableName);
         
         return $this->references($column)->on($table ?? $tableName[0] ?? '');
@@ -147,7 +147,7 @@ trait SchemaCollectionTrait{
      * @param string $referencedColumn 
      * <code> - Parent Table References Column name </code>
      * 
-     * @return object\references
+     * @return $this
      */
     public function references($referencedColumn)
     {
@@ -161,7 +161,7 @@ trait SchemaCollectionTrait{
      * @param string $referencedTable 
      * - Table name you're referencing to
      * 
-     * @return object\on
+     * @return $this
      */
     public function on($referencedTable)
     {
@@ -173,7 +173,7 @@ trait SchemaCollectionTrait{
      * Creating Constraints Property
      * @param string $action 
      * 
-     * @return object\onDelete
+     * @return $this
      */
     public function onDelete($action)
     {
@@ -185,7 +185,7 @@ trait SchemaCollectionTrait{
      * Creating Constraints Property
      * @param string $action 
      * 
-     * @return object\onUpdate
+     * @return $this
      */
     public function onUpdate($action)
     {

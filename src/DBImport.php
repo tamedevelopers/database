@@ -10,23 +10,46 @@ use builder\Database\Traits\ServerTrait;
 use builder\Database\Traits\DBImportTrait;
 
 
-class DBImport extends DB{
+class DBImport{
 
     use DBImportTrait, 
         ServerTrait;
     
-    private $db_connection;
+    /**
+     * Realpath to database file
+     *
+     * @var mixed
+     */
     private $realpath;
+
+    /**
+     * Error status
+     *
+     * @var int
+     */
     public $error;
+
+    /**
+     * Message body
+     *
+     * @var mixed
+     */
     public $message;
+    
+    /**
+     * Instance of Database Object
+     *
+     * @var \builder\Database\DB
+     */
+    private $db;
+
     
     /**
      * Construct Instance of Database
      */
     public function __construct() {
-        parent::__construct();
         $this->error = Constant::STATUS_404;
-        $this->db_connection = $this->dbConnection();
+        $this->db = DB::connection()->dbConnection();
     }
 
     /**
@@ -59,7 +82,7 @@ class DBImport extends DB{
                 if($this->DBConnect()){
                     try{
                         // connection driver
-                        $Driver = $this->db_connection['driver'];
+                        $pdo = $this->db['pdo'];
 
                         // get content
                         $sql = file_get_contents($this->realpath);
@@ -84,7 +107,7 @@ class DBImport extends DB{
                         // loop through to check if table exist already and ignore ALTER queries
                         foreach ($tableNames as $tableName) {
                             $tableExistsQuery = "SHOW TABLES LIKE '{$tableName}'";
-                            $tableExists = $Driver->query($tableExistsQuery)->rowCount() > 0;
+                            $tableExists = $pdo->query($tableExistsQuery)->rowCount() > 0;
                         
                             if ($tableExists) {
                                 $sql = preg_replace("/ALTER TABLE `{$tableName}`.*?;/is", "", $sql);
@@ -92,7 +115,7 @@ class DBImport extends DB{
                         }
 
                         // execute query
-                        $Driver->exec($sql);
+                        $pdo->exec($sql);
 
                         $this->error    = Constant::STATUS_200;
                         $this->message  = "- Database has been imported successfully.";
@@ -101,7 +124,7 @@ class DBImport extends DB{
                         $this->error    = Constant::STATUS_400;
                     }
                 } else{
-                    $this->message  = $this->db_connection['message'];
+                    $this->message  = $this->db['message'];
                 }
             }
         }
@@ -126,12 +149,12 @@ class DBImport extends DB{
     /**
      * Check Database connection 
      * 
-     * @return boolean\DBConnect
+     * @return boolean
     */
     private function DBConnect()
     {
         // status
-        if($this->db_connection['status'] != Constant::STATUS_200){
+        if($this->db['status'] != Constant::STATUS_200){
             return false;
         }
 

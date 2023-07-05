@@ -28,29 +28,33 @@ class Migration{
     }
 
     /**
+     * Create migration name
+     * @param string $table_name 
+     * @param string $type
+     * - optional $jobs\To create dummy Jobs table Data
+     * 
+     * @return void
+     */
+    public static function create(?string $table_name, ?string $type = null)
+    {
+        self::initStatic();
+
+        self::initBaseDirectory();
+
+        self::runMigration($table_name, $type);
+    }
+
+    /**
      * Staring our migration
      * @param string $type 
      * @param string $column 
      * 
      * @return array
      */
-    public static function run(?string $type = null, ?string $column = null)
+    public static function run()
     {
         // read file inside folders
         $files = self::initBaseDirectory();
-
-        // use default
-        if(empty($type)){
-            $type = 'up';
-        }
-
-        // Check if method exist
-        if(!in_array(strtolower($type), ['up', 'drop', 'column'])  || !method_exists(__CLASS__, strtolower($type))){
-            return [
-                'status'    => Constant::STATUS_404,
-                'message'   => sprintf("The method or type `%s` you're trying to call doesn't exist", $type)
-            ];
-        }
 
         // run migration methods of included file
         $errorMessage   = [];
@@ -59,10 +63,10 @@ class Migration{
             $migration = include_once "{$file}";
 
             // error
-            $migration->{$type}($column);
-            
+            $migration->up();
+
             // handle migration query data
-            $handle = json_decode($_SESSION[self::getSession()] ?? [], true);
+            $handle = json_decode($_SESSION[self::getSession()] ?? "", true);
 
             // store all messages
             $errorMessage[] = $handle['message'];
@@ -84,23 +88,6 @@ class Migration{
     }
     
     /**
-     * Create migration name
-     * @param string $table_name 
-     * @param string $type
-     * - optional $jobs\To create dummy Jobs table Data
-     * 
-     * @return void
-     */
-    public static function create(?string $table_name, ?string $type = null)
-    {
-        self::initStatic();
-
-        self::initBaseDirectory();
-
-        self::runMigration($table_name, $type);
-    }
-    
-    /**
      * Run the migrations.
      *
      * @return mixed
@@ -109,18 +96,41 @@ class Migration{
     
     /**
      * Drop database table
-     *
+     * 
+     * @param bool $force 
+     * [optional] Default is false
+     * Force drop all tables or throw an error on Foreign keys
+     * 
      * @return mixed
      */
-    public function drop(){}
+    public function drop($force = false)
+    {
+        // read file inside folders
+        $files = self::initBaseDirectory();
+        
+        // run migration methods of included file
+        $errorMessage   = [];
+        $errorstatus    = Constant::STATUS_200;
+        foreach($files as $file){
+            $migration = include_once "{$file}";
 
-    /**
-     * drop database column
-     * @param string $column
-     *
-     * @return mixed
-     */
-    public function column(?string $column){}
-    
+            // error
+            $handle = $migration->drop($force);
+
+            // store all messages
+            $errorMessage[] = $handle['message'];
+            
+            // error occured stop code execution
+            if($handle['status'] != Constant::STATUS_200){
+                $errorstatus = Constant::STATUS_404;
+                break;
+            }
+        }
+
+        return [
+            'status'    => $errorstatus, 
+            'message'   => implode("\n", $errorMessage)
+        ];
+    }
 
 }

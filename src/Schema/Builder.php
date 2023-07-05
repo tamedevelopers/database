@@ -1256,7 +1256,7 @@ class Builder  {
             }
 
             $pdo->query("
-                select exists (select 1 from `{$this->connection->tablePrefix}{$table}` limit 1) as 'exists'
+                select exists (select 1 from `{$table}` limit 1) as 'exists'
             ")->execute();
 
             $this->close();

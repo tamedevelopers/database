@@ -11,7 +11,7 @@ trait SchemaTrait{
      * Creating column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function increments($name)
     {
@@ -22,7 +22,7 @@ trait SchemaTrait{
      * Creating column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function bigIncrements($name)
     {
@@ -33,7 +33,7 @@ trait SchemaTrait{
      * Creating column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function integer($name)
     {
@@ -45,7 +45,7 @@ trait SchemaTrait{
      * @param string $name 
      * @param int $length 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function tinyInteger($name, ?int $length = 4)
     {
@@ -56,7 +56,7 @@ trait SchemaTrait{
      * Creating column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function bigInteger($name)
     {
@@ -67,7 +67,7 @@ trait SchemaTrait{
      * Creating column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function unsignedBigInteger($name)
     {
@@ -80,7 +80,7 @@ trait SchemaTrait{
      * @param int $total
      * @param int $places
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function double($name, $total = 8, $places = 2)
     {
@@ -93,7 +93,7 @@ trait SchemaTrait{
      * @param int $total
      * @param int $places
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function decimal($name, $total = 8, $places = 2)
     {
@@ -107,7 +107,7 @@ trait SchemaTrait{
      * @param int|null $total
      * @param int|null $places
      *
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function float($name, $total = null, $places = null)
     {
@@ -119,7 +119,7 @@ trait SchemaTrait{
      * @param string $name 
      * @param int $length 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function string($name, ?int $length = 255)
     {
@@ -142,7 +142,7 @@ trait SchemaTrait{
      * Creating column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function text($name)
     {
@@ -153,7 +153,7 @@ trait SchemaTrait{
      * Creating column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function longText($name)
     {
@@ -164,7 +164,7 @@ trait SchemaTrait{
      * Creating column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function mediumText($name)
     {
@@ -175,7 +175,7 @@ trait SchemaTrait{
      * Creating a column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function blob($name)
     {
@@ -186,7 +186,7 @@ trait SchemaTrait{
      * Creating a column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function tinyBlob($name)
     {
@@ -197,7 +197,7 @@ trait SchemaTrait{
      * Creating a column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function mediumBlob($name)
     {
@@ -208,7 +208,7 @@ trait SchemaTrait{
      * Creating a column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function longBlob($name)
     {
@@ -218,7 +218,7 @@ trait SchemaTrait{
     /**
      * Creating a column
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function rememberToken()
     {
@@ -228,7 +228,7 @@ trait SchemaTrait{
     /**
      * Creating a column
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function softDeletes()
     {
@@ -239,7 +239,7 @@ trait SchemaTrait{
      * Creating a column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function year($name)
     {
@@ -251,7 +251,7 @@ trait SchemaTrait{
      * @param string $name 
      * @param int $length
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function binary($name, $length = 255)
     {
@@ -262,7 +262,7 @@ trait SchemaTrait{
      * Creating a column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function json($name)
     {
@@ -274,7 +274,7 @@ trait SchemaTrait{
      * @param string $name 
      * @param array $values 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function enum($name, array $values)
     {
@@ -286,7 +286,7 @@ trait SchemaTrait{
      *
      * @param  string  $name
      * @param  array  $values
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function set($name, array $values)
     {
@@ -297,7 +297,7 @@ trait SchemaTrait{
      * Creating column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function boolean($name)
     {
@@ -309,7 +309,7 @@ trait SchemaTrait{
      *
      * @param string $name
      *
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function uuid($name)
     {
@@ -321,7 +321,7 @@ trait SchemaTrait{
      *
      * @param string $name
      *
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function ipAddress($name)
     {
@@ -344,7 +344,7 @@ trait SchemaTrait{
      * Creating a column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function date($name)
     {
@@ -355,7 +355,7 @@ trait SchemaTrait{
      * Creating a column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function dateTime($name)
     {
@@ -366,7 +366,7 @@ trait SchemaTrait{
      * Creating a column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function time($name)
     {
@@ -377,7 +377,7 @@ trait SchemaTrait{
      * Creating a column
      * @param string $name 
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function timestamp($name)
     {
@@ -387,7 +387,7 @@ trait SchemaTrait{
     /**
      * Creating a column
      * 
-     * @return \builder\Database\Migrations\Traits\addColumn
+     * @return $this
      */
     public function timestamps()
     {

@@ -30,7 +30,7 @@ class Schema{
      */
     private static function initSchemaDatabase() 
     {
-        self::$db = new DB();
+        self::$db = DB::connection();
     }
 
     /**
@@ -61,7 +61,7 @@ class Schema{
      * @param string $tableName 
      * @param callable $callback
      * 
-     * @return mixed
+     * @return \builder\Database\Migrations\Blueprint
      */
     public static function create(?string $tableName, callable $callback) 
     {
@@ -133,8 +133,8 @@ class Schema{
                 'status'    => Constant::STATUS_404,
                 'message'   => preg_replace(
                     '/^[ \t]+|[ \t]+$/m', '', 
-                    sprintf("<<\\Error code>> %s
-                        <br><br>
+                    sprintf("<<\\Error %s>> 
+                        <br>
                         <<\\PDO::ERROR>> %s `%s` <br>\n 
                     ", Constant::STATUS_404, $e->getMessage(), $value)
                 ),
@@ -145,10 +145,11 @@ class Schema{
     /**
      * Drop table
      * @param string $tableName 
+     * @param bool $force 
      * 
      * @return array
      */
-    public static function dropTable(?string $tableName)
+    public static function dropTable(?string $tableName, $force = false)
     {
         self::initSchemaDatabase();
 
@@ -161,7 +162,14 @@ class Schema{
         // Handle query
         try{
             // DROP TABLE IF EXISTS
-            self::$db->query( "DROP TABLE {$tableName};" )->execute();
+            if($force){
+                $pdo = self::$db->getPDO();
+                $pdo->exec("SET FOREIGN_KEY_CHECKS = 0; "); // Disable foreign key checks temporarily
+                $pdo->exec("DROP TABLE {$tableName} CASCADE;"); // Drop the table with CASCADE option
+                $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;"); // Enable foreign key checks again
+            } else{
+                self::$db->query( "DROP TABLE {$tableName};" )->execute();
+            }
 
             return [
                 'status'    => Constant::STATUS_200,
@@ -172,9 +180,9 @@ class Schema{
                 'status'    => Constant::STATUS_404,
                 'message'   => preg_replace(
                     '/^[ \t]+|[ \t]+$/m', '', 
-                    sprintf("<<\\Error code>> %s
-                        <br><br>
-                        <<\\PDO::ERROR>> %s <br> \n
+                    sprintf("<<\\Error %s>> 
+                        <br>
+                        <<\\PDO::ERROR>> %s  \n
                     ", Constant::STATUS_404, $e->getMessage())
                 ),
             ];
@@ -226,8 +234,8 @@ class Schema{
                 'status'    => Constant::STATUS_404,
                 'message'   => preg_replace(
                     '/^[ \t]+|[ \t]+$/m', '', 
-                    sprintf("<<\\Error code>> %s
-                        <br><br>
+                    sprintf("<<\\Error %s>>
+                        <br>
                         <<\\PDO::ERROR>> %s <br> \n
                     ", Constant::STATUS_404, $e->getMessage())
                 ),
