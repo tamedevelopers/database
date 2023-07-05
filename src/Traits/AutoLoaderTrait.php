@@ -78,7 +78,7 @@ trait AutoLoaderTrait{
     private static function createConfigDirectory($paths = null)
     {
         // folder path
-        $configFolder = str_replace('database.dum', '', $paths['database']['path']);
+        $configFolder = str_replace(['database.dum', 'database.php'], '', $paths['database']['path']);
 
         // if config folder not found
         if(!is_dir($configFolder)){
