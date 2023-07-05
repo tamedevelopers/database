@@ -1,7 +1,7 @@
 /upload
 /vendor
 /config
-/database
+/database/migrations
 /storage
 /.idea
 /.vscode
@@ -11,4 +11,4 @@
 .gitignore
 .user.ini
 composer.lock
-test.php
+test.php 
