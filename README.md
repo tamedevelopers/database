@@ -305,7 +305,7 @@ $db->table('users')
 | `count or []`     |  int \| array   |
 | param             |  array          |
 
-1 By default if the the second param not passed, the it increment by 1
+1 By default if the the second param not passed, this will increment by 1
 ```
 $db->table('users')
     ->where('user_id', 10000001)
