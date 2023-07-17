@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Lightweight PHP ORM Database Model.",
     "keywords": ["php orm database", "orm database", "php database", "php orm github"],
-    "homepage": "https://github.com/tamedevelopers/phpOrmDatabase",
+    "homepage": "https://github.com/tamedevelopers/database",
     "license": "MIT",
     "authors": [
         {
