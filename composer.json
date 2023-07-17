@@ -22,7 +22,7 @@
         "filp/whoops": "^2.15",
         "symfony/var-dumper": "^4.4.47 || ^5.0 || ^6.0"
     },
-    "override": {
+    "replace": {
         "symfony/var-dumper": "*"
     },
     "autoload": {
