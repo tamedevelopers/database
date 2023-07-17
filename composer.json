@@ -20,7 +20,7 @@
         "psr/log": "^1.0 || ^1.1.4",
         "vlucas/phpdotenv": "^5.3",
         "filp/whoops": "^2.15",
-        "symfony/var-dumper": "4.4.*"
+        "symfony/var-dumper": "^4.4.47"
     },
     "autoload": {
         "files": [
