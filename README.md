@@ -1282,4 +1282,3 @@ class Post extends Model{
 - [Lightweight - PHP ORM Database](https://github.com/tamedevelopers/phpOrmDatabase)
 - If you love this PHP Library, you can [Buy Tame Developers a coffee](https://www.buymeacoffee.com/tamedevelopers)
 - Udemy Course on Usage [Coming Soon]()
-
