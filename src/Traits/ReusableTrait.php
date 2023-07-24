@@ -22,6 +22,7 @@ trait ReusableTrait{
         if(Manager::AppDebug()){ 
             $dataArray = $data[0] ?? $data;
             RichRenderer::$folder = false;
+            RichRenderer::$theme  = 'solarized.css';
             
             if(is_array($dataArray)){
                 foreach ($dataArray as $var) {
