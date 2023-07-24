@@ -20,10 +20,10 @@
         "psr/log": "^1.0 || ^1.1.4",
         "vlucas/phpdotenv": "^5.3",
         "filp/whoops": "^2.15",
-        "symfony/var-dumper": "^5.4.3"
+        "kint-php/kint": "^5.0"
     },
     "conflict": {
-        "symfony/var-dumper": ">=6.0.0"
+        "psr/log": "^2.0"
     },
     "autoload": {
         "files": [
