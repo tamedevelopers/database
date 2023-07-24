@@ -22,9 +22,6 @@
         "filp/whoops": "^2.15",
         "kint-php/kint": "^5.0"
     },
-    "conflict": {
-        "psr/log": "^2.0"
-    },
     "autoload": {
         "files": [
             "src/helpers.php"
