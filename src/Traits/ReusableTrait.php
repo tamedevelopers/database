@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace builder\Database\Traits;
 
-use Kint\Kint;
-use Kint\Renderer\RichRenderer;
 use builder\Database\Capsule\Manager;
+use Symfony\Component\VarDumper\VarDumper;
 
 trait ReusableTrait{
 
@@ -21,15 +20,12 @@ trait ReusableTrait{
         // if DEBUG MODE IS ON
         if(Manager::AppDebug()){ 
             $dataArray = $data[0] ?? $data;
-            RichRenderer::$folder = false;
-            RichRenderer::$theme  = 'solarized.css';
-            
             if(is_array($dataArray)){
                 foreach ($dataArray as $var) {
-                    Kint::dump($var);
+                    VarDumper::dump($var);
                 }
             } else{
-                Kint::dump($dataArray);
+                VarDumper::dump($dataArray);
             }
         }
     }
