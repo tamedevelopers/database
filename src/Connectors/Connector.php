@@ -72,6 +72,17 @@ class Connector {
     }
 
     /**
+     * Direct Query Expression
+     * 
+     * @param string $query
+     * @return \builder\Database\Schema\Builder
+     */ 
+    public function query(string $query)
+    {
+        return $this->table('')->query($query);
+    }
+
+    /**
      * Configuring pagination settings 
      * @param array $options
      * [optional]
@@ -156,21 +167,6 @@ class Connector {
         return array_merge($conn, [
             'name' => $this->name,
         ]);
-    }
-
-    /**
-     * Query method uses default connection only.
-     * or you can use [connection('connName')->getPDO()->query()]
-     * 
-     * @param string $query\Raw sql query string
-     * 
-     * @return $this
-     * The PDO instance or null if the connection is not established.
-     */
-    public function query($query)
-    {
-        $pdo = $this->getPDO();
-        return !is_null($pdo) ? $pdo->query($query) : $pdo;
     }
 
     /**

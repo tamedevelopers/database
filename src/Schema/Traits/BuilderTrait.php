@@ -885,6 +885,11 @@ trait BuilderTrait{
         $pdo = $this->connection->pdo;
 
         try {
+            // checking if global query is used
+            if(!empty($this->query)){
+                $query = $this->query;
+            }
+
             $statement = $pdo->prepare($query);
             $this->bindValues(
                 $statement, 
@@ -898,6 +903,7 @@ trait BuilderTrait{
         }
 
         $this->connection->statement = $statement ?? null;
+        $this->query = null;
         
         return $this;
     }
@@ -1340,6 +1346,7 @@ trait BuilderTrait{
         $this->wheres   = [];
         $this->columns  = null;
         $this->method   = null;
+        $this->query    = null;
         $this->joins    = null;
         $this->orders   = null;
         $this->havings  = null;
@@ -1348,7 +1355,7 @@ trait BuilderTrait{
         $this->offset   = null;
         $this->runtime  = 0.00;
         if($table){
-            $this->from     = null;
+            $this->from = null;
         }
     }
 
@@ -1392,7 +1399,5 @@ trait BuilderTrait{
         exit(1);
     }
     
-}
-
-
+} 
 

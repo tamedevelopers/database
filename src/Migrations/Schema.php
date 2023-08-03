@@ -22,6 +22,14 @@ class Schema{
      * @var object\builder\Database\DB
      */
     private static $db;
+    
+    /**
+     * Instance of Database Object
+     *
+     * @var mixed
+     */
+    private static $pdo;
+
 
     /**
      * Creating Instance of Database
@@ -31,6 +39,7 @@ class Schema{
     private static function initSchemaDatabase() 
     {
         self::$db = DB::connection();
+        self::$pdo = self::$db->getPDO();
     }
 
     /**
@@ -98,7 +107,7 @@ class Schema{
             $formatValue  = self::formatDefaultValue($value);
 
             // Get the current column definition
-            $stmt   = self::$db->query("DESCRIBE {$table} {$column}");
+            $stmt       = self::$pdo->query("DESCRIBE {$table} {$column}");
             $columnInfo = $stmt->execute()->fetch(PDO::FETCH_ASSOC);
 
             // Extract the column type, nullability, and constraints
@@ -122,7 +131,7 @@ class Schema{
             }
 
             // execute query
-            self::$db->query($query)->execute();
+            self::$pdo->query($query)->execute();
 
             return [
                 'status'    => Constant::STATUS_200,
@@ -163,12 +172,11 @@ class Schema{
         try{
             // DROP TABLE IF EXISTS
             if($force){
-                $pdo = self::$db->getPDO();
-                $pdo->exec("SET FOREIGN_KEY_CHECKS = 0; "); // Disable foreign key checks temporarily
-                $pdo->exec("DROP TABLE {$tableName} CASCADE;"); // Drop the table with CASCADE option
-                $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;"); // Enable foreign key checks again
+                self::$pdo->exec("SET FOREIGN_KEY_CHECKS = 0; "); // Disable foreign key checks temporarily
+                self::$pdo->exec("DROP TABLE {$tableName} CASCADE;"); // Drop the table with CASCADE option
+                self::$pdo->exec("SET FOREIGN_KEY_CHECKS = 1;"); // Enable foreign key checks again
             } else{
-                self::$db->query( "DROP TABLE {$tableName};" )->execute();
+                self::$pdo->query( "DROP TABLE {$tableName};" )->execute();
             }
 
             return [
@@ -217,13 +225,13 @@ class Schema{
         // Handle query
         try{
             // DROP COLUMN IF EXISTS
-            self::$db->query( "ALTER TABLE {$tableName} DROP COLUMN {$columnName};" )->execute();
+            self::$pdo->query( "ALTER TABLE {$tableName} DROP COLUMN {$columnName};" )->execute();
 
             // DROP COLUMN TRIGGERS 
-            self::$db->query( "DROP TRIGGER IF EXISTS {$columnName}_created_at;" )->execute();
+            self::$pdo->query( "DROP TRIGGER IF EXISTS {$columnName}_created_at;" )->execute();
 
             // DROP COLUMN TRIGGERS 
-            self::$db->query( "DROP TRIGGER IF EXISTS {$columnName}_updated_at;" )->execute();
+            self::$pdo->query( "DROP TRIGGER IF EXISTS {$columnName}_updated_at;" )->execute();
             
             return [
                 'status'    => Constant::STATUS_200,

@@ -30,6 +30,11 @@ trait MySqlProperties{
      * @var string
      */
     public $method;
+
+    /**
+     * @var string
+     */
+    public $query;
     
     /**
      * The current query value bindings.

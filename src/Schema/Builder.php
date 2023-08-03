@@ -47,6 +47,19 @@ class Builder  {
     }
 
     /**
+     * Direct Query Expression
+     * 
+     * @param string $query
+     * @return $this
+     */ 
+    public function query(string $query)
+    {
+        $this->query = $query;
+
+        return $this;
+    }
+
+    /**
      * Columns to be selected.
      * 
      * @param mixed $columns

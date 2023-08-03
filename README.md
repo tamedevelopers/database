@@ -60,6 +60,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
     * [Get Pagination](#get-pagination)
 * [Clause](#clause)
   * [Raw](#raw)
+  * [Query](#query)
   * [select](#select)
   * [selectRaw](#selectRaw)
   * [orderBy](#orderby)
@@ -118,7 +119,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/database": "^4.3.1"
+    "peterson/database": "^4.3.2"
 }
 ```
 
@@ -717,6 +718,15 @@ $db->table("tb_wallet")
     ->where('email', 'email@gmail.com')
     ->limit(10)
     ->random()
+    ->get();
+```
+
+### Query
+- Allows the use direct sql query `SQL query syntax`
+
+```
+$db->query("SHOW COLUMNS FROM users")
+    ->limit(10)
     ->get();
 ```
 
