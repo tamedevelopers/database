@@ -1537,12 +1537,12 @@ class Builder  {
     /**
      * Destroy/Delete records from the database.
      *
-     * @param  mixed  $id
+     * @param string|int  $id
      * [default column name is 'id']
      * 
      * @return int
      */
-    public function destroy(string $id = null)
+    public function destroy(string|int $id)
     {
         return $this->where('id', $id)->delete();
     }
