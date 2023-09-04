@@ -322,7 +322,7 @@ class Paginator extends Builder{
      * 
      * @return $this
      */
-    protected function getPagination($totalCount, int $perPage = 15, Builder $query = null)
+    protected function getPagination($totalCount, int|string $perPage = 15, Builder $query = null)
     {
         try {
             // convert to int

@@ -1340,7 +1340,7 @@ class Builder  {
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int|float|string $perPage
+     * @param  int|string $perPage
      * - Supporting numeric string values, which will be internally converted to `int`
      * 
      * @param  string $pageParam
@@ -1356,7 +1356,7 @@ class Builder  {
         $totalCount = $this->countBuilder('*', false);
 
         // new paginator class
-        $paginator = new Paginator($pageParam,);
+        $paginator = new Paginator($pageParam);
 
         $this->setMethod(__FUNCTION__);
 
