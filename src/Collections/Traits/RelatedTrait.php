@@ -21,7 +21,7 @@ trait RelatedTrait{
      */
     public function offsetExists($offset): bool
     {
-        return isset($this->items[$offset]);
+        return $this->__isset($offset);
     }
 
     /**
@@ -55,7 +55,7 @@ trait RelatedTrait{
      */
     public function offsetUnset($offset): void
     {
-        unset($this->items[$offset]);
+        $this->__unset($offset);
     }
 
     /**
@@ -67,17 +67,6 @@ trait RelatedTrait{
     public function has($key)
     {
         return array_key_exists($key, $this->items);
-    }
-
-    /**
-     * Check if an item exists in the collection.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function __isset($key)
-    {
-        return isset($this->items[$key]);
     }
 
     /**
@@ -101,6 +90,28 @@ trait RelatedTrait{
     public function __set($key, $value)
     {
         $this->items[$key] = $value;
+    }
+
+    /**
+     * Check if an item exists in the collection.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function __isset($key)
+    {
+        return isset($this->items[$key]);
+    }
+
+    /**
+     * Remove an item from items collection.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function __unset($key)
+    {
+        unset($this->items[$key]);
     }
 
     /**

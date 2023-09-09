@@ -58,7 +58,6 @@ class AppManager{
             PUSHER_SCHEME=https
             PUSHER_APP_CLUSTER=mt1
             
-            #©Copyright '. date('Y', time()) .'
             APP_DEVELOPER=
             APP_DEVELOPER_EMAIL=
         ');

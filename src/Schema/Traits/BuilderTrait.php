@@ -1189,7 +1189,7 @@ trait BuilderTrait{
     {
         $this->applyBeforeQueryCallbacks();
         $this->selectRaw('count' . '(' . $this->columnize(Forge::wrap($columns)) . ') as aggregate');
-
+        
         $results = $this->statement(
             $this->compile()->compileSelect($this),
             $this->getBindings(),

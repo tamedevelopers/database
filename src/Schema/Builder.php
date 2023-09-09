@@ -1334,7 +1334,13 @@ class Builder  {
      */
     public function get($limit = null)
     {
-        return $this->limit($limit)->getBuilder(true, false, __FUNCTION__);
+        // only allow get limit parameter
+        // if limit has not been set and if not empty
+        if(empty($this->limit) && !empty($limit)){
+            $this->limit($limit);
+        }
+
+        return $this->getBuilder(true, false, __FUNCTION__);
     }
 
     /**
@@ -1507,18 +1513,10 @@ class Builder  {
     /**
      * Delete records from the database.
      *
-     * @param  mixed  $id
      * @return int
      */
-    public function delete($id = null)
+    public function delete()
     {
-        // If an ID is passed to the method, we will set the where clause to check the
-        // ID to let developers to simply and quickly remove a single row from this
-        // database without manually specifying the "where" clauses on the query.
-        if (! is_null($id)) {
-            $this->where($this->from.'.id', '=', $id);
-        }
-
         $this->applyBeforeQueryCallbacks();
 
         $sql = $this->compile()->compileDelete($this);
@@ -1535,16 +1533,19 @@ class Builder  {
     }
 
     /**
-     * Destroy/Delete records from the database.
+     * Destroy records from the database.
+     * [performing where clause under the hood]
      *
-     * @param string|int  $id
+     * @param mixed $id
+     *
+     * @param string $column
      * [default column name is 'id']
      * 
      * @return int
      */
-    public function destroy(string|int $id)
+    public function destroy($id, $column = 'id')
     {
-        return $this->where('id', $id)->delete();
+        return $this->where($column, $id)->delete();
     }
 
     /**
