@@ -12,7 +12,7 @@ class DebugManager{
     
     use ReusableTrait;
 
-    private static $whoops;
+    public static $whoops;
 
     /**
      * Boot the DebugManager.
@@ -25,7 +25,7 @@ class DebugManager{
     {
         if(!defined('ORMDebugManager')){
             self::autoStartDebugger();
-            define('ORMDebugManager', self::$whoops);
+            define('ORMDebugManager', 1);
         } 
     }
 

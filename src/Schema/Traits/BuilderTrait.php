@@ -8,15 +8,15 @@ use PDO;
 use Closure;
 use DateTime;
 use Exception;
-use HTMLPurifier;
 use DateTimeInterface;
 use builder\Database\Capsule\Forge;
 use builder\Database\Schema\Builder;
 use builder\Database\Schema\Expression;
 use builder\Database\Schema\JoinClause;
-use builder\Database\Schema\Pagination\Paginator;
-use builder\Database\Collections\Collection;
+use builder\Database\Capsule\DebugManager;
 use builder\Database\Schema\BuilderCompiler;
+use builder\Database\Collections\Collection;
+use builder\Database\Schema\Pagination\Paginator;
 
 
 /**
@@ -1392,7 +1392,7 @@ trait BuilderTrait{
     protected function errorException(mixed $exception)
     {
         if($this->manager::AppDebug()){
-            ORMDebugManager->handleException(
+            DebugManager::$whoops->handleException(
                 new \PDOException($exception->getMessage(), (int) $exception->getCode(), $exception),
             );
         } 
