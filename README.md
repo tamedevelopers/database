@@ -94,8 +94,11 @@ was pretty tough. So i decided to create a much more easier way of communicating
   * [Drop Migration](#drop-migration)
   * [Drop Table](#drop-table)
   * [Drop Column](#drop-column)
-* [Get Database Config Data](#get-database-config-data)
+* [Get Database Config](#get-database-config)
 * [Get Database Connection](#get-database-connection)
+* [Get Database Name](#get-database-name)
+* [Get Database PDO](#get-database-pdo)
+* [Get Database TablePrefix](#get-database-tableprefix)
 * [Database Import](#database-import)
 * [Update Env Variable](#update-env-variable)
 * [Env Servers](#Env-servers)
@@ -119,7 +122,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/database": "^4.3.5"
+    "peterson/database": "^4.3.6"
 }
 ```
 
@@ -140,28 +143,26 @@ composer require peterson/database
 require_once __DIR__ . '/vendor/autoload.php';
 ```
 
-**Step 2** — `Run once in browser`
+**Step 2** — `Call the below methid() and Run once in browser`
 - This will auto setup your entire application on a `go!`
 
 |  Description                                                                                  | 
 |-----------------------------------------------------------------------------------------------|
-| It's important to install vendor in your project root. We use this to get your root  [dir]    | 
+| It's important to install vendor in your project root, As we use this to get your root [dir]  | 
 | By default you don't need to define any path again                                            |
-| Files you'll see `.env` `.gitignore` `.htaccess` `.user.ini` `init.php`                       |
+|                                                                                               |
+| Files you'll see after you reload browser:                                                    |
+| `.env` `.gitignore` `.htaccess` `.user.ini` `init.php`                                        |
 
 ```
 use builder\Database\AutoLoader;
 
-AutoLoader::start([
-    'path' => 'define root path or ignore'
-]);
+AutoLoader::start();
 ```
 
 - or -- `Helpers Function`
 ```
-autoloader_start([
-    'path' => 'define root path or ignore'
-]);
+autoloader_start('optional_path_to_root');
 ```
 
 ## Init.php File
@@ -1118,17 +1119,35 @@ schema()->dropColumn('table_name', 'column_name');
 ```
 </details>
 
-## Get Database Config Data
-
-| object            | Helpers       |
-|-------------------|---------------|
-| $db->env()        | env()         |
-
+## Get Database Config
+```
+$db->getConfig()
+```
 
 ## Get Database Connection
-| object                | Helpers           |
-|-----------------------|-------------------|
-| $db->dbConnection()   | db_connection()   |
+```
+$db->dbConnection()
+```
+
+- or -- `Helpers Function`
+```
+db_connection();
+```
+
+## Get Database Name
+```
+$db->getDatabaseName()
+```
+
+## Get Database PDO
+```
+$db->getPDO()
+```
+
+## Get Database TablePrefix
+```
+$db->getTablePrefix()
+```
 
 ## Database Import
 - You can use this class to import .sql into a database programatically
@@ -1152,6 +1171,7 @@ $status = $database->import('path_to/orm.sql');
 ```
 import('path_to/orm.sql');
 ```
+
 
 ## Update Env Variable
 - You can use this class to import .sql into a database programatically

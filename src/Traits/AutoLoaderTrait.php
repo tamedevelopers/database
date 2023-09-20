@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace builder\Database\Traits;
 
+use builder\Database\Env;
+
 
 trait AutoLoaderTrait{
 
@@ -140,7 +142,7 @@ trait AutoLoaderTrait{
      */
     private static function getPathsData($realPath)
     {
-        $env        = DOT_ENV_CONNECTION['env'];
+        $env        = new Env(DOT_ENV_CONNECTION['server']);
         $serverPath = $env->clean_path( DOT_ENV_CONNECTION['server'] );
         $realPath   = $env->clean_path( $realPath );
 

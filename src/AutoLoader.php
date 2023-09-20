@@ -79,7 +79,6 @@ class AutoLoader{
                 'status'    => $loader['status'],
                 'env_path'  => $loader['path'],
                 'message'   => $loader['message'],
-                'env'       => $Env,
             ], $Env->getServers()));
         }
         

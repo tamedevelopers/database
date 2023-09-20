@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace builder\Database\Traits;
 
 use ReflectionClass;
-use builder\Database\Env;
+
 
 trait ServerTrait{
     
@@ -147,7 +147,6 @@ trait ServerTrait{
             */
             define('DOT_ENV_CONNECTION', array_merge($data, [
                 'env_path'  => $data['server'],
-                'env'       => new Env($data['server']),
             ]));
         } else{
             // Data
