@@ -143,7 +143,7 @@ composer require peterson/database
 require_once __DIR__ . '/vendor/autoload.php';
 ```
 
-**Step 2** — `Call the below methid() and Run once in browser`
+**Step 2** — `Call the below method() and Run once in browser`
 - This will auto setup your entire application on a `go!`
 
 |  Description                                                                                  | 
