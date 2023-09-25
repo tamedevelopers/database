@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Collections\Traits;
+namespace Tamedevelopers\Database\Collections\Traits;
 
 
 /**

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Migrations;
+namespace Tamedevelopers\Database\Migrations;
 
 
 use PDO;
 use PDOException;
-use builder\Database\DB;
-use builder\Database\Constant;
-use builder\Database\Migrations\Blueprint;
-use builder\Database\Migrations\Traits\ManagerTrait;
+use Tamedevelopers\Database\DB;
+use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Database\Migrations\Blueprint;
+use Tamedevelopers\Database\Migrations\Traits\ManagerTrait;
 
 class Schema{
     
@@ -19,7 +19,7 @@ class Schema{
     /**
      * Instance of Database Object
      *
-     * @var object\builder\Database\DB
+     * @var object\Tamedevelopers\Database\DB
      */
     private static $db;
     
@@ -70,7 +70,7 @@ class Schema{
      * @param string $tableName 
      * @param callable $callback
      * 
-     * @return \builder\Database\Migrations\Blueprint
+     * @return \Tamedevelopers\Database\Migrations\Blueprint
      */
     public static function create(?string $tableName, callable $callback) 
     {

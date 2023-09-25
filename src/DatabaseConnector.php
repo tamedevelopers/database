@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace builder\Database;
+namespace Tamedevelopers\Database;
 
-use builder\Database\Capsule\Str;
+use Tamedevelopers\Support\Str;
 
 /**
  * @property-read mixed $table
@@ -154,6 +154,3 @@ class DatabaseConnector{
     }
     
 }
-
-
-

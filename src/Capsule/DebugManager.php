@@ -2,16 +2,14 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Capsule;
+namespace Tamedevelopers\Database\Capsule;
 
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
-use builder\Database\Traits\ReusableTrait;
+use Tamedevelopers\Support\Capsule\Manager;
 
 class DebugManager{
     
-    use ReusableTrait;
-
     public static $whoops;
 
     /**

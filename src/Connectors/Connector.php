@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Connectors;
+namespace Tamedevelopers\Database\Connectors;
 
 use PDO;
-use builder\Database\Schema\Builder;
-use builder\Database\Capsule\Manager;
-use builder\Database\DatabaseManager;
-use builder\Database\Capsule\FileCache;
-use builder\Database\Schema\Pagination\Paginator;
-use builder\Database\Connectors\ConnectionBuilder;
-use builder\Database\Schema\Traits\ExpressionTrait;
-use builder\Database\Connectors\Traits\ConnectorTrait;
+use Tamedevelopers\Database\Schema\Builder;
+use Tamedevelopers\Support\Capsule\Manager;
+use Tamedevelopers\Database\DatabaseManager;
+use Tamedevelopers\Support\Capsule\FileCache;
+use Tamedevelopers\Database\Schema\Pagination\Paginator;
+use Tamedevelopers\Database\Connectors\ConnectionBuilder;
+use Tamedevelopers\Database\Schema\Traits\ExpressionTrait;
+use Tamedevelopers\Database\Connectors\Traits\ConnectorTrait;
 
 
 class Connector {
@@ -50,7 +50,7 @@ class Connector {
      * 
      * @param string $table
      * 
-     * @return \builder\Database\Schema\Builder
+     * @return \Tamedevelopers\Database\Schema\Builder
      */
     public function table(string $table)
     {
@@ -75,7 +75,7 @@ class Connector {
      * Direct Query Expression
      * 
      * @param string $query
-     * @return \builder\Database\Schema\Builder
+     * @return \Tamedevelopers\Database\Schema\Builder
      */ 
     public function query(string $query)
     {
@@ -160,7 +160,7 @@ class Connector {
     {
         // get connection data
         $conn = DatabaseManager::getConnection($this->name);
-
+        
         // connection data
         $conn = self::createConnector($conn['driver'])->connect($conn);
 

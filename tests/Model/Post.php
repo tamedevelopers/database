@@ -1,7 +1,7 @@
 <?php
 
-use builder\Database\DB;
-use builder\Database\Model;
+use Tamedevelopers\Database\DB;
+use Tamedevelopers\Database\Model;
 
 class Post extends Model{
     

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace builder\Database;
+namespace Tamedevelopers\Database;
 
 
 class Constant{

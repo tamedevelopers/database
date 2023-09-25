@@ -1,14 +1,13 @@
 <?php
     
-use builder\Database\DBImport;
-use builder\Database\AutoLoader;
+use Tamedevelopers\Database\DBImport;
+use Tamedevelopers\Database\Capsule\AppManager;
 
 include_once __DIR__ . "/../vendor/autoload.php";
 
-// start env configuration
-AutoLoader::start();
-
-
+// as long as we're not including the init.php file
+// then we must boot into out app to start using package
+AppManager::bootLoader();
 
 
 $import = new DBImport();
@@ -21,7 +20,7 @@ $response = $import->import('orm.sql');
 $same = import('orm.sql');
 
 
-$import->dump( 
+dump( 
     $response['message'] 
 );
 

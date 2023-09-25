@@ -1,6 +1,6 @@
 <?php
 
-namespace builder\Database\Schema\Pagination\Yidas;
+namespace Tamedevelopers\Database\Schema\Pagination\Yidas;
 
 /**
  * Pagination Widget
@@ -38,7 +38,7 @@ class PaginationWidget
     /**
      * The data pagination object that this pager is associated with.
      *
-     * @var \builder\Database\Schema\Pagination\Yidas\PaginationLoader
+     * @var \Tamedevelopers\Database\Schema\Pagination\Yidas\PaginationLoader
      */
     public $pagination;
 

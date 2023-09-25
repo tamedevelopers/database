@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Collections\Traits;
+namespace Tamedevelopers\Database\Collections\Traits;
 
-use builder\Database\Capsule\Str;
-use builder\Database\Schema\Builder;
-use builder\Database\Schema\Pagination\Paginator;
-use builder\Database\Collections\CollectionMapper;
+use Tamedevelopers\Support\Str;
+use Tamedevelopers\Database\Schema\Builder;
+use Tamedevelopers\Database\Schema\Pagination\Paginator;
+use Tamedevelopers\Database\Collections\CollectionMapper;
 
 /**
  * @property bool $isProxyAllowed

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Connectors;
+namespace Tamedevelopers\Database\Connectors;
 
 use PDO;
 use PDOException;
-use builder\Database\Constant;
-use builder\Database\Capsule\Str;
-use builder\Database\Schema\Builder;
-use builder\Database\Connectors\ConnectorInterface;
-use builder\Database\Connectors\Traits\ConnectorTrait;
-use builder\Database\Schema\Traits\BuilderTrait;
+use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Support\Str;
+use Tamedevelopers\Database\Schema\Builder;
+use Tamedevelopers\Database\Connectors\ConnectorInterface;
+use Tamedevelopers\Database\Connectors\Traits\ConnectorTrait;
+use Tamedevelopers\Database\Schema\Traits\BuilderTrait;
 
 class MysqlConnector implements ConnectorInterface{
 
@@ -82,7 +82,7 @@ class MysqlConnector implements ConnectorInterface{
     /**
      * Describe a table and Get Column Name and Last Insert ID
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @return array
      */
     public function describeColumn(Builder $query)

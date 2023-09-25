@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Traits;
+namespace Tamedevelopers\Database\Traits;
 
-use builder\Database\Env;
+use Tamedevelopers\Support\Env;
 
 
 trait AutoLoaderTrait{
@@ -71,7 +71,6 @@ trait AutoLoaderTrait{
         }
     }
 
-
     /**
      * Create Configuration directory is not exists
      * 
@@ -87,7 +86,6 @@ trait AutoLoaderTrait{
             @mkdir($configFolder, 0777);
         }
     }
-
 
     /**
      * Check if dummy data is present
@@ -133,8 +131,7 @@ trait AutoLoaderTrait{
 
         return true;
     }
-
-
+    
     /**
      * Get all dummy contents path data
      * 
@@ -142,9 +139,9 @@ trait AutoLoaderTrait{
      */
     private static function getPathsData($realPath)
     {
-        $env        = new Env(DOT_ENV_CONNECTION['server']);
-        $serverPath = $env->clean_path( DOT_ENV_CONNECTION['server'] );
-        $realPath   = $env->clean_path( $realPath );
+        $env = new Env(TAME_SERVER_CONNECT['server']);
+        $serverPath = $env->cleanServerPath( TAME_SERVER_CONNECT['server'] );
+        $realPath   = $env->cleanServerPath( $realPath );
 
         return [
             'database' => [

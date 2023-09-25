@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Schema;
+namespace Tamedevelopers\Database\Schema;
 
 class Expression 
 {

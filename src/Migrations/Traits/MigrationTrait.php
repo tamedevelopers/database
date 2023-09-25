@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Migrations\Traits;
+namespace Tamedevelopers\Database\Migrations\Traits;
 
-use builder\Database\Env;
+use Tamedevelopers\Database\Env;
 
 /**
  * 
@@ -139,12 +139,12 @@ trait MigrationTrait{
     private static function initStatic() 
     {
         // if not defined
-        if ( ! defined('DOT_ENV_CONNECTION') ) {
+        if ( ! defined('TAME_SERVER_CONNECT') ) {
             self::$database = (new Env)->getDirectory();
         } else{
             // once we run env autoloader
-            // we have access to global Constant DOT_ENV_CONNECTION
-            self::$database = DOT_ENV_CONNECTION['server'];
+            // we have access to global Constant TAME_SERVER_CONNECT
+            self::$database = TAME_SERVER_CONNECT['server'];
         }
 
         self::$database     .= "database/";

@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-namespace builder\Database;
+namespace Tamedevelopers\Database;
 
 use PDOException;
-use builder\Database\DB;
-use builder\Database\Traits\ServerTrait;
-use builder\Database\Traits\DBImportTrait;
+use Tamedevelopers\Database\DB;
+use Tamedevelopers\Support\Server;
+use Tamedevelopers\Database\Traits\DBImportTrait;
 
 
 class DBImport{
 
-    use DBImportTrait, 
-        ServerTrait;
+    use DBImportTrait;
     
     /**
      * Realpath to database file
@@ -39,7 +38,7 @@ class DBImport{
     /**
      * Instance of Database Object
      *
-     * @var \builder\Database\DB
+     * @var \Tamedevelopers\Database\DB
      */
     private $db;
 
@@ -61,7 +60,7 @@ class DBImport{
      */
     public function import($path_to_sql = NULL)
     {
-        $this->realpath = self::formatWithBaseDirectory($path_to_sql);
+        $this->realpath = Server::formatWithBaseDirectory($path_to_sql);
         
         /**
          * If SQL file does'nt exists

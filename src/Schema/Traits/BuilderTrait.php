@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Schema\Traits;
+namespace Tamedevelopers\Database\Schema\Traits;
 
 use PDO;
 use Closure;
 use DateTime;
 use Exception;
 use DateTimeInterface;
-use builder\Database\Capsule\Forge;
-use builder\Database\Schema\Builder;
-use builder\Database\Schema\Expression;
-use builder\Database\Schema\JoinClause;
-use builder\Database\Capsule\DebugManager;
-use builder\Database\Schema\BuilderCompiler;
-use builder\Database\Collections\Collection;
-use builder\Database\Schema\Pagination\Paginator;
+use Tamedevelopers\Support\Capsule\Forge;
+use Tamedevelopers\Database\Schema\Builder;
+use Tamedevelopers\Database\Schema\Expression;
+use Tamedevelopers\Database\Schema\JoinClause;
+use Tamedevelopers\Database\Capsule\DebugManager;
+use Tamedevelopers\Database\Collections\Collection;
+use Tamedevelopers\Database\Schema\BuilderCompiler;
+use Tamedevelopers\Database\Schema\Pagination\Paginator;
 
 
 /**
  * @property mixed $connection
  * 
- * @see \builder\Database\Schema\Builder
- * @see \builder\Database\Schema\BuilderCompiler
+ * @see \Tamedevelopers\Database\Schema\Builder
+ * @see \Tamedevelopers\Database\Schema\BuilderCompiler
  */
 trait BuilderTrait{
 
@@ -49,7 +49,7 @@ trait BuilderTrait{
     /**
      * Builder Compiler Instance
      * 
-     * @return \builder\Database\Schema\BuilderCompiler
+     * @return \Tamedevelopers\Database\Schema\BuilderCompiler
      */
     protected function compile()
     {
@@ -62,7 +62,7 @@ trait BuilderTrait{
     /**
      * Get the singleton instance of new query builder.
      *
-     * @return \builder\Database\Schema\Builder
+     * @return \Tamedevelopers\Database\Schema\Builder
      */
     protected function newQuery()
     {
@@ -77,10 +77,10 @@ trait BuilderTrait{
     /**
      * Get a new join clause.
      *
-     * @param  \builder\Database\Schema\Builder  $parentQuery
+     * @param  \Tamedevelopers\Database\Schema\Builder  $parentQuery
      * @param  string  $type
      * @param  string  $table
-     * @return \builder\Database\Schema\Query\JoinClause
+     * @return \Tamedevelopers\Database\Schema\Query\JoinClause
      */
     protected function newJoinClause(self $parentQuery, $type, $table)
     {
@@ -436,7 +436,7 @@ trait BuilderTrait{
     /**
      * Add another query builder as a nested where to the query builder.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  string  $boolean
      * @return $this
      */
@@ -457,7 +457,7 @@ trait BuilderTrait{
      * Add a date based (year, month, day, time) statement to the query.
      *
      * @param  string  $type
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -477,7 +477,7 @@ trait BuilderTrait{
     /**
      * Compile the "select *" portion of the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $columns
      * @return string|null
      */
@@ -502,7 +502,7 @@ trait BuilderTrait{
     /**
      * Create a new query instance for nested where condition.
      *
-     * @return \builder\Database\Schema\Builder
+     * @return \Tamedevelopers\Database\Schema\Builder
      */
     protected function forNestedWhere()
     {
@@ -567,7 +567,7 @@ trait BuilderTrait{
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param  \builder\Database\Schema\Expression|string  $table
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $table
      * @return string
      */
     protected function wrapTable($table)
@@ -599,7 +599,7 @@ trait BuilderTrait{
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  \builder\Database\Schema\Expression|string  $value
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $value
      * @param  bool  $prefixAlias
      * @return string
      */
@@ -717,7 +717,7 @@ trait BuilderTrait{
     /**
      * Transforms expressions to their scalar types.
      *
-     * @param  \builder\Database\Schema\Expression|string|int|float  $value
+     * @param  \Tamedevelopers\Database\Schema\Expression|string|int|float  $value
      * @return string|int|float
      */
     protected function getValue($value)
@@ -911,8 +911,8 @@ trait BuilderTrait{
     /**
      * Execute an SQL statement and return the boolean result.
      *
-     * @param  \builder\Database\Schema\Builder  $query
-     * @param  \builder\Database\Schema\Pagination\Paginator  $paginator
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Pagination\Paginator  $paginator
      * @return $this
      */
     protected function paginateStatement(Builder $query, Paginator $paginator)

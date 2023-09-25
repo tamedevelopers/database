@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Schema\Traits;
+namespace Tamedevelopers\Database\Schema\Traits;
 
 
 trait MySqlProperties{
@@ -22,7 +22,7 @@ trait MySqlProperties{
     public $dbManager;
 
     /**
-     * @var \builder\Database\Capsule\Manager
+     * @var \Tamedevelopers\Database\Capsule\Manager
      */
     public $manager;
 

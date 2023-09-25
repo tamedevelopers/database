@@ -10,12 +10,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace builder\Database;
+namespace Tamedevelopers\Database;
 
 use Exception;
-use builder\Database\DB;
-use builder\Database\Connectors\Connector;
-use builder\Database\Connectors\Traits\ConnectorTrait;
+use Tamedevelopers\Database\DB;
+use Tamedevelopers\Database\Connectors\Connector;
+use Tamedevelopers\Database\Connectors\Traits\ConnectorTrait;
 
 
 /**
@@ -66,7 +66,7 @@ abstract class Model extends DB{
      * @param string $name
      * @param mixed $args \arguments
      * 
-     * @return \builder\Database\Schema\Builder
+     * @return \Tamedevelopers\Database\Schema\Builder
      */
     private static function initTableWithConnector()
     {

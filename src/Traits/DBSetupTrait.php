@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Traits;
+namespace Tamedevelopers\Database\Traits;
 
 
-use builder\Database\Connectors\Connector;
+use Tamedevelopers\Database\Connectors\Connector;
 
 /**
  * @property static $staticConn
@@ -18,7 +18,7 @@ trait DBSetupTrait{
      * 
      * @param string $table
      * 
-     * @return \builder\Database\Schema\Builder
+     * @return \Tamedevelopers\Database\Schema\Builder
      */
     public static function table(string $table)
     {

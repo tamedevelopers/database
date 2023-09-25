@@ -1,6 +1,6 @@
 <?php
 
-namespace builder\Database\Schema\Pagination;
+namespace Tamedevelopers\Database\Schema\Pagination;
 
 
 class PaginatorAsset

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Migrations;
+namespace Tamedevelopers\Database\Migrations;
 
-use builder\Database\Constant;
-use builder\Database\Migrations\Traits\ManagerTrait;
-use builder\Database\Migrations\Traits\FilePathTrait;
-use builder\Database\Migrations\Traits\MigrationTrait;
+use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Database\Migrations\Traits\ManagerTrait;
+use Tamedevelopers\Database\Migrations\Traits\FilePathTrait;
+use Tamedevelopers\Database\Migrations\Traits\MigrationTrait;
 
 class Migration{
 

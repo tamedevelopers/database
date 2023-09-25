@@ -10,13 +10,13 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace builder\Database\Schema\Pagination;
+namespace Tamedevelopers\Database\Schema\Pagination;
     
-use builder\Database\Capsule\Str;
-use builder\Database\Schema\Builder;
-use builder\Database\Schema\Pagination\PaginatorAsset;
-use builder\Database\Schema\Pagination\Yidas\PaginationLoader;
-use builder\Database\Schema\Pagination\Yidas\PaginationWidget;
+use Tamedevelopers\Support\Str;
+use Tamedevelopers\Database\Schema\Builder;
+use Tamedevelopers\Database\Schema\Pagination\PaginatorAsset;
+use Tamedevelopers\Database\Schema\Pagination\Yidas\PaginationLoader;
+use Tamedevelopers\Database\Schema\Pagination\Yidas\PaginationWidget;
 
 
 class Paginator extends Builder{
@@ -60,7 +60,7 @@ class Paginator extends Builder{
 
     /**
      * pagination asset class
-     * @var \builder\Database\Schema\Pagination\PaginatorAsset
+     * @var \Tamedevelopers\Database\Schema\Pagination\PaginatorAsset
      */
     private $asset;
 
@@ -318,7 +318,7 @@ class Paginator extends Builder{
      * Get Pagination data
      * @param int $totalCount
      * @param int|string $perPage
-     * @param \builder\Database\Schema\Builder  $query
+     * @param \Tamedevelopers\Database\Schema\Builder  $query
      * 
      * @return $this
      */
@@ -388,7 +388,7 @@ class Paginator extends Builder{
     /**
      * Build paginator query
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @return $this
      */
     private function buildPaginatorQuery(Builder $query)

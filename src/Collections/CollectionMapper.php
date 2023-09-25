@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Collections;
+namespace Tamedevelopers\Database\Collections;
 
 use ArrayAccess;
 use Traversable;
 use ArrayIterator;
 use IteratorAggregate;
-use builder\Database\Collections\CollectionProperty;
-use builder\Database\Collections\Traits\RelatedTrait;
+use Tamedevelopers\Database\Collections\CollectionProperty;
+use Tamedevelopers\Database\Collections\Traits\RelatedTrait;
 
 class CollectionMapper extends CollectionProperty implements IteratorAggregate, ArrayAccess
 {
@@ -26,7 +26,7 @@ class CollectionMapper extends CollectionProperty implements IteratorAggregate, 
      *
      * @param  mixed $items
      * @param  mixed $key
-     * @param  \builder\Database\Collections\Collection
+     * @param  \Tamedevelopers\Database\Collections\Collection
      * - Instance of Collection
      */
     public function __construct(mixed $items = [], mixed $key = 0, Collection $collection = null)

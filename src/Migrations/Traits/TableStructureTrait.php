@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\MigrationTrait\Traits;
+namespace Tamedevelopers\Database\MigrationTrait\Traits;
 
 trait TableStructureTrait{
     
     /**
      * Instance of Database Object
      *
-     * @var object\builder\Database\DB
+     * @var object\Tamedevelopers\Database\DB
      */
     protected $db;
     

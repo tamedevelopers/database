@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Schema;
+namespace Tamedevelopers\Database\Schema;
 
-use builder\Database\Capsule\Forge;
-use builder\Database\Schema\Builder;
-use builder\Database\Schema\Traits\BuilderTrait;
+use Tamedevelopers\Support\Capsule\Forge;
+use Tamedevelopers\Database\Schema\Builder;
+use Tamedevelopers\Database\Schema\Traits\BuilderTrait;
 
 /**
- * @see \builder\Database\Schema\Traits\BuilderTrait
+ * @see \Tamedevelopers\Database\Schema\Traits\BuilderTrait
 */
 class BuilderCompiler{
 
@@ -52,7 +52,7 @@ class BuilderCompiler{
     /**
      * Compile a select query into SQL.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @return string
      */
     public function compileSelect(Builder $query)
@@ -85,7 +85,7 @@ class BuilderCompiler{
     /**
      * Compile an exists statement into SQL.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @return string
      */
     public function compileExists(Builder $query)
@@ -98,7 +98,7 @@ class BuilderCompiler{
     /**
      * Compile an insert statement into SQL.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $values
      * @return string
      */
@@ -129,7 +129,7 @@ class BuilderCompiler{
     /**
      * Compile an update statement into SQL.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $values
      * @return string
      */
@@ -167,7 +167,7 @@ class BuilderCompiler{
     /**
      * Compile a delete statement into SQL.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @return string
      */
     public function compileDelete(Builder $query)
@@ -199,7 +199,7 @@ class BuilderCompiler{
     /**
      * Compile a clause based on an expression.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -211,7 +211,7 @@ class BuilderCompiler{
     /**
      * Compile a raw where clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -223,7 +223,7 @@ class BuilderCompiler{
     /**
      * Compile a basic where clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -239,7 +239,7 @@ class BuilderCompiler{
     /**
      * Compile a "where in" clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -255,7 +255,7 @@ class BuilderCompiler{
     /**
      * Compile a "where not in" clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -273,7 +273,7 @@ class BuilderCompiler{
      *
      * For safety, whereIntegerInRaw ensures this method is only used with integer values.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -291,7 +291,7 @@ class BuilderCompiler{
      *
      * For safety, whereIntegerInRaw ensures this method is only used with integer values.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -307,7 +307,7 @@ class BuilderCompiler{
     /**
      * Compile a "where null" clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -319,7 +319,7 @@ class BuilderCompiler{
     /**
      * Compile a "where not null" clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -331,7 +331,7 @@ class BuilderCompiler{
     /**
      * Compile a "between" where clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -349,7 +349,7 @@ class BuilderCompiler{
     /**
      * Compile a "between" where clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -367,7 +367,7 @@ class BuilderCompiler{
     /**
      * Compile a "where date" clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -379,7 +379,7 @@ class BuilderCompiler{
     /**
      * Compile a "where time" clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -391,7 +391,7 @@ class BuilderCompiler{
     /**
      * Compile a "where day" clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -403,7 +403,7 @@ class BuilderCompiler{
     /**
      * Compile a "where month" clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -415,7 +415,7 @@ class BuilderCompiler{
     /**
      * Compile a "where year" clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -428,7 +428,7 @@ class BuilderCompiler{
      * Compile a date based where clause.
      *
      * @param  string  $type
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -442,7 +442,7 @@ class BuilderCompiler{
     /**
      * Compile a where clause comparing two columns.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -454,7 +454,7 @@ class BuilderCompiler{
     /**
      * Compile a nested where clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -471,7 +471,7 @@ class BuilderCompiler{
     /**
      * Compile a where exists clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -483,7 +483,7 @@ class BuilderCompiler{
     /**
      * Compile a where exists clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -495,7 +495,7 @@ class BuilderCompiler{
     /**
      * Compile a where row values condition.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -511,7 +511,7 @@ class BuilderCompiler{
     /**
      * Compile the "where" portions of the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @return string
      */
     protected function compileWheres(Builder $query)
@@ -536,7 +536,7 @@ class BuilderCompiler{
     /**
      * Compile the components necessary for a select clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @return array
      */
     protected function compileComponents(Builder $query)
@@ -557,7 +557,7 @@ class BuilderCompiler{
     /**
      * Compile an aggregated select clause.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $aggregate
      * @return string
      */
@@ -580,7 +580,7 @@ class BuilderCompiler{
     /**
      * Compile the "select *" portion of the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $columns
      * @return string|null
      */
@@ -605,7 +605,7 @@ class BuilderCompiler{
     /**
      * Compile the "from" portion of the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  string  $table
      * @return string
      */
@@ -617,7 +617,7 @@ class BuilderCompiler{
     /**
      * Compile the "group by" portions of the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $groups
      * @return string
      */
@@ -629,7 +629,7 @@ class BuilderCompiler{
     /**
      * Compile the "having" portions of the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @return string
      */
     protected function compileHavings(Builder $query)
@@ -779,7 +779,7 @@ class BuilderCompiler{
     /**
      * Compile the "order by" portions of the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $orders
      * @return string
      */
@@ -795,7 +795,7 @@ class BuilderCompiler{
     /**
      * Compile the query orders to an array.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $orders
      * @return array
      */
@@ -820,7 +820,7 @@ class BuilderCompiler{
     /**
      * Compile the "limit" portions of the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  int  $limit
      * @return string
      */
@@ -832,7 +832,7 @@ class BuilderCompiler{
     /**
      * Compile the "offset" portions of the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  int  $offset
      * @return string
      */
@@ -844,7 +844,7 @@ class BuilderCompiler{
     /**
      * Compile a union aggregate query into SQL.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @return string
      */
     protected function compileUnionAggregate(Builder $query)
@@ -859,7 +859,7 @@ class BuilderCompiler{
     /**
      * Compile the where clauses into an array for the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @return array
      */
     protected function compileWheresToArray($query)
@@ -876,7 +876,7 @@ class BuilderCompiler{
     /**
      * Compile the columns for an update statement.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $values
      * @return string
      */
@@ -895,7 +895,7 @@ class BuilderCompiler{
     /**
      * Compile an update statement without joins into SQL.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  string  $table
      * @param  string  $columns
      * @param  string  $where
@@ -909,7 +909,7 @@ class BuilderCompiler{
     /**
      * Compile an update statement with joins into SQL.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  string  $table
      * @param  string  $columns
      * @param  string  $where
@@ -925,7 +925,7 @@ class BuilderCompiler{
     /**
      * Compile a delete statement without joins into SQL.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  string  $table
      * @param  string  $where
      * @return string
@@ -938,7 +938,7 @@ class BuilderCompiler{
     /**
      * Compile a delete statement with joins into SQL.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  string  $table
      * @param  string  $where
      * @return string
@@ -955,7 +955,7 @@ class BuilderCompiler{
     /**
      * Compile the "join" portions of the query.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $joins
      * @return string
      */
@@ -981,7 +981,7 @@ class BuilderCompiler{
     /**
      * Format the where clause statements into one string.
      *
-     * @param  \builder\Database\Schema\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Builder  $query
      * @param  array  $sql
      * @return string
      */

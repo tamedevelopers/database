@@ -2,17 +2,14 @@
 
 declare(strict_types=1);
 
-namespace builder\Database;
+namespace Tamedevelopers\Database;
 
-use builder\Database\Capsule\FileCache;
-use builder\Database\Connectors\Connector;
-use builder\Database\Traits\ReusableTrait;
-
+use Tamedevelopers\Support\Capsule\FileCache;
+use Tamedevelopers\Database\Connectors\Connector;
 
 class DatabaseManager extends DatabaseConnector {
 
-    use ReusableTrait;
-    
+
     /**
      * Database Storage Cache Key
      * This allow us ability to store multiple connections on each instance

@@ -10,16 +10,16 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace builder\Database\Collections;
+namespace Tamedevelopers\Database\Collections;
 
 
 use ArrayAccess;
 use Traversable;
 use ArrayIterator;
 use IteratorAggregate;
-use builder\Database\Collections\CollectionProperty;
-use builder\Database\Collections\Traits\RelatedTrait;
-use builder\Database\Collections\Traits\CollectionTrait;
+use Tamedevelopers\Database\Collections\CollectionProperty;
+use Tamedevelopers\Database\Collections\Traits\RelatedTrait;
+use Tamedevelopers\Database\Collections\Traits\CollectionTrait;
 
 
 class Collection extends CollectionProperty implements IteratorAggregate, ArrayAccess
@@ -59,7 +59,7 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
      * Get Pagination Links
      * @param array $options
      *
-     * @return \builder\Database\Schema\Pagination\links()
+     * @return \Tamedevelopers\Database\Schema\Pagination\links()
      */
     public function links(?array $options = [])
     {
@@ -73,7 +73,7 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
      * Format Pagination Data
      * @param array $options
      * 
-     * @return \builder\Database\Schema\Pagination\showing()
+     * @return \Tamedevelopers\Database\Schema\Pagination\showing()
      */
     public function showing(?array $options = [])
     {

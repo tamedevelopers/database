@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Traits;
+namespace Tamedevelopers\Database\Traits;
 
 
 trait DBImportTrait{
@@ -11,7 +11,7 @@ trait DBImportTrait{
      * Check if data is Readable
      * 
      * @param array|null $readFile
-     * @return boolean\isReadable
+     * @return boolean
     */
     protected function isReadable(?array $readFile = null)
     {
@@ -25,7 +25,7 @@ trait DBImportTrait{
      * Check if sql string is a comment
      * 
      * @param string|null $string
-     * @return boolean\isComment
+     * @return boolean
     */
     protected function isComment(?string $string = null)
     {
@@ -41,7 +41,7 @@ trait DBImportTrait{
      * Check if sql string is a Query
      * 
      * @param string|null $string
-     * @return boolean\isQuery
+     * @return boolean
     */
     protected function isQuery(?string $string = null)
     {

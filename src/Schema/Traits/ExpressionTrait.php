@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Schema\Traits;
+namespace Tamedevelopers\Database\Schema\Traits;
 
 
-use builder\Database\Schema\Expression;
+use Tamedevelopers\Database\Schema\Expression;
 
 trait ExpressionTrait{
     
@@ -14,7 +14,7 @@ trait ExpressionTrait{
      *
      * @param string $expression
      * 
-     * @return builder\Database\Schema\Expression
+     * @return Tamedevelopers\Database\Schema\Expression
      */
     public static function raw($expression)
     {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Connectors;
+namespace Tamedevelopers\Database\Connectors;
 
 use DateTime;
 

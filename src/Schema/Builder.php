@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Schema;
+namespace Tamedevelopers\Database\Schema;
 
 use PDO;
 use Closure;
 use Exception;
 use PDOException;
 use DateTimeInterface;
-use builder\Database\Constant;
-use builder\Database\Capsule\Forge;
-use builder\Database\Schema\Pagination\Paginator;
-use builder\Database\Collections\Collection;
-use builder\Database\Schema\Traits\BuilderTrait;
-use builder\Database\Schema\Traits\ExpressionTrait;
-use builder\Database\Schema\Traits\MySqlProperties;
+use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Support\Capsule\Forge;
+use Tamedevelopers\Database\Collections\Collection;
+use Tamedevelopers\Database\Schema\Traits\BuilderTrait;
+use Tamedevelopers\Database\Schema\Pagination\Paginator;
+use Tamedevelopers\Database\Schema\Traits\ExpressionTrait;
+use Tamedevelopers\Database\Schema\Traits\MySqlProperties;
 
 /**
- * @property $manager \builder\Database\Capsule\Manager
- * @property $dbManager \builder\Database\DatabaseManager
+ * @property $manager \Tamedevelopers\Database\Capsule\Manager
+ * @property $dbManager \Tamedevelopers\Database\DatabaseManager
  * 
- * @see \builder\Database\Schema\Traits\MySqlProperties
- * @see \builder\Database\Capsule\Manager
- * @see \builder\Database\DatabaseManager
+ * @see \Tamedevelopers\Database\Schema\Traits\MySqlProperties
+ * @see \Tamedevelopers\Database\Capsule\Manager
+ * @see \Tamedevelopers\Database\DatabaseManager
 */
 class Builder  {
     
@@ -261,7 +261,7 @@ class Builder  {
     /**
      * Add a "join where" clause to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $table
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $table
      * @param  \Closure|string  $first
      * @param  string  $operator
      * @param  string  $second
@@ -294,7 +294,7 @@ class Builder  {
     /**
      * Add a "join where" clause to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $table
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $table
      * @param  \Closure|string  $first
      * @param  string  $operator
      * @param  string  $second
@@ -325,7 +325,7 @@ class Builder  {
     /**
      * Add a "right join where" clause to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $table
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $table
      * @param  \Closure|string  $first
      * @param  string  $operator
      * @param  string  $second
@@ -394,7 +394,7 @@ class Builder  {
     /**
      * Add a basic where clause to the query.
      * 
-     * @param  \Closure|string|array|\builder\Database\Schema\Expression  $column
+     * @param  \Closure|string|array|\Tamedevelopers\Database\Schema\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -464,7 +464,7 @@ class Builder  {
      * By default if you provide two param (operator becomes =) equals to. And Value becomes 2nd param
      * If you provide three values then, operator must be the middle param
      * 
-     * @param \Closure|string|array|\builder\Database\Schema\Expression  $column
+     * @param \Closure|string|array|\Tamedevelopers\Database\Schema\Expression  $column
      * @param string $operator
      * @param string $value
      * 
@@ -482,7 +482,7 @@ class Builder  {
     /**
      * Add a basic "where not" clause to the query.
      *
-     * @param  \Closure|string|array|\builder\Database\Schema\Expression  $column
+     * @param  \Closure|string|array|\Tamedevelopers\Database\Schema\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -502,7 +502,7 @@ class Builder  {
     /**
      * Add an "or where not" clause to the query.
      *
-     * @param  \Closure|string|array|\builder\Database\Schema\Expression  $column
+     * @param  \Closure|string|array|\Tamedevelopers\Database\Schema\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -515,7 +515,7 @@ class Builder  {
     /**
      * Add a "where null" clause to the query.
      *
-     * @param  string|array|\builder\Database\Schema\Expression  $columns
+     * @param  string|array|\Tamedevelopers\Database\Schema\Expression  $columns
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -534,7 +534,7 @@ class Builder  {
     /**
      * Add an "or where null" clause to the query.
      *
-     * @param  string|array|\builder\Database\Schema\Expression  $column
+     * @param  string|array|\Tamedevelopers\Database\Schema\Expression  $column
      * @return $this
      */
     public function orWhereNull($column)
@@ -545,7 +545,7 @@ class Builder  {
     /**
      * Add a "where not null" clause to the query.
      *
-     * @param  string|array|\builder\Database\Schema\Expression  $columns
+     * @param  string|array|\Tamedevelopers\Database\Schema\Expression  $columns
      * @param  string  $boolean
      * @return $this
      */
@@ -557,7 +557,7 @@ class Builder  {
     /**
      * Add an "or where not null" clause to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @return $this
      */
     public function orWhereNotNull($column)
@@ -647,7 +647,7 @@ class Builder  {
     /**
      * Add a "where in" clause to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -681,7 +681,7 @@ class Builder  {
     /**
      * Add an "or where in" clause to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  mixed  $values
      * @return $this
      */
@@ -693,7 +693,7 @@ class Builder  {
     /**
      * Add a "where not in" clause to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @return $this
@@ -706,7 +706,7 @@ class Builder  {
     /**
      * Add an "or where not in" clause to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  mixed  $values
      * @return $this
      */
@@ -718,7 +718,7 @@ class Builder  {
     /**
      * Add a where between statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -742,7 +742,7 @@ class Builder  {
     /**
      * Add an or where between statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  iterable  $values
      * @return $this
      */
@@ -754,7 +754,7 @@ class Builder  {
     /**
      * Add a where not between statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  iterable  $values
      * @param  string  $boolean
      * @return $this
@@ -767,7 +767,7 @@ class Builder  {
     /**
      * Add an or where not between statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  iterable  $values
      * @return $this
      */
@@ -779,7 +779,7 @@ class Builder  {
     /**
      * Add a where between statement using columns to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  array  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -797,7 +797,7 @@ class Builder  {
     /**
      * Add an or where between statement using columns to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  array  $values
      * @return $this
      */
@@ -809,7 +809,7 @@ class Builder  {
     /**
      * Add a where not between statement using columns to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  array  $values
      * @param  string  $boolean
      * @return $this
@@ -822,7 +822,7 @@ class Builder  {
     /**
      * Add an or where not between statement using columns to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  array  $values
      * @return $this
      */
@@ -834,7 +834,7 @@ class Builder  {
     /**
      * Add a "where date" statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @param  string  $boolean
@@ -858,7 +858,7 @@ class Builder  {
     /**
      * Add an "or where date" statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @return $this
@@ -875,7 +875,7 @@ class Builder  {
     /**
      * Add a "where time" statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @param  string  $boolean
@@ -899,7 +899,7 @@ class Builder  {
     /**
      * Add an "or where time" statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @return $this
@@ -916,7 +916,7 @@ class Builder  {
     /**
      * Add a "where day" statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @param  string  $boolean
@@ -944,7 +944,7 @@ class Builder  {
     /**
      * Add an "or where day" statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @return $this
@@ -961,7 +961,7 @@ class Builder  {
     /**
      * Add a "where month" statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @param  string  $boolean
@@ -989,7 +989,7 @@ class Builder  {
     /**
      * Add an "or where month" statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @return $this
@@ -1006,7 +1006,7 @@ class Builder  {
     /**
      * Add a "where year" statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @param  string  $boolean
@@ -1030,7 +1030,7 @@ class Builder  {
     /**
      * Add an "or where year" statement to the query.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @return $this
@@ -1047,7 +1047,7 @@ class Builder  {
     /**
      * Add a "having" clause to the query.
      *
-     * @param  \builder\Database\Schema\Expression|\Closure|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|\Closure|string  $column
      * @param  string|int|float|null  $operator
      * @param  string|int|float|null  $value
      * @param  string  $boolean
@@ -1095,7 +1095,7 @@ class Builder  {
     /**
      * Add an "or having" clause to the query.
      *
-     * @param  \builder\Database\Schema\Expression|\Closure|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|\Closure|string  $column
      * @param  string|int|float|null  $operator
      * @param  string|int|float|null  $value
      * @return $this
@@ -1126,7 +1126,7 @@ class Builder  {
     /**
      * Add another query builder as a nested having to the query builder.
      *
-     * @param  \builder\Database\Schema\Query\Builder  $query
+     * @param  \Tamedevelopers\Database\Schema\Query\Builder  $query
      * @param  string  $boolean
      * @return $this
      */
@@ -1330,7 +1330,7 @@ class Builder  {
      * Execute the query as a "select" statement.
      *
      * @param  int $limit
-     * @return \builder\Database\Collections\Collection
+     * @return \Tamedevelopers\Database\Collections\Collection
      */
     public function get($limit = null)
     {
@@ -1352,7 +1352,7 @@ class Builder  {
      * @param  string $pageParam
      * [optional] parameter name on url
      * 
-     * @return \builder\Database\Collections\Collection
+     * @return \Tamedevelopers\Database\Collections\Collection
      */
     public function paginate($perPage = 15, $pageParam = 'page')
     {
@@ -1387,7 +1387,7 @@ class Builder  {
      * @param int $value
      * [default column name is `id`]
      *
-     * @return null\builder\Database\Collections\Collection
+     * @return null\Tamedevelopers\Database\Collections\Collection
      */
     public function find(int $value)
     {
@@ -1396,7 +1396,7 @@ class Builder  {
 
     /**
      * Execute the query and get the first result.
-     * @return null\builder\Database\Collections\Collection
+     * @return null\Tamedevelopers\Database\Collections\Collection
      */
     public function first()
     {
@@ -1405,7 +1405,7 @@ class Builder  {
 
     /**
      * Execute the query and get the first result or throw an exception.
-     * @return null\builder\Database\Collections\Collection
+     * @return null\Tamedevelopers\Database\Collections\Collection
      */
     public function firstOrIgnore()
     {
@@ -1414,7 +1414,7 @@ class Builder  {
 
     /**
      * Execute the query and get the first result or throw an exception.
-     * @return void\builder\Database\Collections\Collection
+     * @return void\Tamedevelopers\Database\Collections\Collection
      */
     public function firstOrFail()
     {
@@ -1430,7 +1430,7 @@ class Builder  {
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \builder\Database\Collections\Collection
+     * @return \Tamedevelopers\Database\Collections\Collection
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
@@ -1470,7 +1470,7 @@ class Builder  {
      * Insert new records into the database.
      *
      * @param  array  $values
-     * @return \builder\Database\Collections\Collection
+     * @return \Tamedevelopers\Database\Collections\Collection
      */
     public function insert(array $values)
     {
@@ -1481,7 +1481,7 @@ class Builder  {
      * Insert new records into the database while ignoring errors.
      *
      * @param  array  $values
-     * @return null\builder\Database\Collections\Collection
+     * @return null\Tamedevelopers\Database\Collections\Collection
      */
     public function insertOrIgnore(array $values)
     {
@@ -1589,7 +1589,7 @@ class Builder  {
     /**
      * Retrieve the minimum value of a given column.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @return mixed
      */
     public function min($column)
@@ -1600,7 +1600,7 @@ class Builder  {
     /**
      * Retrieve the maximum value of a given column.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @return mixed
      */
     public function max($column)
@@ -1611,7 +1611,7 @@ class Builder  {
     /**
      * Retrieve the sum of the values of a given column.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @return mixed
      */
     public function sum($column)
@@ -1624,7 +1624,7 @@ class Builder  {
     /**
      * Retrieve the average of the values of a given column.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @return mixed
      */
     public function avg($column)
@@ -1635,7 +1635,7 @@ class Builder  {
     /**
      * Alias for the "avg" method.
      *
-     * @param  \builder\Database\Schema\Expression|string  $column
+     * @param  \Tamedevelopers\Database\Schema\Expression|string  $column
      * @return mixed
      */
     public function average($column)

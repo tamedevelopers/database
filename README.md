@@ -42,9 +42,6 @@ was pretty tough. So i decided to create a much more easier way of communicating
     * [Paginate](#paginate)
     * [Exist](#exists)
     * [Table Exists](#table-exists)
-* [Asset](#Asset)
-    * [Asset config](#asset-config)
-        * [Asset Cache](#asset-cache)
 * [Collections](#collections)
     * [Collection Methods](#collection-methods)
     * [Collection Usage](#collection-usage)
@@ -113,7 +110,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
 
 ## Requirements
 
-- `>= php7.2.5+`
+- `>= php 8.0+`
 
 ## Installation
 
@@ -122,7 +119,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/database": "^4.3.7"
+    "peterson/database": "^4.3.8"
 }
 ```
 
@@ -133,7 +130,7 @@ composer update
 
 **Or composer require**:
 ```
-composer require peterson/database
+composer require tamedevelopers/database
 ```
 
 ## Instantiate
@@ -457,62 +454,6 @@ $db->table('users')
 ```
 $db->tableExists('users');
 ```
-
-## Asset
-- Takes a param as `string` path to asset file
-    - Default [dir] is set to `assets`
-
-```
-use builder\Database\Asset;
-
-Asset::asset('css/style.css');
-
-- Returns
-http://domain.com/assets/css/style.css
-```
-
-- or -- `Helpers Function`
-```
-asset('css/style.css');
-```
-
-## Asset Config
-- Takes two param as `string` 
-    - `$base_path` path base directory
-    - `$cache` Tells method to return `cache` of assets.
-        - You'll see a link representation as `http://domain.com/[path_to_asset_file]?v=111111111`
-
-```
-use builder\Database\Asset;
-
-Asset::config('public/storage');
-
-- Returns
-http://domain.com/public/storage/[asset_file]
-```
-
-- or -- `Helpers Function`
-```
-asset_config('public');
-```
-
-### Asset Cache
-- By Default, `$cache` is set to `true`
-
-```
-Asset::config('storage', false);
-
-- Returns
-http://domain.com/storage/[asset_file]
-```
-
-- or -- `Helpers Function`
-```
-asset_config('storage');
-
-http://domain.com/storage/[asset_file]?v=111111111
-```
-
 
 ## Collections
 - You can directly use `methods` of `Collections Instance` on any of the below

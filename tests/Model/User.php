@@ -1,6 +1,6 @@
 <?php
 
-use builder\Database\Model;
+use Tamedevelopers\Database\Model;
 
 class User extends Model{
     

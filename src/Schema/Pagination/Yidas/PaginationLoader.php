@@ -1,6 +1,6 @@
 <?php
 
-namespace builder\Database\Schema\Pagination\Yidas;
+namespace Tamedevelopers\Database\Schema\Pagination\Yidas;
 
 use Exception;
 

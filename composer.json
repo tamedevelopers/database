@@ -1,5 +1,5 @@
 {
-    "name": "peterson/database",
+    "name": "tamedevelopers/database",
     "type": "library",
     "description": "Lightweight PHP ORM Database Model.",
     "keywords": ["php orm database", "orm database", "php database", "php orm github"],
@@ -16,27 +16,23 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "psr/log": "^1.0 || ^1.1.4",
-        "vlucas/phpdotenv": "^5.3",
+        "php": ">=8.0",
+        "vlucas/phpdotenv": "^5.4.1",
         "filp/whoops": "^2.15",
-        "symfony/var-dumper": "^5.4.3"
-    },
-    "conflict": {
-        "symfony/var-dumper": ">=6.0.0"
+        "tamedevelopers/support": "*"
     },
     "autoload": {
         "files": [
             "src/helpers.php"
         ],
         "psr-4": {
-            "builder\\Database\\": "src/"
+            "Tamedevelopers\\Database\\": "src/"
         },
         "classmap": ["src/*"]
     },
     "autoload-dev": {
         "psr-4": {
-            "builder\\Database\\Tests\\": "tests/"
+            "Tamedevelopers\\Database\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",

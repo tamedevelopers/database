@@ -1,6 +1,6 @@
 <?php
 
-namespace builder\Database\Schema;
+namespace Tamedevelopers\Database\Schema;
 
 use Closure;
 
@@ -23,7 +23,7 @@ class JoinClause extends Builder
     /**
      * The connection of the parent query builder.
      *
-     * @var \builder\Database\Schema\Builder\connection
+     * @var \Tamedevelopers\Database\Schema\Builder\connection
      */
     protected $parentConnection;
 
@@ -37,7 +37,7 @@ class JoinClause extends Builder
     /**
      * Create a new join clause instance.
      *
-     * @param  \builder\Database\Schema\Query\Builder  $parentQuery
+     * @param  \Tamedevelopers\Database\Schema\Query\Builder  $parentQuery
      * @param  string  $type
      * @param  string  $table
      * @return void
@@ -64,7 +64,7 @@ class JoinClause extends Builder
      *
      * @param  \Closure|string  $first
      * @param  string|null  $operator
-     * @param  \builder\Database\Schema\Expression|string|null  $second
+     * @param  \Tamedevelopers\Database\Schema\Expression|string|null  $second
      * @param  string  $boolean
      * @return $this
      *
@@ -84,8 +84,8 @@ class JoinClause extends Builder
      *
      * @param  \Closure|string  $first
      * @param  string|null  $operator
-     * @param  \builder\Database\Schema\Expression|string|null  $second
-     * @return \builder\Database\Schema\Query\JoinClause
+     * @param  \Tamedevelopers\Database\Schema\Expression|string|null  $second
+     * @return \Tamedevelopers\Database\Schema\Query\JoinClause
      */
     public function orOn($first, $operator = null, $second = null)
     {

@@ -1,8 +1,8 @@
 <?php
 
-use builder\Database\Migrations\Schema;
-use builder\Database\Migrations\Blueprint;
-use builder\Database\Migrations\Migration;
+use Tamedevelopers\Database\Migrations\Schema;
+use Tamedevelopers\Database\Migrations\Blueprint;
+use Tamedevelopers\Database\Migrations\Migration;
 
 
 return new class extends Migration

@@ -1,6 +1,6 @@
 <?php
 
-namespace builder\Database\Connectors;
+namespace Tamedevelopers\Database\Connectors;
 
 interface ConnectorInterface
 {

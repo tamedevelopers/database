@@ -10,7 +10,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace builder\Database\Collections;
+namespace Tamedevelopers\Database\Collections;
 
 
 class CollectionProperty
@@ -38,12 +38,12 @@ class CollectionProperty
     /**
      * Instance of ORM Database Class
      *
-     * @var \builder\Database\Schema\Builder
+     * @var \Tamedevelopers\Database\Schema\Builder
      */
     protected $builder;
 
     /**
-     * If Instance of \builder\Database\DB is true
+     * If Instance of \Tamedevelopers\Database\DB is true
      * @var bool
      */
     protected static $isBuilder = false;

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace builder\Database\Connectors\Traits;
+namespace Tamedevelopers\Database\Connectors\Traits;
 
 use Exception;
-use builder\Database\Capsule\Str;
-use builder\Database\Connectors\MysqlConnector;
-use builder\Database\Connectors\SQLiteConnector;
-use builder\Database\Connectors\PostgresConnector;
+use Tamedevelopers\Support\Str;
+use Tamedevelopers\Database\Connectors\MysqlConnector;
+use Tamedevelopers\Database\Connectors\SQLiteConnector;
+use Tamedevelopers\Database\Connectors\PostgresConnector;
 
 trait ConnectorTrait{
 
@@ -38,7 +38,7 @@ trait ConnectorTrait{
     {
         $childClassName     = get_called_class(); // Get the name of the child class
         $parentClassName    = get_parent_class($childClassName); // Get the name of the parent class
-        if(is_subclass_of($childClassName, '\builder\Database\Model')){
+        if(is_subclass_of($childClassName, '\Tamedevelopers\Database\Model')){
             return true;
         }
 
@@ -52,7 +52,7 @@ trait ConnectorTrait{
      */
     protected static function tabelCamelCase()
     {
-        // check if child class is instance of builder\Database\Model
+        // check if child class is instance of Tamedevelopers\Database\Model
         if(self::isModelExtended()){
             // Convert camel case to snake case
             $snakeCase = Str::snakeCase(get_called_class());

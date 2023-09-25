@@ -1,6 +1,6 @@
 <?php
 
-use builder\Database\Model;
+use Tamedevelopers\Database\Model;
 
 class Wallet extends Model{
 
@@ -13,7 +13,7 @@ class Wallet extends Model{
      * Now we have override the systems default model name of `wallets`
      * to `tb_wallet`
      */
-    protected $table = 'tb_wallet';
+    protected $table = 'wallet';
 
 
     public function getWallets()
