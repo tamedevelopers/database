@@ -1,11 +1,11 @@
 # PHP ORM Database
 
-[![Total Downloads](https://poser.pugx.org/peterson/database/downloads)](https://packagist.org/packages/peterson/database)
-[![Latest Stable Version](https://poser.pugx.org/peterson/database/version.png)](https://packagist.org/packages/peterson/database)
-[![License](https://poser.pugx.org/peterson/database/license)](https://packagist.org/packages/peterson/database)
-[![Build Status](https://github.com/tamedevelopers/phpOrmDatabase/actions/workflows/php.yml/badge.svg)](https://github.com/tamedevelopers/phpOrmDatabase/actions)
-[![Code Coverage](https://codecov.io/gh/peterson/database/branch/2.2.x/graph/badge.svg)](https://codecov.io/gh/peterson/database/branch/2.2.x)
-[![Gitter](https://badges.gitter.im/peterson/database.svg)](https://app.element.io/#/room/#php-orm-database:gitter.im)
+[![Total Downloads](https://poser.pugx.org/tamedevelopers/database/downloads)](https://packagist.org/packages/tamedevelopers/database)
+[![Latest Stable Version](https://poser.pugx.org/tamedevelopers/database/version.png)](https://packagist.org/packages/tamedevelopers/database)
+[![License](https://poser.pugx.org/tamedevelopers/database/license)](https://packagist.org/packages/tamedevelopers/database)
+[![Build Status](https://github.com/tamedevelopers/database/actions/workflows/php.yml/badge.svg)](https://github.com/tamedevelopers/database/actions)
+[![Code Coverage](https://codecov.io/gh/tamedevelopers/database/branch/2.2.x/graph/badge.svg)](https://codecov.io/gh/tamedevelopers/database/branch/2.2.x)
+[![Gitter](https://badges.gitter.im/tamedevelopers/database.svg)](https://app.element.io/#/room/#php-orm-database:gitter.im)
 
 ## Inspiration
 
@@ -98,7 +98,6 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Get Database TablePrefix](#get-database-tableprefix)
 * [Database Import](#database-import)
 * [Update Env Variable](#update-env-variable)
-* [Env Servers](#Env-servers)
 * [Autoload Register](#autoload-register)
 * [Collation And Charset](#collation-and-charset)
 * [Extend Model Class](#extend-model-class)
@@ -119,7 +118,7 @@ Prior to installing `php-orm-database` get the [Composer](https://getcomposer.or
 **Step 1** — update your `composer.json`:
 ```composer.json
 "require": {
-    "peterson/database": "^4.3.8"
+    "tamedevelopers/database": "^4.3.8"
 }
 ```
 
@@ -152,7 +151,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 | `.env` `.gitignore` `.htaccess` `.user.ini` `init.php`                                        |
 
 ```
-use builder\Database\AutoLoader;
+use Tamedevelopers\Database\AutoLoader;
 
 AutoLoader::start();
 ```
@@ -176,7 +175,7 @@ autoloader_start('optional_path_to_root');
     - All you need do is call the bootloader, to start your application.
 
 ```
-use builder\Database\Capsule\AppManager;
+use Tamedevelopers\Database\Capsule\AppManager;
 
 AppManager::bootLoader();
 
@@ -937,7 +936,7 @@ $db->table('wallet')
 | drop()        |  Drop migration tables            |
 
 ```
-use builder\Database\Migrations\Migration;
+use Tamedevelopers\Database\Migrations\Migration;
 ```
 
 ### Create Table Schema
@@ -974,7 +973,7 @@ migration()->create('users');
 | You must define this before start using the migrations                                |
 
 ```
-use builder\Database\Migrations\Schema;
+use Tamedevelopers\Database\Migrations\Schema;
 
 Schema::defaultStringLength(200);
 ```
@@ -992,7 +991,7 @@ schema()->defaultStringLength(2000);
     - `$values` as mixed data `NULL` `NOT NULL\|None` `STRING` `current_timestamp()`
 
 ```
-use builder\Database\Migrations\Schema;
+use Tamedevelopers\Database\Migrations\Schema;
 
 Schema::updateColumnDefaultValue('users_table', 'email_column', 'NOT NULL);
 Schema::updateColumnDefaultValue('users_table', 'gender_column', []);
@@ -1034,7 +1033,7 @@ migration()->drop();
 - Takes one param as `string` $table_name
 
 ```
-use builder\Database\Migrations\Schema;
+use Tamedevelopers\Database\Migrations\Schema;
 
 Schema::dropTable('table_name');
 
@@ -1050,7 +1049,7 @@ schema()->dropTable('table_name');
 - To Drop Column `takes two param`
     - This will drop the column available
 ```
-use builder\Database\Migrations\Schema;
+use Tamedevelopers\Database\Migrations\Schema;
 
 Schema::dropColumn('table_name', 'column_name');
 
@@ -1095,7 +1094,7 @@ $db->getTablePrefix()
     - Remember the system already have absolute path to your project.
 
 ```
-use builder\Database\DBImport;
+use Tamedevelopers\Database\DBImport;
 
 $database = new DBImport();
 
@@ -1113,7 +1112,6 @@ $status = $database->import('path_to/orm.sql');
 import('path_to/orm.sql');
 ```
 
-
 ## Update Env Variable
 - You can use this class to import .sql into a database programatically
 
@@ -1125,7 +1123,7 @@ import('path_to/orm.sql');
 | allow_space   | `true` \| `false`  - Default is false (Allow space between key and value)|
 
 ```
-use builder\Database\Methods\Env;
+use Tamedevelopers\Support\Env;
 
 Env::updateENV('DB_PASSWORD', 'newPassword');
 Env::updateENV('APP_DEBUG', false);
@@ -1138,38 +1136,6 @@ true|false
 - or -- `Helpers Function`
 ```
 env_update('DB_CHARSET', 'utf8', false);
-env_orm()->updateENV('DB_CHARSET', 'utf8', false);
-```
-
-
-## Env Servers
-- Returns assoc arrays of Server
-    - `server\|domain\|protocol`
-
-```
-use builder\Database\Env;
-
-Env::getServers();
-```
-
-- or -- `Helpers Function`
-```
-env_orm()::getServers('server');
-env_orm()->getServers('domain');
-```
-
-## Autoload Register
-- Takes an `string\|array` as param
-    - You can use register a folder containing all needed files
-    - This automatically register `Files\|Classes` in the folder and sub-folders.
-
-```
-use builder\Database\AutoloadRegister;
-
-AutoloadRegister::load('folder');
-
-or
-autoload_register(['folder', 'folder2]);
 ```
 
 ## Collation And Charset
@@ -1194,7 +1160,7 @@ autoload_register(['folder', 'folder2]);
 
 - You can as well extends the DB Model class directly from other class
 ```
-use builder\Database\Model;
+use Tamedevelopers\Database\Model;
 
 class Post extends Model{
     
@@ -1217,22 +1183,11 @@ class Post extends Model{
 | db_connection()           | Same as `$db->dbConnection()`                 |
 | config_pagination()       | Same as `$db->configPagination()` or `AutoLoader::configPagination`  |
 | autoloader_start()        | Same as `AutoLoader::start()`                 |
-| autoload_register()       | Same as `AutoloadRegister::load()`            |
-| env()                     | Same as `$db->env()`                          |
-| env_update()              | Same as `Env::updateENV` method            |
-| env_orm()                 | Return instance of `(new Env)` class       |
+| env_update()              | Same as `Env::updateENV` method               |
 | app_manager()             | Return instance of `(new AppManager)` class       |
 | import()                  | Return instance of `(new DBImport)->import()` method      |
 | migration()               | Return instance of `(new Migration)` class    |
 | schema()                  | Return instance of `(new Schema)` class       |
-| asset()                   | Return Absolute path of asset. Same as `Asset::asset()`   |
-| asset_config()            | Same as `Asset::config()`. Configure Asset root directory |
-| base_path()               | Get absolute base directory path. It accepts a param as `string` if given, will be appended to the path |
-| directory()               | Same as `base_path()` just naming difference        |
-| domain()                  | Similar to `base_path()` as it returns domain URI. Also accepts path given and this will append to the endpoint of URL. |
-| to_array()                | `array` Convert items to array                |
-| to_object()               | `object` Convert items to object              |
-| to_json()                 | `string` Convert items to json                |
 
 ## Error Dump
 
@@ -1250,6 +1205,7 @@ class Post extends Model{
 ## Useful Links
 
 - @author Fredrick Peterson (Tame Developers)   
-- [Lightweight - PHP ORM Database](https://github.com/tamedevelopers/phpOrmDatabase)
+- [Lightweight - PHP ORM Database](https://github.com/tamedevelopers/database)
+- [Support - Library](https://github.com/tamedevelopers/support)
 - If you love this PHP Library, you can [Buy Tame Developers a coffee](https://www.buymeacoffee.com/tamedevelopers)
 - Udemy Course on Usage [Coming Soon]()
