@@ -19,7 +19,7 @@
         "php": ">=8.0",
         "vlucas/phpdotenv": "^5.4.1",
         "filp/whoops": "^2.15",
-        "tamedevelopers/support": "*"
+        "tamedevelopers/support": "^1.0.2"
     },
     "autoload": {
         "files": [
