@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=8.0",
+        "tamedevelopers/support": "*",
         "vlucas/phpdotenv": "^5.4.1",
-        "filp/whoops": "^2.15",
-        "tamedevelopers/support": "^1.0.2"
+        "filp/whoops": "^2.15"
     },
     "autoload": {
         "files": [
