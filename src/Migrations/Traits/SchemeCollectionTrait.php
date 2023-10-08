@@ -64,7 +64,7 @@ trait SchemaCollectionTrait{
      * 
      * @return $this
      */
-    public function primary(?string $name, $autoIncrement = true, $unsigned = true)
+    public function primary($name, ?bool $autoIncrement = true, ?bool $unsigned = true)
     {
         return $this->addColumn($name, 'bigInteger', [
             'primary'           => "PRIMARY", 
@@ -75,11 +75,11 @@ trait SchemaCollectionTrait{
 
     /**
      * Creating Indexs
-     * @param string $name 
+     * @param string|null $name 
      * 
      * @return $this
      */
-    public function index(?string $name = null)
+    public function index($name = null)
     {
         $this->columns[count($this->columns) - 1]['index'] = $this->generix_name($name);
 
@@ -88,11 +88,11 @@ trait SchemaCollectionTrait{
 
     /**
      * Creating Indexs
-     * @param string $name 
+     * @param string|null $name 
      * 
      * @return $this
      */
-    public function unique(?string $name = null)
+    public function unique($name = null)
     {
         $this->columns[count($this->columns) - 1]['unique'] = $this->generix_name($name);
         
@@ -128,13 +128,13 @@ trait SchemaCollectionTrait{
     /**
      * Create a foreign key constraint on this column referencing the "id" column of the conventionally related table.
      *
-     * @param string $table
+     * @param string|null $table
      * @param string $column
      * - [optional] Default is `id`
      * 
      * @return $this
      */
-    public function constrained(?string $table = null, $column = 'id')
+    public function constrained($table = null, $column = 'id')
     {
         // we try to use defined table name, if no name is given to the method
         $tableName = explode('_', $this->tableName);

@@ -38,7 +38,7 @@ class Connector {
      * @param mixed $connection \Connection instance
      * 
      */
-    public function __construct(?string $name = null, mixed $connection = null)
+    public function __construct($name = null, mixed $connection = null)
     {
         $this->setConnectionName($name);
         $this->setConnection($connection);
@@ -62,11 +62,11 @@ class Connector {
     /**
      * Check if table exists
      * 
-     * @param string $table
+     * @param string|null $table
      * 
      * @return bool
      */
-    public function tableExists(?string $table)
+    public function tableExists($table)
     {
         return $this->table('')->tableExists($table);
     }
@@ -204,7 +204,6 @@ class Connector {
      * Get Table Name
      * @param string $table
      * @param array $data
-     * 
      * @return string
      */
     private static function compileTableWithPrefix($table = null, ?array $data = null)
@@ -222,11 +221,10 @@ class Connector {
     /**
      * Get currently selected driver data
      *
-     * @param string $mode
-     * 
+     * @param string|null $mode
      * @return mixed
      */
-    private function getDataByMode(?string $mode = null)
+    private function getDataByMode($mode = null)
     {
         return $this->getConfig()[$mode] ?? null;
     }
@@ -247,9 +245,10 @@ class Connector {
     /**
      * Set connection connection name
      *
+     * @param string|null $name
      * @return void
      */
-    private function setConnectionName(?string $name = null)
+    private function setConnectionName($name = null)
     {
         $this->name = empty($name) ? 'default' : $name;
     }

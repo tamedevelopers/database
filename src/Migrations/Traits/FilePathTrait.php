@@ -13,11 +13,11 @@ trait FilePathTrait{
 
     /**
      * Get Traceable File name
-     * @param string $name 
+     * @param string|null $name 
      * 
      * @return string|null\traceable
      */
-    public function traceableTableFileName(?string $table = null)
+    public function traceableTableFileName($table = null)
     {
         // exception trace
         $exception = (new Exception)->getTrace();

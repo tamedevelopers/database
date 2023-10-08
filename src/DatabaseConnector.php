@@ -30,10 +30,10 @@ class DatabaseConnector{
 
     /**
      * Find Database Driver Name
-     * @param string $name
+     * @param string|null $name
      * @return string
      */
-    protected static function getDriverName(?string $name = null)
+    protected static function getDriverName($name = null)
     {
         // try to get driver config data
         $config = config(
@@ -74,11 +74,11 @@ class DatabaseConnector{
 
     /**
      * Get supported database Driver
-     * @param string $driver
+     * @param string|null $driver
      * 
      * @return string|null
      */
-    public static function findDriver(?string $driver = null)
+    public static function findDriver($driver = null)
     {
         // collation get
         $driver = Str::lower($driver);
@@ -91,11 +91,11 @@ class DatabaseConnector{
 
     /**
      * Get supported database Collation
-     * @param string $collation
+     * @param string|null $collation
      * 
      * @return string|null
      */
-    public static function findCollation(?string $collation = null)
+    public static function findCollation($collation = null)
     {
         // collation get
         $collation = Str::lower($collation);
@@ -108,11 +108,11 @@ class DatabaseConnector{
 
     /**
      * Get supported database Charset
-     * @param string $charset
+     * @param string|null $charset
      * 
      * @return string|null
      */
-    public static function findCharset(?string $charset = null)
+    public static function findCharset($charset = null)
     {
         // charset get
         $charset = Str::lower($charset);
@@ -150,7 +150,7 @@ class DatabaseConnector{
      */
     private static function supportedCollations()
     {
-        return ['utf8mb4_unicode_ci', 'utf8mb4_general_ci', 'utf8mb4_bin', 'utf8_general_ci', 'utf8_bin', 'latin1_general_ci', 'latin1_bin',];
+        return ['utf8mb4_unicode_ci', 'utf8mb4_general_ci', 'utf8mb4_bin', 'utf8_general_ci', 'utf8_bin', 'latin1_general_ci', 'latin1_bin'];
     }
     
 }

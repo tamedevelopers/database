@@ -1258,7 +1258,7 @@ class Builder  {
      * 
      * @return bool
      */
-    public function tableExists(?string $table)
+    public function tableExists($table)
     {
         try{
             $pdo = $this->connection->pdo;

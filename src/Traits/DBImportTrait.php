@@ -27,7 +27,7 @@ trait DBImportTrait{
      * @param string|null $string
      * @return boolean
     */
-    protected function isComment(?string $string = null)
+    protected function isComment($string = null)
     {
         // if first two is --
         // or it's empty
@@ -43,7 +43,7 @@ trait DBImportTrait{
      * @param string|null $string
      * @return boolean
     */
-    protected function isQuery(?string $string = null)
+    protected function isQuery($string = null)
     {
         // check is last char is `;`
         if(substr(trim($string), -1, 1) == ';'){

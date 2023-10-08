@@ -20,7 +20,7 @@ trait DBSetupTrait{
      * 
      * @return \Tamedevelopers\Database\Schema\Builder
      */
-    public static function table(string $table)
+    public static function table($table)
     {
         return (new Connector)->table($table);
     }
@@ -32,7 +32,7 @@ trait DBSetupTrait{
      * 
      * @return bool
      */
-    public static function tableExists(?string $table)
+    public static function tableExists($table)
     {
         return (new Connector)->table('')->tableExists($table);
     }

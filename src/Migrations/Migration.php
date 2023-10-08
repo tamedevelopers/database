@@ -30,12 +30,12 @@ class Migration{
     /**
      * Create migration name
      * @param string $table_name 
-     * @param string $type
+     * @param string|null $type
      * - optional $jobs\To create dummy Jobs table Data
      * 
      * @return void
      */
-    public static function create(?string $table_name, ?string $type = null)
+    public static function create($table_name, $type = null)
     {
         self::initStatic();
 

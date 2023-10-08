@@ -323,11 +323,11 @@ trait TableStructureTrait{
     /**
      * Regixify the query.
      *
-     * @param string $query The query to be regixified.
+     * @param string|null $formatted The query to be regixified.
      *
      * @return string The regixified query.
      */
-    private function regixifyQuery(?string $formatted)
+    private function regixifyQuery($formatted = null)
     {
         // clean string from begining and ending
         $formatted = preg_replace("/^[ \t]+|[ \t]+$/m", "", $formatted);

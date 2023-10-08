@@ -20,7 +20,6 @@ use Tamedevelopers\Database\Connectors\Traits\ConnectorTrait;
 
 /**
  * @property string $table
- * 
  */
 abstract class Model extends DB{
 
@@ -93,7 +92,7 @@ abstract class Model extends DB{
      * 
      * @return mixed
      */
-    public static function modelException(?string $method = null, $args = null, $class = null) 
+    public static function modelException($method = null, $args = null, $class = null) 
     {
         // instance of DB Class
         $instance = !$class ? new self() : $class;

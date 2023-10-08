@@ -158,11 +158,11 @@ trait SchemaConfigurationTrait{
 
     /**
      * Creating Query String for Collate
-     * @param string $getType
+     * @param string|null $getType
      * 
      * @return string
      */
-    protected function queryForCollate(?string $getType = null)
+    protected function queryForCollate($getType = null)
     {
         $columnDef = "";
         if(in_array($getType, $this->collateTypes)){
@@ -177,12 +177,12 @@ trait SchemaConfigurationTrait{
     /**
      * Creating Query String for Unsigned
      * @param array $options
-     * @param string $getType
-     * @param string $unsigned
+     * @param string|null $getType
+     * @param string|null $unsigned
      * 
      * @return string
      */
-    protected function queryForUnsigned(?array $options = [], ?string $getType = null, ?string $unsigned = null)
+    protected function queryForUnsigned(?array $options = [], $getType = null, $unsigned = null)
     {
         $columnDef = "";
         if(isset($options['unsigned'])){
@@ -247,7 +247,7 @@ trait SchemaConfigurationTrait{
      * 
      * @return string
      */
-    protected function getColumnLength(?string $type, ?int $length = null)
+    protected function getColumnLength($type, ?int $length = null)
     {
         // if global length is defined
         if( defined('ORM_MAX_STRING_LENGTH') ){
@@ -308,7 +308,7 @@ trait SchemaConfigurationTrait{
      * 
      * @return string
      */
-    protected function getColumnType(?string $type)
+    protected function getColumnType($type)
     {
         $typeMap = [
             'increments'            => 'int',
@@ -354,7 +354,7 @@ trait SchemaConfigurationTrait{
      * 
      * @return string
      */
-    protected function getUnsigned(?string $type)
+    protected function getUnsigned($type)
     {
         $typeUnassigned = [
             'increments'            => 'UNSIGNED',
@@ -372,11 +372,11 @@ trait SchemaConfigurationTrait{
 
     /**
      * Create generix identifier name
-     * @param string $name
+     * @param string|null $name
      * 
      * @return string
      */
-    protected function generix_name(?string $name = null)
+    protected function generix_name($name = null)
     {
         $column = $this->columns[count($this->columns) - 1];
         $unique = (new Exception)->getTrace()[1]['function'] ?? '__';

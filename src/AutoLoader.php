@@ -17,13 +17,13 @@ class AutoLoader{
     /**
      * Star env configuration
      * 
-     * @param string $custom_path 
+     * @param string|null $custom_path 
      * path \Path to .env file
      * - [optional] path \By default we use project root path
      * 
      * @return void
      */
-    public static function start(?string $custom_path = null)
+    public static function start($custom_path = null)
     {
         /*
         |--------------------------------------------------------------------------

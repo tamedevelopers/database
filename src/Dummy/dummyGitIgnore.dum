@@ -4,4 +4,5 @@
 /.vscode
 /.github
 .gitignore
+.env
 composer.lock

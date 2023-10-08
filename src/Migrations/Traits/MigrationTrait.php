@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database\Migrations\Traits;
 
-use Tamedevelopers\Database\Env;
+use Tamedevelopers\Support\Env;
 
 /**
  * 
@@ -16,12 +16,15 @@ trait MigrationTrait{
     private static $migrations;
     private static $seeders;
     
+    
     /**
      * Run Migrations
-     * 
-     * @return mixed
+     *
+     * @param  string $table_name
+     * @param  string|null $type
+     * @return void
      */
-    private static function runMigration(?string $table_name, ?string $type = null) 
+    private static function runMigration($table_name, $type = null) 
     {
         // table name
         $case_table = self::toSnakeCase($table_name);
@@ -159,7 +162,7 @@ trait MigrationTrait{
      * @return string 
      * - String toSnakeCase
      */
-    private static function toSnakeCase(?string $input)
+    private static function toSnakeCase($input)
     {
         $output = preg_replace_callback(
             '/[A-Z]/',
@@ -178,7 +181,7 @@ trait MigrationTrait{
      * 
      * @return array|string
      */
-    private static function directoryfiles(?string $directory)
+    private static function directoryfiles($directory)
     {
         // read file inside folders
         $readDir = scandir($directory);

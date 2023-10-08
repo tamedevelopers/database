@@ -21,7 +21,7 @@ class DatabaseManager extends DatabaseConnector {
     /**
      * Connect to a Database 
      * 
-     * @param string $name
+     * @param string|null $name
      * - [name] of connections in [config/database.php] file
      * 
      * @param array $default 
@@ -29,7 +29,7 @@ class DatabaseManager extends DatabaseConnector {
      * 
      * @return $this
      */
-    public static function connection(?string $name = null, ?array $default = [])
+    public static function connection($name = null, ?array $default = [])
     {
         $config = self::driverValidator($name);
         if (!FileCache::has($config['key'])) {
@@ -54,12 +54,12 @@ class DatabaseManager extends DatabaseConnector {
     /**
      * Get Connection data
      * 
-     * @param string $name
+     * @param string|null $name
      * - [name] of connections\Default name is `default`
      * 
      * @return mixed
      */
-    public static function getConnection(?string $name = null)
+    public static function getConnection($name = null)
     {
         $key = self::getCacheKey($name);
         if (FileCache::has($key)) {
@@ -75,7 +75,7 @@ class DatabaseManager extends DatabaseConnector {
      * @param string|null $name
      * @return void
      */
-    public static function disconnect(?string $name = null)
+    public static function disconnect($name = null)
     {
         $name = empty($name) ? 'default' : $name;
         $key  = self::getCacheKey($name);
@@ -94,7 +94,7 @@ class DatabaseManager extends DatabaseConnector {
      * 
      * @return object
      */
-    public static function reconnect(?string $name = null, mixed $default = null)
+    public static function reconnect($name = null, mixed $default = null)
     {
         return self::connection($name, $default);
     }
@@ -113,10 +113,10 @@ class DatabaseManager extends DatabaseConnector {
     /**
      * get Cache Key name
      *
-     * @param string $name
+     * @param string|null $name
      * @return array
      */
-    private static function driverValidator(?string $name = null)
+    private static function driverValidator($name = null)
     {
         $name = self::getDriverName($name);
         return [

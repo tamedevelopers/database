@@ -27,9 +27,9 @@ class Blueprint{
     /**
      * Creating Managers
      * 
-     * @param string $tableName 
+     * @param string|null $tableName 
      */
-    public function __construct(?string $tableName = null) 
+    public function __construct($tableName = null) 
     {
         $this->db           = DB::connection();
         $this->tableName    = $tableName;

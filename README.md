@@ -1205,7 +1205,6 @@ class Post extends Model{
 ## Useful Links
 
 - @author Fredrick Peterson (Tame Developers)   
+- If you love this PHP Library, you can [Buy Tame Developers a coffee](https://www.buymeacoffee.com/tamedevelopers)
 - [Lightweight - PHP ORM Database](https://github.com/tamedevelopers/database)
 - [Support - Library](https://github.com/tamedevelopers/support)
-- If you love this PHP Library, you can [Buy Tame Developers a coffee](https://www.buymeacoffee.com/tamedevelopers)
-- Udemy Course on Usage [Coming Soon]()

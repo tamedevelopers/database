@@ -72,7 +72,7 @@ class Schema{
      * 
      * @return \Tamedevelopers\Database\Migrations\Blueprint
      */
-    public static function create(?string $tableName, callable $callback) 
+    public static function create($tableName, callable $callback) 
     {
         $callback(new Blueprint($tableName));
     }
@@ -91,7 +91,7 @@ class Schema{
      * 
      * @return array
      */
-    public static function updateColumnDefaultValue(?string $table, ?string $column, mixed $value = null)
+    public static function updateColumnDefaultValue($table, $column, mixed $value = null)
     {
         self::initSchemaDatabase();
 
@@ -158,7 +158,7 @@ class Schema{
      * 
      * @return array
      */
-    public static function dropTable(?string $tableName, $force = false)
+    public static function dropTable($tableName, $force = false)
     {
         self::initSchemaDatabase();
 
@@ -204,7 +204,7 @@ class Schema{
      * 
      * @return array
      */
-    public static function dropColumn(?string $tableName, ?string $columnName)
+    public static function dropColumn($tableName, $columnName)
     {
         self::initSchemaDatabase();
 

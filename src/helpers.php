@@ -11,13 +11,13 @@ if (! function_exists('autoloader_start')) {
     /**
      * Configure Instance of AutoLoader `Environment`
      * 
-     * @param string $custom_path 
+     * @param string|null $custom_path 
      * path \Path to .env file
      * - [optional] path \By default we use project root path
      * 
      * @return void
      */
-    function autoloader_start(?string $custom_path = null)
+    function autoloader_start($custom_path = null)
     {
         (new AutoLoader)->start($custom_path);
     }
@@ -43,12 +43,12 @@ if (! function_exists('db_connection')) {
     /**
      * Get Database Connection
      * 
-     * @param string $type
+     * @param string|null $type
      * - [optional]  reponse|message|driver
      * 
      * @return mixed
      */
-    function db_connection(?string $type = null)
+    function db_connection($type = null)
     {
         return db()->dbConnection($type);
     }
