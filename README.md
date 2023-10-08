@@ -113,21 +113,8 @@ was pretty tough. So i decided to create a much more easier way of communicating
 
 ## Installation
 
-Prior to installing `php-orm-database` get the [Composer](https://getcomposer.org) dependency manager for PHP because it'll simplify installation.
+Prior to installing `database package` get the [Composer](https://getcomposer.org) dependency manager for PHP because it'll simplify installation.
 
-**Step 1** — update your `composer.json`:
-```composer.json
-"require": {
-    "tamedevelopers/database": "^4.3.8"
-}
-```
-
-**Step 2** — run [Composer](https://getcomposer.org):
-```update
-composer update
-```
-
-**Or composer require**:
 ```
 composer require tamedevelopers/database
 ```
@@ -139,7 +126,7 @@ composer require tamedevelopers/database
 require_once __DIR__ . '/vendor/autoload.php';
 ```
 
-**Step 2** — `Call the below method() and Run once in browser`
+**Step 2** — Call `the below method() and Run once in browser`
 - This will auto setup your entire application on a `go!`
 
 |  Description                                                                                  | 
@@ -148,7 +135,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 | By default you don't need to define any path again                                            |
 |                                                                                               |
 | Files you'll see after you reload browser:                                                    |
-| `.env` `.gitignore` `.htaccess` `.user.ini` `init.php`                                        |
+| `.env` `.env.example` `.gitignore` `.htaccess` `.user.ini` `init.php`                         |
 
 ```
 use Tamedevelopers\Database\AutoLoader;
@@ -158,29 +145,30 @@ AutoLoader::start();
 
 - or -- `Helpers Function`
 ```
-autoloader_start('optional_path_to_root');
+autoloader_start();
 ```
 
 ## Init.php File
-- This will extends the `composer autoload` and other setup
+- [optional] This will extends the `composer autoload` and other setup
 
 |  Description                                                                                  | 
 |-----------------------------------------------------------------------------------------------|
-| After you hav `AutoLoader::start` your application! you can choose to include the init.php    | 
-| Everywhere in your project, instead of the `vendor/autoload.php` file.                        |
-| This is totally optional.  |
+| Once application is started! You can choose to include the `init.php`                         | 
+| The file includes all configuration needed and as well extends the `vendor/autoload.php` path.|
+
 
 ## BootLoader
-- If you do not want to include or use the `Init.php` file
+- If you do not want to include or use the `init.php` file
     - All you need do is call the bootloader, to start your application.
 
 ```
 use Tamedevelopers\Database\Capsule\AppManager;
 
 AppManager::bootLoader();
+```
 
-or
-
+- or -- `Helpers Function`
+```
 app_manager()->bootLoader();
 ```
 
