@@ -33,7 +33,7 @@ if (! function_exists('db')) {
      * 
      * @return \Tamedevelopers\Database\Connectors\Connector
      */
-    function db(?string $key = 'default')
+    function db(?string $key = 'mysql')
     {
         return DB::connection($key);
     }

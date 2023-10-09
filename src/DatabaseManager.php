@@ -6,6 +6,7 @@ namespace Tamedevelopers\Database;
 
 use Tamedevelopers\Support\Capsule\FileCache;
 use Tamedevelopers\Database\Connectors\Connector;
+use Tamedevelopers\Support\Server;
 
 class DatabaseManager extends DatabaseConnector {
 
@@ -29,22 +30,24 @@ class DatabaseManager extends DatabaseConnector {
      * 
      * @return $this
      */
-    public static function connection($name = null, ?array $default = [])
+    public static function connection($name = null, $default = [])
     {
         $config = self::driverValidator($name);
         if (!FileCache::has($config['key'])) {
             // create data
-            $data = self::getDriverData(
+            $connectionData = self::getDriverData(
                 config("database.connections.{$config['name']}")
             );
 
             // merge data
-            $mergeData = array_merge($data ?? [], $default ?? []);
+            $mergeData = array_merge($connectionData, $default);
             
             // Cache the connection
             FileCache::put(
                 $config['key'], 
-                self::createDriverData($mergeData)
+                self::createDriverData(
+                    $mergeData
+                )
             );
         }
 
@@ -77,7 +80,7 @@ class DatabaseManager extends DatabaseConnector {
      */
     public static function disconnect($name = null)
     {
-        $name = empty($name) ? 'default' : $name;
+        $name = empty($name) ? self::getDriverName() : $name;
         $key  = self::getCacheKey($name);
         if (FileCache::has($key)) {
             FileCache::forget($key);
@@ -89,12 +92,12 @@ class DatabaseManager extends DatabaseConnector {
      *
      * @param string|null $name
      * 
-     * * @param mixed $default 
+     * * @param array|null $default 
      * [optional] The default value to return if the configuration option is not found
      * 
      * @return object
      */
-    public static function reconnect($name = null, mixed $default = null)
+    public static function reconnect($name = null, $default = null)
     {
         return self::connection($name, $default);
     }

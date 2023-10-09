@@ -13,15 +13,16 @@ class DatabaseConnector{
 
     /**
      * Find Database Connection data
-     * @param mixed $data
+     * @param array|null $data
      * @return array
      */
     protected static function getDriverData($data = null)
     {
         if(!is_array($data)){
-            $default = config("database.default");
+            $default = self::getDriverName();
             return config(
-                "database.connections.{$default}"
+                "database.connections.{$default}",
+                []
             );
         }
 
@@ -35,11 +36,16 @@ class DatabaseConnector{
      */
     protected static function getDriverName($name = null)
     {
+        if(empty($name)){
+            return config("database.default");
+        }
+
         // try to get driver config data
-        $config = config(
-            "database.connections.{$name}"
-        );
-        return empty($config) ? 'default' : $name;
+        $database = config("database.connections.{$name}");
+
+        return empty($database) 
+                ? config("database.default") 
+                : $name;
     }
 
     /**

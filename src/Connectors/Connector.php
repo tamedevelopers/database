@@ -154,19 +154,24 @@ class Connector {
     /**
      * Get Connection data
      * 
-     * @return array
+     * @param string|null $mode
+     * 
+     * @return mixed
      */
-    public function dbConnection()
+    public function dbConnection($mode = null)
     {
         // get connection data
         $conn = DatabaseManager::getConnection($this->name);
         
         // connection data
-        $conn = self::createConnector($conn['driver'])->connect($conn);
+        $connData = self::createConnector($conn['driver'])->connect($conn);
 
-        return array_merge($conn, [
+        // merge data
+        $data = array_merge($connData ?? [], [
             'name' => $this->name,
         ]);
+
+        return $data[$mode] ?? $data;
     }
 
     /**
@@ -177,7 +182,7 @@ class Connector {
      */
     public function getPDO()
     {
-        return $this->dbConnection($this->name)['pdo'];
+        return $this->dbConnection('pdo');
     }
 
     /**
@@ -250,7 +255,9 @@ class Connector {
      */
     private function setConnectionName($name = null)
     {
-        $this->name = empty($name) ? 'default' : $name;
+        $this->name = empty($name) 
+                    ? config("database.default") 
+                    : $name;
     }
 
     /**
