@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database\Connectors;
 
 use PDO;
+use Exception;
+use Tamedevelopers\Support\Server;
 use Tamedevelopers\Database\Schema\Builder;
 use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\DatabaseManager;
@@ -26,22 +28,76 @@ class Connector {
     private $connection;
 
     /**
+     * @var array|null
+     */
+    private $default;
+
+    /**
      * @var string|null
      */
     private $name;
 
+    /**
+     * Save instances of all connection
+     * @var mixed
+     */
+    private static $connections = [];
     
     /**
      * Constructors
      * 
-     * @param string|null $name\Database connection name
-     * @param mixed $connection \Connection instance
-     * 
+     * @param string|null $name - Driver name
+     * @param mixed $connection - Connection instance
+     * @param array $data - Default data
      */
-    public function __construct($name = null, mixed $connection = null)
+    public function __construct($name = null, $connection = null, $data = [])
     {
         $this->setConnectionName($name);
         $this->setConnection($connection);
+        $this->setDefaultData($data);
+    }
+
+    /**
+     * Add to connection instance
+     * 
+     * @param string|null $name - Driver name
+     * @param mixed $connection - Connection instance
+     * @param array $data - Default data
+     * 
+     * @return \Tamedevelopers\Database\Connectors\Connector
+     */
+    static public function addConnection($name = null, $connection = null, $data = [])
+    {
+        $driver = DatabaseManager::driverValidator($name);
+
+        // driver name
+        $driverName = $driver['name'];
+
+        // connector object
+        self::$connections[$driverName] = new self(
+            connection: $connection,
+            name: $driverName,
+            data: $data,
+        );
+
+        return self::$connections[$driverName];
+    }
+
+    /**
+     * Remove from connection instance
+     * 
+     * @param string|null $name - Driver name
+     * 
+     * @return void
+     */
+    static public function removeFromConnection($name = null)
+    {
+        $driver = DatabaseManager::driverValidator($name);
+
+        // driver name
+        $driverName = $driver['name'];
+
+        unset(self::$connections[$driverName]);
     }
 
     /**
@@ -96,8 +152,8 @@ class Connector {
 
         // Only if the Global Constant is not yet defined
         // If set to allow global use of ENV Autoloader Settings
-        if(defined('PAGINATION_CONFIG') && Manager::isEnvBool(PAGINATION_CONFIG['allow']) === true){
-            $paginator->configPagination(PAGINATION_CONFIG);
+        if(defined('TAME_PAGI_CONFIG') && Manager::isEnvBool(TAME_PAGI_CONFIG['allow']) === true){
+            $paginator->configPagination(TAME_PAGI_CONFIG);
         } else{
             $paginator->configPagination($options);
         }
@@ -111,18 +167,24 @@ class Connector {
      */
     private function buidTable($table = null)
     {
+        // begin build
         $builder = new Builder;
         $builder->manager = new Manager;
         $builder->dbManager = new DatabaseManager;
 
-        // create instance of self
-        $instance = new self(
-            $this->name,
-            $this->dbConnection(),
-        );
+        // get saved connection from $connections array
+        $instance = self::$connections[$this->name] ?? null;
+
+        // There's no connecton instance set
+        if(empty($instance)){
+            throw new Exception("There's no active connection! Unknown connection [{$this->name}].");
+        }
+
+        // set connection
+        $instance->connection = $this->dbConnection();
 
         // setup table name
-        $builder->from = $this->compileTableWithPrefix($table, $this->getConfig());
+        $builder->from = $table;
 
         // building of table name is only called once
         // so we will build the instance of Connection data into the
@@ -161,8 +223,9 @@ class Connector {
     public function dbConnection($mode = null)
     {
         // get connection data
-        $conn = DatabaseManager::getConnection($this->name);
-        
+        // merge data to default if provided, before we try to connect
+        $conn = self::getConnectionFromDatabaseFile($this->name, $this->default);
+
         // connection data
         $connData = self::createConnector($conn['driver'])->connect($conn);
 
@@ -202,25 +265,25 @@ class Connector {
      */
     public function getConfig()
     {
-        return DatabaseManager::getConnection($this->name);
+        return self::getConnectionFromDatabaseFile($this->name, $this->default);
     }
 
     /**
-     * Get Table Name
-     * @param string $table
-     * @param array $data
-     * @return string
+     * Get Connection data
+     * 
+     * @param string|null $name
+     * @param array|null $default
+     * 
+     * @return array
      */
-    private static function compileTableWithPrefix($table = null, ?array $data = null)
+    private static function getConnectionFromDatabaseFile($name = null, $default = [])
     {
-        // check prefixes
-        if(isset($data['prefix_indexes']) && $data['prefix_indexes']){
-            if(isset($data['prefix'])){
-                $table = "{$data['prefix']}{$table}";
-            }
-        }
+        $data = Server::config(
+            DatabaseManager::getConnectionKey($name), 
+            []
+        );
 
-        return $table;
+        return array_merge($data, $default ?? []);
     }
 
     /**
@@ -248,6 +311,19 @@ class Connector {
     }
 
     /**
+     * Set default connection data
+     *
+     * @param array $default
+     * @return void
+     */
+    private function setDefaultData($default = [])
+    {
+        if(!empty($default)){
+            $this->default = $default;
+        }
+    }
+
+    /**
      * Set connection connection name
      *
      * @param string|null $name
@@ -256,7 +332,7 @@ class Connector {
     private function setConnectionName($name = null)
     {
         $this->name = empty($name) 
-                    ? config("database.default") 
+                    ? Server::config("database.default") 
                     : $name;
     }
 
@@ -270,7 +346,7 @@ class Connector {
     {
         if(self::isModelExtended()){
             $this->setConnectionName();
-            $key = DatabaseManager::getCacheKey($this->name);
+            $key = DatabaseManager::getConnectionKey($this->name);
             if (!FileCache::exists($key)) {
                 DatabaseManager::connection($this->name);
             }

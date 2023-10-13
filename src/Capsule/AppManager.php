@@ -9,7 +9,7 @@ use Tamedevelopers\Support\Env;
 use Tamedevelopers\Database\AutoLoader;
 use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Support\Capsule\FileCache;
-use Tamedevelopers\Database\Capsule\DebugManager;
+use Tamedevelopers\Support\Capsule\DebugManager;
 
 class AppManager{
 
@@ -63,14 +63,6 @@ class AppManager{
         |--------------------------------------------------------------------------
         */
         AutoLoader::start();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Default connection driver is `mysql`
-        | use DB::connection() \to connection to other connection instance
-        |--------------------------------------------------------------------------
-        */
-        DB::connection();
     }
 
 }

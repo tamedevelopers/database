@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database\Connectors;
 
 use PDO;
+use Exception;
 use PDOException;
-use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Str;
+use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Database\Schema\Builder;
 use Tamedevelopers\Database\Connectors\ConnectorInterface;
 use Tamedevelopers\Database\Connectors\Traits\ConnectorTrait;
@@ -38,6 +39,7 @@ class SQLiteConnector
     public function connect(array $config)
     {
         // 
+        throw new Exception("Driver cannot be used at the moment! Unsupported driver [{$config['driver']}].");
     }
 
     

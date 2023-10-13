@@ -18,11 +18,11 @@ use Tamedevelopers\Database\Schema\Traits\ExpressionTrait;
 use Tamedevelopers\Database\Schema\Traits\MySqlProperties;
 
 /**
- * @property $manager \Tamedevelopers\Database\Capsule\Manager
+ * @property $manager \Tamedevelopers\Support\Capsule\Manager
  * @property $dbManager \Tamedevelopers\Database\DatabaseManager
  * 
  * @see \Tamedevelopers\Database\Schema\Traits\MySqlProperties
- * @see \Tamedevelopers\Database\Capsule\Manager
+ * @see \Tamedevelopers\Support\Capsule\Manager
  * @see \Tamedevelopers\Database\DatabaseManager
 */
 class Builder  {

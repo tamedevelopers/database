@@ -27,15 +27,17 @@ if (! function_exists('db')) {
     /**
      * Get Database 
      * 
-     * @param string $key
-     * - key of already defined connections
-     * [dir]/config/database.php
+     * @param string|null $name
+     * - [name] of connections in [config/database.php] file
+     * 
+     * @param array $default 
+     * [optional] The default value to return if the configuration option is not found
      * 
      * @return \Tamedevelopers\Database\Connectors\Connector
      */
-    function db(?string $key = 'mysql')
+    function db($name = null, $default = [])
     {
-        return DB::connection($key);
+        return DB::connection($name, $default);
     }
 }
 

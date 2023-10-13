@@ -111,8 +111,8 @@ class AutoLoader{
         | Adding Pagination Configuration into Constant
         |--------------------------------------------------------------------------
         */
-        if ( ! defined('PAGINATION_CONFIG') ) {
-            define('PAGINATION_CONFIG', $default);
+        if ( ! defined('TAME_PAGI_CONFIG') ) {
+            define('TAME_PAGI_CONFIG', $default);
         }
     }
 

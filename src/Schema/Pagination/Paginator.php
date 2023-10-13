@@ -87,8 +87,8 @@ class Paginator extends Builder{
     public function configPagination(?array $options = [])
     {
         // trying to us global AutoLoader::configPagination data
-        if(defined('PAGINATION_CONFIG') && is_bool(PAGINATION_CONFIG['allow']) && PAGINATION_CONFIG['allow'] === true){
-            $this->pagination_settings = PAGINATION_CONFIG;
+        if(defined('TAME_PAGI_CONFIG') && is_bool(TAME_PAGI_CONFIG['allow']) && TAME_PAGI_CONFIG['allow'] === true){
+            $this->pagination_settings = TAME_PAGI_CONFIG;
         }else{
             // create a default data
             $this->pagination_settings = array_merge([

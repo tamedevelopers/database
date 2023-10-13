@@ -1,6 +1,8 @@
 <?php
 
+use Tamedevelopers\Database\DB;
 use Tamedevelopers\Database\Capsule\AppManager;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -28,12 +30,12 @@ AppManager::bootLoader();
 
 /*
 |--------------------------------------------------------------------------
-| Default connection type is `mysql`
-| So you can use the $db | db()
-| in your application
+| Default connection driver is `mysql`
+| use DB::connection() \to connection to other connection instance
+| or using Helper function | db()
 |--------------------------------------------------------------------------
 */
-$db = db();
+$db = DB::connection();
 
 
 /*

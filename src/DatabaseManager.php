@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database;
 
-use Tamedevelopers\Support\Capsule\FileCache;
 use Tamedevelopers\Database\Connectors\Connector;
-use Tamedevelopers\Support\Server;
+
 
 class DatabaseManager extends DatabaseConnector {
 
-
     /**
-     * Database Storage Cache Key
+     * Database Storage Key
      * This allow us ability to store multiple connections on each instance
      * @var string
      */
-    const CONNECTION_CACHE = "database.connections.";
-    
+    const CONNECTION_KEY = "database.connections.";
 
     /**
      * Connect to a Database 
@@ -28,48 +25,53 @@ class DatabaseManager extends DatabaseConnector {
      * @param array $default 
      * [optional] The default value to return if the configuration option is not found
      * 
-     * @return $this
+     * @return \Tamedevelopers\Database\Connectors\Connector
      */
     public static function connection($name = null, $default = [])
     {
-        $config = self::driverValidator($name);
-        if (!FileCache::has($config['key'])) {
-            // create data
-            $connectionData = self::getDriverData(
-                config("database.connections.{$config['name']}")
-            );
-
-            // merge data
-            $mergeData = array_merge($connectionData, $default);
-            
-            // Cache the connection
-            FileCache::put(
-                $config['key'], 
-                self::createDriverData(
-                    $mergeData
-                )
-            );
-        }
-
-        return new Connector($config['name']);
+        [$name, $default] = self::prepareValues(
+            $name, $default, func_num_args() === 2
+        );
+        
+        // connector object
+        return Connector::addConnection(
+            name: $name,
+            data: $default,
+        );
     }
 
     /**
-     * Get Connection data
-     * 
-     * @param string|null $name
-     * - [name] of connections\Default name is `default`
-     * 
-     * @return mixed
+     * Prepare Values
+     *
+     * @param  string|null $name
+     * @param  array $default
+     * @param  bool $useDefault
+     * @return void
      */
-    public static function getConnection($name = null)
+    private static function prepareValues($name = null, $default = [], $useDefault)
     {
-        $key = self::getCacheKey($name);
-        if (FileCache::has($key)) {
-            return FileCache::get($key);
+        // when only one data is passed 
+        // now we just check if data is an array
+        if(!$useDefault && is_array($name)){
+            return [null, $name];
         }
 
-        return [];
+        return [$name, $default];
+    }
+
+    /**
+     * Reconnect to a database.
+     *
+     * @param string|null $name
+     * 
+     * * @param array $default 
+     * [optional] The default value to return if the configuration option is not found
+     * 
+     * @return \Tamedevelopers\Database\Connectors\Connector
+     */
+    public static function reconnect($name = null, $default = [])
+    {
+        return self::connection($name, $default);
     }
 
     /**
@@ -80,37 +82,18 @@ class DatabaseManager extends DatabaseConnector {
      */
     public static function disconnect($name = null)
     {
-        $name = empty($name) ? self::getDriverName() : $name;
-        $key  = self::getCacheKey($name);
-        if (FileCache::has($key)) {
-            FileCache::forget($key);
-        }
+        Connector::removeFromConnection($name);
     }
 
     /**
-     * Reconnect to a database.
-     *
-     * @param string|null $name
-     * 
-     * * @param array|null $default 
-     * [optional] The default value to return if the configuration option is not found
-     * 
-     * @return object
-     */
-    public static function reconnect($name = null, $default = null)
-    {
-        return self::connection($name, $default);
-    }
-
-    /**
-     * get Cache Key name
+     * Get Connection Key
      *
      * @param string $name
      * @return string
      */
-    public static function getCacheKey($name = null)
+    public static function getConnectionKey($name = null)
     {
-        return self::CONNECTION_CACHE . $name;
+        return self::CONNECTION_KEY . $name;
     }
 
     /**
@@ -119,12 +102,12 @@ class DatabaseManager extends DatabaseConnector {
      * @param string|null $name
      * @return array
      */
-    private static function driverValidator($name = null)
+    public static function driverValidator($name = null)
     {
         $name = self::getDriverName($name);
         return [
             'name'  => $name,
-            'key'   => self::getCacheKey($name),
+            'key'   => self::getConnectionKey($name),
         ];
     }
     

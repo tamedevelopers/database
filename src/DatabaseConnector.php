@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database;
 
 use Tamedevelopers\Support\Str;
+use Tamedevelopers\Support\Server;
 
 /**
  * @property-read mixed $table
@@ -20,7 +21,7 @@ class DatabaseConnector{
     {
         if(!is_array($data)){
             $default = self::getDriverName();
-            return config(
+            return Server::config(
                 "database.connections.{$default}",
                 []
             );
@@ -37,14 +38,14 @@ class DatabaseConnector{
     protected static function getDriverName($name = null)
     {
         if(empty($name)){
-            return config("database.default");
+            return Server::config("database.default");
         }
 
         // try to get driver config data
-        $database = config("database.connections.{$name}");
+        $database = Server::config("database.connections.{$name}");
 
         return empty($database) 
-                ? config("database.default") 
+                ? Server::config("database.default") 
                 : $name;
     }
 

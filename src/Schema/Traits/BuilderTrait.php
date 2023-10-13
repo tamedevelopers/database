@@ -13,7 +13,7 @@ use Tamedevelopers\Support\Capsule\Forge;
 use Tamedevelopers\Database\Schema\Builder;
 use Tamedevelopers\Database\Schema\Expression;
 use Tamedevelopers\Database\Schema\JoinClause;
-use Tamedevelopers\Database\Capsule\DebugManager;
+use Tamedevelopers\Support\Capsule\DebugManager;
 use Tamedevelopers\Database\Collections\Collection;
 use Tamedevelopers\Database\Schema\BuilderCompiler;
 use Tamedevelopers\Database\Schema\Pagination\Paginator;

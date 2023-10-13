@@ -69,7 +69,21 @@ class ConnectionBuilder
             $this->pdo      = $connection['pdo'] ?? $connection['message'];
             $this->config   = array_merge($connection['config'], ['name' => $name]);
             $this->database = $this->config['database'];
-            $this->tablePrefix = $this->config['prefix'];
+            $this->tablePrefix = $this->getTablePrefixIfAllowed();
+        }
+    }
+
+    /**
+     * Get Table Prefix
+     * @return string|null
+     */
+    private function getTablePrefixIfAllowed()
+    {
+        // if prefixes is set and is `true`
+        if(isset($this->config['prefix_indexes']) && $this->config['prefix_indexes']){
+            if(isset($this->config['prefix'])){
+                return $this->config['prefix'];
+            }
         }
     }
 

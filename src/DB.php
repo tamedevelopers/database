@@ -22,7 +22,6 @@ use Tamedevelopers\Database\Schema\Traits\ExpressionTrait;
  * @method static \Tamedevelopers\Database\Connectors\Connector reconnect(string|null $name = null)
  * @method static \Tamedevelopers\Database\DatabaseManager disconnect(string|null $name = null)
  * @method static string getDefaultConnection()
- * @method static array  getConnection(string|null $name)
  * @method static \Tamedevelopers\Database\Schema\Builder table(string $table)
  * @method static \Tamedevelopers\Database\Schema\Builder from(string $table)
  * @method static \Tamedevelopers\Database\Schema\Builder query()

@@ -22,7 +22,7 @@ trait MySqlProperties{
     public $dbManager;
 
     /**
-     * @var \Tamedevelopers\Database\Capsule\Manager
+     * @var \Tamedevelopers\Support\Capsule\Manager
      */
     public $manager;
 

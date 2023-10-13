@@ -2,11 +2,10 @@
 
 use Tamedevelopers\Database\Model;
 
-class User extends Model{
+class Admin extends Model{
     
     // this model table name will become `users`
     // you can dump to always see table name
-    // protected $table = 'users';
     
     public function getUsers()
     {
