@@ -41,7 +41,7 @@ class Blueprint{
      * Creating Table Structure
      * Indexs|Primary|Constraints 
      * 
-     * @return array\MySQLTemplate
+     * @return array
      */
     private function MySQLTemplate()
     {
@@ -62,7 +62,7 @@ class Blueprint{
     /**
      * Creating Database Table
      * 
-     * @return array\handle
+     * @return array
      */
     public function handle() 
     {

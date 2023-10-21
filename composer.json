@@ -28,11 +28,6 @@
         },
         "classmap": ["src/*"]
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Tamedevelopers\\Database\\Tests\\": "tests/"
-        }
-    },
     "minimum-stability": "stable",
     "prefer-stable": true
 }

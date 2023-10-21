@@ -15,7 +15,7 @@ trait FilePathTrait{
      * Get Traceable File name
      * @param string|null $name 
      * 
-     * @return string|null\traceable
+     * @return string|null
      */
     public function traceableTableFileName($table = null)
     {

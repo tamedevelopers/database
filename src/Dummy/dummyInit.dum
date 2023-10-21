@@ -85,4 +85,4 @@ $db->configPagination([
 | expire old cache whenever a change has been made to the file
 |--------------------------------------------------------------------------
 */
-asset_config('/', true);
+config_asset('/', true);

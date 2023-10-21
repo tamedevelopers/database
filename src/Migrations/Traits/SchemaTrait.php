@@ -43,13 +43,12 @@ trait SchemaTrait{
     /**
      * Creating column
      * @param string $name 
-     * @param int $length 
      * 
      * @return $this
      */
-    public function tinyInteger($name, ?int $length = 4)
+    public function unsignedInteger($name)
     {
-        return $this->addColumn($name, 'tinyInteger', compact('length'));
+        return $this->addColumn($name, 'unsignedInteger');
     }
 
     /**
@@ -72,6 +71,54 @@ trait SchemaTrait{
     public function unsignedBigInteger($name)
     {
         return $this->addColumn($name, 'unsignedBigInteger');
+    }
+
+    /**
+     * Creating column
+     * @param string $name 
+     * @param int $length 
+     * 
+     * @return $this
+     */
+    public function tinyInteger($name, ?int $length = 4)
+    {
+        return $this->addColumn($name, 'tinyInteger', compact('length'));
+    }
+
+    /**
+     * Creating column
+     * @param string $name 
+     * @param int $length
+     * 
+     * @return $this
+     */
+    public function unsignedTinyInteger($name, ?int $length = 4)
+    {
+        return $this->addColumn($name, 'unsignedTinyInteger', compact('length'));
+    }
+
+    /**
+     * Creating column
+     * @param string $name 
+     * @param int $length
+     * 
+     * @return $this
+     */
+    public function unsignedSmallInteger($name, ?int $length = 4)
+    {
+        return $this->addColumn($name, 'unsignedSmallInteger', compact('length'));
+    }
+
+    /**
+     * Creating column
+     * @param string $name 
+     * @param int $length
+     * 
+     * @return $this
+     */
+    public function unsignedMediumInteger($name, ?int $length = 4)
+    {
+        return $this->addColumn($name, 'unsignedMediumInteger', compact('length'));
     }
 
     /**
@@ -98,6 +145,19 @@ trait SchemaTrait{
     public function decimal($name, $total = 8, $places = 2)
     {
         return $this->addColumn($name, 'decimal', ['total' => $total, 'places' => $places]);
+    }
+
+    /**
+     * Creating a column
+     * @param string $name 
+     * @param int $total
+     * @param int $places
+     * 
+     * @return $this
+     */
+    public function unsignedDecimal($name, $total = 8, $places = 2)
+    {
+        return $this->addColumn($name, 'unsignedDecimal', ['total' => $total, 'places' => $places]);
     }
 
     /**
@@ -131,7 +191,7 @@ trait SchemaTrait{
      * @param string $name 
      * @param int $length
      * 
-     * @return object\char
+     * @return $this
      */
     public function char($name, $length = 255)
     {
@@ -333,7 +393,7 @@ trait SchemaTrait{
      *
      * @param string $name
      *
-     * @return \Illuminate\Database\Schema\ColumnDefinition
+     * @return $this
      */
     public function macAddress($name)
     {
