@@ -73,13 +73,16 @@ if (! function_exists('import')) {
      * Database Importation
      * 
      * @param string $path_to_sql
+     * @param string|null $connection
      * 
      * @return object
      * [status, message]
      */
-    function import($path_to_sql = null)
+    function import($path_to_sql, $connection = null)
     {
-        return (new DBImport)->import($path_to_sql);
+        $import = new DBImport($connection);
+
+        return $import->import($path_to_sql);
     }
 }
 

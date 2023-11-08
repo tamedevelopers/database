@@ -42,13 +42,17 @@ class DBImport{
      */
     private $db;
 
-    
+       
     /**
      * Construct Instance of Database
+     *
+     * @param  string|null $connection
+     * @return void
      */
-    public function __construct() {
+    public function __construct($connection = null) 
+    {
         $this->error = Constant::STATUS_404;
-        $this->db = DB::connection()->dbConnection();
+        $this->db = DB::connection($connection)->dbConnection();
     }
 
     /**
@@ -58,7 +62,7 @@ class DBImport{
      * @return object
      * [status, message]
      */
-    public function import($path_to_sql = NULL)
+    public function import($path_to_sql)
     {
         $this->realpath = Server::formatWithBaseDirectory($path_to_sql);
         

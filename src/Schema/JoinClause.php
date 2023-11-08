@@ -23,7 +23,7 @@ class JoinClause extends Builder
     /**
      * The connection of the parent query builder.
      *
-     * @var \Tamedevelopers\Database\Schema\Builder\connection
+     * @var \Tamedevelopers\Database\Schema\Builder\connection|mixed
      */
     protected $parentConnection;
 
