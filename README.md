@@ -3,7 +3,6 @@
 [![Total Downloads](https://poser.pugx.org/tamedevelopers/database/downloads)](https://packagist.org/packages/tamedevelopers/database)
 [![Latest Stable Version](https://poser.pugx.org/tamedevelopers/database/version.png)](https://packagist.org/packages/tamedevelopers/database)
 [![License](https://poser.pugx.org/tamedevelopers/database/license)](https://packagist.org/packages/tamedevelopers/database)
-[![Build Status](https://github.com/tamedevelopers/database/actions/workflows/php.yml/badge.svg)](https://github.com/tamedevelopers/database/actions)
 [![Code Coverage](https://codecov.io/gh/tamedevelopers/database/branch/2.2.x/graph/badge.svg)](https://codecov.io/gh/tamedevelopers/database/branch/2.2.x)
 [![Gitter](https://badges.gitter.im/tamedevelopers/database.svg)](https://app.element.io/#/room/#php-orm-database:gitter.im)
 
