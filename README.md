@@ -1006,12 +1006,12 @@ Migration runned successfully on `2023_04_19_1681860618_user_wallet`
 <details><summary>Read more...</summary>
 
 - Be careful as this will execute and drop all files table `located in the migration`
-
+- [optional param] `bool` to force delete of tables
 ```
 Migration::drop();
 
 or
-migration()->drop();
+migration()->drop(true);
 ```
 </details>
 
@@ -1019,14 +1019,12 @@ migration()->drop();
 <details><summary>Read more...</summary>
 
 - Takes one param as `string` $table_name
-
 ```
 use Tamedevelopers\Database\Migrations\Schema;
 
 Schema::dropTable('table_name');
 
 or 
-
 schema()->dropTable('table_name');
 ```
 </details>
@@ -1042,7 +1040,6 @@ use Tamedevelopers\Database\Migrations\Schema;
 Schema::dropColumn('table_name', 'column_name');
 
 or 
-
 schema()->dropColumn('table_name', 'column_name');
 ```
 </details>

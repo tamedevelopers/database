@@ -27,7 +27,6 @@ trait ConnectorTrait{
             default  => throw new Exception("Unsupported driver [{$driver}]."),
         };
     }
-   
 
     /**
      * Check if Model Class is in use
@@ -46,19 +45,16 @@ trait ConnectorTrait{
     }
 
     /**
-     * Convert Model Class to table camel case
+     * Convert Model Class to table tabelPluralization name
      * 
      * @return string|null
      */
-    protected static function tabelCamelCase()
+    protected static function tabelPluralization()
     {
         // check if child class is instance of Tamedevelopers\Database\Model
         if(self::isModelExtended()){
-            // Convert camel case to snake case
-            $snakeCase = Str::snakeCase(get_called_class());
-
             return Str::pluralize(
-                strtolower($snakeCase)
+                Str::snake(get_called_class())
             );
         }
     }

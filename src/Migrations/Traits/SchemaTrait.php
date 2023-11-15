@@ -453,11 +453,11 @@ trait SchemaTrait{
     {
         return $this->addColumn('created_at', 'timestamps', [
                         'nullable'  => true,
-                        'index'     => $this->generix_name('created_at_index')
+                        'index'     => $this->genericIdentifier('created_at_index')
                     ])
                     ->addColumn('updated_at', 'timestamps', [
                         'nullable'  => true,
-                        'index'     => $this->generix_name('updated_at_index')
+                        'index'     => $this->genericIdentifier('updated_at_index')
                     ]);
     }
 

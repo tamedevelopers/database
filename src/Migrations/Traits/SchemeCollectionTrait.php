@@ -81,7 +81,7 @@ trait SchemaCollectionTrait{
      */
     public function index($name = null)
     {
-        $this->columns[count($this->columns) - 1]['index'] = $this->generix_name($name);
+        $this->columns[count($this->columns) - 1]['index'] = $this->genericIdentifier($name);
 
         return $this;
     }
@@ -94,7 +94,7 @@ trait SchemaCollectionTrait{
      */
     public function unique($name = null)
     {
-        $this->columns[count($this->columns) - 1]['unique'] = $this->generix_name($name);
+        $this->columns[count($this->columns) - 1]['unique'] = $this->genericIdentifier($name);
         
         return $this;
     }
@@ -132,40 +132,49 @@ trait SchemaCollectionTrait{
      * @param string $column
      * - [optional] Default is `id`
      * 
+     * @param string|null $indexName
+     * 
      * @return $this
      */
-    public function constrained($table = null, $column = 'id')
+    public function constrained($table = null, $column = 'id', $indexName = null)
     {
         // we try to use defined table name, if no name is given to the method
-        $tableName = explode('_', $this->tableName);
+        if(empty($table)){
+            $table = explode('_', $this->tableName)[0] ?? '';
+        }
         
-        return $this->references($column)->on($table ?? $tableName[0] ?? '');
+        return $this->references($column, $indexName)->on($table);
     }
 
     /**
      * Creating Constraints Property
-     * @param string $referencedColumn 
+     * 
+     * @param string $columns 
      * <code> - Parent Table References Column name </code>
+     * 
+     * @param string|null $indexName
      * 
      * @return $this
      */
-    public function references($referencedColumn)
+    public function references($columns, $indexName = null)
     {
-        $this->columns[count($this->columns) - 1]['references'] = $referencedColumn;
-        $this->columns[count($this->columns) - 1]['generix'] = $this->generix_name($referencedColumn);
+        $this->columns[count($this->columns) - 1]['references'] = $columns;
+        $this->columns[count($this->columns) - 1]['generix'] = $this->genericIdentifier($indexName ?? $columns);
+
         return $this;
     }
 
     /**
      * Creating Constraints Property
-     * @param string $referencedTable 
+     * 
+     * @param string $table 
      * - Table name you're referencing to
      * 
      * @return $this
      */
-    public function on($referencedTable)
+    public function on($table)
     {
-        $this->columns[count($this->columns) - 1]['on'] = $referencedTable;
+        $this->columns[count($this->columns) - 1]['on'] = $table;
         return $this;
     }
 

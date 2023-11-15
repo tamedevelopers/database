@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database\Migrations\Traits;
 
 use Tamedevelopers\Support\Env;
+use Tamedevelopers\Support\Str;
 
 /**
  * 
@@ -27,7 +28,7 @@ trait MigrationTrait{
     private static function runMigration($table_name, $type = null) 
     {
         // table name
-        $case_table = self::toSnakeCase($table_name);
+        $case_table = Str::snake($table_name);
 
         // Date convert
         $fileName = sprintf( "%s_%s_%s", date('Y_m_d'), substr((string) time(), 4), "{$case_table}.php" );
@@ -153,26 +154,6 @@ trait MigrationTrait{
         self::$database     .= "database/";
         self::$migrations   = self::$database . "migrations/";
         self::$seeders      = self::$database . "seeders/";
-    }
-    
-    /**
-     * drop database column
-     * @param string $input
-     *
-     * @return string 
-     * - String toSnakeCase
-     */
-    private static function toSnakeCase($input)
-    {
-        $output = preg_replace_callback(
-            '/[A-Z]/',
-            function ($match) {
-                return '_' . strtolower($match[0]);
-            },
-            $input
-        );
-
-        return ltrim($output, '_');
     }
 
     /**

@@ -78,7 +78,7 @@ abstract class Model extends DB{
         // and convert model class name to table name
         // using pluralization method
         if(empty($table)){
-            $table = self::tabelCamelCase();
+            $table = self::tabelPluralization();
         }
         
         return (new Connector)->table($table);

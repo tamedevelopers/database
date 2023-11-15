@@ -48,7 +48,7 @@ class DatabaseManager extends DatabaseConnector {
      * @param  bool $useDefault
      * @return void
      */
-    private static function prepareValues($name = null, $default = [], $useDefault)
+    private static function prepareValues($name = null, $default = [], $useDefault = false)
     {
         // when only one data is passed 
         // now we just check if data is an array

@@ -376,7 +376,7 @@ trait SchemaConfigurationTrait{
      * 
      * @return string
      */
-    protected function generix_name($name = null)
+    protected function genericIdentifier($name = null)
     {
         $column = $this->columns[count($this->columns) - 1];
         $unique = (new Exception)->getTrace()[1]['function'] ?? '__';
@@ -384,11 +384,11 @@ trait SchemaConfigurationTrait{
         // for foreign keys
         if($column['type'] == 'foreign'){
             $name = "{$this->tableName}_{$column['name']}_{$column['type']}";
-        }else{
+        } else{
             // create unique name
-            if(is_null($name)){
+            if(empty($name)){
                 $name = "{$this->tableName}_{$column['name']}_{$unique}";
-            }else{
+            } else{
                 $name = "{$this->tableName}_{$name}";
             }
         }
