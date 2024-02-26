@@ -95,8 +95,11 @@ class MysqlConnector implements ConnectorInterface{
 
         $columnName = 'id';
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $column) {
-            if ($column['Key'] === 'PRI') {
-                $columnName = $column['Field'];
+            // convert key case
+            $column = Str::convertArrayCase($column);
+
+            if ($column['key'] ?? null === 'PRI') {
+                $columnName = $column['field'] ?? null;
                 break;
             }
         }

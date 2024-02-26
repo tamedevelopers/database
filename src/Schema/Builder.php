@@ -1321,6 +1321,10 @@ class Builder  {
      */
     public function toSql()
     {
+        if(!empty($this->query)){
+            return $this->query;
+        }
+        
         $this->applyBeforeQueryCallbacks();
 
         return $this->compile()->compileSelect($this);
