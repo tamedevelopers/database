@@ -181,8 +181,6 @@ class PaginationLoader
      */
     public function createUrl($page, $perPage = null)
     {
-        $requestUri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-
         // Add or reset page parameter
         $params[$this->pageParam] = (int) $page;
 
@@ -194,8 +192,16 @@ class PaginationLoader
         // Verify $this->params
         $this->params = is_array($this->params) ? $this->params : [];
 
+        // request url
+        $requestUri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+
+        // merge main params
+        $mainParams = array_merge($params, $this->params);
+        
         // Build URL
-        $url = "//{$_SERVER['HTTP_HOST']}{$requestUri}?" . http_build_query(array_merge($params, $this->params));
+        $url = "//{$_SERVER['HTTP_HOST']}{$requestUri}?" . http_build_query(
+            array_merge($this->getDefaultURLParams($mainParams), $mainParams)
+        );
         
         return $url;
     }
@@ -247,6 +253,33 @@ class PaginationLoader
         $this->perPage      = (int) $this->perPage;
         $this->pageCount    = (int) $this->pageCount;
         $this->totalCount   = (int) $this->totalCount;
+    }
+    
+    /**
+     * Get Default Url Params
+     *
+     * @param  mixed $mainParams
+     * @return array
+     */
+    private function getDefaultURLParams($mainParams = [])
+    {
+        // get Query
+        $REQUEST_URI = parse_url($_SERVER["REQUEST_URI"]);
+
+        // get request query
+        $REQUEST_URI = isset($REQUEST_URI['query']) ? $REQUEST_URI['query'] : "";
+
+        // Parse the query string into an associative array
+        parse_str($REQUEST_URI, $query_params);
+
+        // remove keys assisnged to pagination
+        foreach($query_params as $key => $param){
+            if(in_array($key, array_keys($mainParams))){
+                unset($query_params[$key]);
+            }
+        }
+
+        return is_array($query_params) ? $query_params : [];
     }
 
 }
