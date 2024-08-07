@@ -82,7 +82,7 @@ class DBImport{
             } else{
 
                 // check if connection test is okay
-                if($this->DBConnect()){
+                if($this->dbConnect()){
                     try{
                         // connection driver
                         $pdo = $this->db['pdo'];
@@ -152,16 +152,11 @@ class DBImport{
     /**
      * Check Database connection 
      * 
-     * @return boolean
+     * @return bool
     */
-    private function DBConnect()
+    private function dbConnect()
     {
-        // status
-        if($this->db['status'] != Constant::STATUS_200){
-            return false;
-        }
-
-        return true;
+        return $this->db['status'] == Constant::STATUS_200;
     }
     
 }

@@ -58,6 +58,20 @@ class Builder  {
 
         return $this;
     }
+    
+    /**
+     * Execute the query strings
+     *
+     * @return int
+     */
+    public function exec()
+    {
+        if (empty($this->query)) {
+            throw new Exception("Query must be passed and not empty.");
+        }
+
+        return $this->connection->pdo->exec($this->query);
+    }
 
     /**
      * Columns to be selected.

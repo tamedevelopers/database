@@ -55,7 +55,6 @@ was pretty tough. So i decided to create a much more easier way of communicating
     * [Pagination Foreach Numbers](#pagination-foreach-numbers)
     * [Get Pagination](#get-pagination)
 * [Clause](#clause)
-  * [Raw](#raw)
   * [Query](#query)
   * [select](#select)
   * [selectRaw](#selectRaw)
@@ -70,8 +69,8 @@ was pretty tough. So i decided to create a much more easier way of communicating
   * [join](#join)
   * [leftJoin](#leftJoin)
   * [where](#where)
-  * [where](#where)
   * [orWhere](#orwhere)
+  * [whereRaw](#whereRaw)
   * [whereColumn](#wherecolumn)
   * [whereNull](#wherenull)
   * [orWhereNull](#orWhereNull)
@@ -633,29 +632,18 @@ $users->getPagination();
 ## Clause
 - Multiple clause
 
-### Raw
-- Allows you to use direct raw `SQL query syntax`
-
-```
-$date = strtotime('next week');
-
-$db->table("tb_wallet")
-    ->whereRaw("NOW() > created_at")
-    ->whereRaw("date >= ?", [$date])
-    ->where(DB::raw("YEAR(created_at) = 2022"))
-    ->where('email', 'email@gmail.com')
-    ->limit(10)
-    ->random()
-    ->get();
-```
-
 ### Query
 - Allows the use direct sql query `SQL query syntax`
+    - Or direct query exec()
 
 ```
 $db->query("SHOW COLUMNS FROM users")
     ->limit(10)
     ->get();
+
+
+$db->query("ALTER TABLE `langs` ADD COLUMN es TEXT; UPDATE `langs` SET es = en;")
+    ->exec();
 ```
 
 ### Select
@@ -815,6 +803,22 @@ $db->table('wallet')
     ->get();
 ```
 </details>
+
+### whereRaw
+- Allows you to use direct raw `SQL query syntax`
+
+```
+$date = strtotime('next week');
+
+$db->table("tb_wallet")
+    ->whereRaw("NOW() > created_at")
+    ->whereRaw("date >= ?", [$date])
+    ->where(DB::raw("YEAR(created_at) = 2022"))
+    ->where('email', 'email@gmail.com')
+    ->limit(10)
+    ->random()
+    ->get();
+```
 
 ### whereColumn
 - Takes three parameter `column` `operator` `column2`

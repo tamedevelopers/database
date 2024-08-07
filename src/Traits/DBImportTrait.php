@@ -11,7 +11,7 @@ trait DBImportTrait{
      * Check if data is Readable
      * 
      * @param array|null $readFile
-     * @return boolean
+     * @return bool
     */
     protected function isReadable(?array $readFile = null)
     {
@@ -25,7 +25,7 @@ trait DBImportTrait{
      * Check if sql string is a comment
      * 
      * @param string|null $string
-     * @return boolean
+     * @return bool
     */
     protected function isComment($string = null)
     {
@@ -41,7 +41,7 @@ trait DBImportTrait{
      * Check if sql string is a Query
      * 
      * @param string|null $string
-     * @return boolean
+     * @return bool
     */
     protected function isQuery($string = null)
     {
