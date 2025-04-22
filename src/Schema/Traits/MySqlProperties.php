@@ -71,6 +71,13 @@ trait MySqlProperties{
     public $distinct = false;
 
     /**
+     * Indicates if the timestamps is available in the database table.
+     *
+     * @var bool
+     */
+    public $isTimeStampsReady = false;
+
+    /**
      * @var string
      */
     public $from;

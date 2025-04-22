@@ -118,11 +118,11 @@ class Connector {
     /**
      * Check if table exists
      * 
-     * @param string|null $table
+     * @param mixed $table
      * 
      * @return bool
      */
-    public function tableExists($table)
+    public function tableExists(...$table)
     {
         return $this->table('')->tableExists($table);
     }

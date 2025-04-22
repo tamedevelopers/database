@@ -1032,6 +1032,9 @@ trait BuilderTrait{
      */
     protected function insertBuilder(array $values, $ignore = false)
     {
+        $createdAT = 'created_at';
+        $updatedAT = 'updated_at';
+
         // Since every insert gets treated like a batch insert, we will make sure the
         // bindings are structured in a way that is convenient when building these
         // inserts statements by verifying these elements are actually an array.
@@ -1040,12 +1043,21 @@ trait BuilderTrait{
         }
 
         // check if timestamps is available in table
-        // if yes then add time stamdps to columns
+        // if yes then add time stamps to columns
         // with this helper, developers dont need to worry adding them
         $stampData = $this->timeStampData();
 
         if (! is_array(reset($values))) {
-            $values = [array_merge($values, $stampData)];
+            
+            if(!isset($values[$createdAT]) && $this->isTimeStampsReady){
+                $values[$createdAT] = $stampData[$createdAT];
+            }
+            
+            if(!isset($values[$updatedAT]) && $this->isTimeStampsReady){
+                $values[$updatedAT] = $stampData[$updatedAT];
+            }
+
+            $values = [$values];
         }
 
         // Here, we will sort the insert keys for every record so that each insert is
@@ -1055,7 +1067,15 @@ trait BuilderTrait{
             foreach ($values as $key => $value) {
                 ksort($value);
 
-                $values[$key] = array_merge($values, $stampData);
+                if(!isset($value[$createdAT]) && $this->isTimeStampsReady){
+                    $value[$createdAT] = $stampData[$createdAT];
+                }
+                
+                if(!isset($value[$updatedAT]) && $this->isTimeStampsReady){
+                    $value[$updatedAT] = $stampData[$updatedAT];
+                }
+
+                $values[$key] = $value;
             }
         }
 
@@ -1276,11 +1296,11 @@ trait BuilderTrait{
 
             // get results data
             $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
-            
-            if(is_array($result) && count($result) === 2){
-                return true;
-            }
-            return false;
+
+            // if columns exists in the table
+            $this->isTimeStampsReady = is_array($result) && count($result) === 2;
+
+            return $this->isTimeStampsReady;
         } catch (\PDOException $th) {
             return false;
         }
@@ -1334,6 +1354,7 @@ trait BuilderTrait{
      */
     protected function close($table = true)
     {
+        $this->isTimeStampsReady = false;
         $this->bindings = [
             'select'    => [],
             'from'      => [],

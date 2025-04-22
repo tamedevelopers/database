@@ -1268,23 +1268,37 @@ class Builder  {
     /**
      * Check if table exists
      * 
-     * @param string $table
+     * @param mixed $table
      * 
      * @return bool
      */
-    public function tableExists($table)
+    public function tableExists(...$table)
     {
+        $tables = Forge::flattenValue($table);
+        
         try{
             $pdo = $this->connection->pdo;
 
             // check if Database connection has been established 
-            if(!$this->isPDO($pdo)){
+            if(!$this->isPDO($pdo) || empty($tables)){
                 return false;
             }
 
-            $pdo->query("
-                select exists (select 1 from `{$table}` limit 1) as 'exists'
-            ")->execute();
+            // Get the database driver (mysql, pgsql, sqlite)
+            $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+            if ($driver === 'sqlite') {
+                $selectQueries = array_map(fn($table) => "(SELECT 1 FROM \"{$table}\" LIMIT 1)", $tables);
+                $sql = "SELECT COALESCE(" . implode(", ", $selectQueries) . ", 0) AS \"exists\"";
+            } elseif($driver === 'mysql') {
+                $caseQueries = array_map(fn($table) => "WHEN EXISTS (SELECT 1 FROM `{$table}` LIMIT 1) THEN 1", $tables);
+                $sql = "SELECT CASE " . implode(" ", $caseQueries) . " ELSE 0 END AS `exists`";
+            } else{
+                $caseQueries = array_map(fn($table) => "WHEN EXISTS (SELECT 1 FROM \"{$table}\" LIMIT 1) THEN 1", $tables);
+                $sql = "SELECT CASE " . implode(" ", $caseQueries) . " ELSE 0 END AS \"exists\"";
+            }
+
+            $pdo->query($sql)->execute();
 
             $this->close();
             

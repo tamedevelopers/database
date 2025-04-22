@@ -28,11 +28,11 @@ trait DBSetupTrait{
     /**
      * Check if table exists
      * 
-     * @param string $table
+     * @param mixed $table
      * 
      * @return bool
      */
-    public static function tableExists($table)
+    public static function tableExists(...$table)
     {
         return (new Connector)->table('')->tableExists($table);
     }
