@@ -25,22 +25,29 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [More Database Connection Keys](#more-database-connection-keys)
 * [Usage](#usage)
   * [Table](#table)
-  * [Insert](#insert)
-  * [Insert Or Ignore](#insert-or-ignore)
-  * [Update](#update)
-  * [Update Or Ignore](#update-or-ignore)
-  * [Delete](#delete)
-  * [Increment](#increment)
-  * [Decrement](#decrement)
+  * [insert](#insert)
+  * [insertOrIgnore](#insert-or-ignore)
+  * [update](#update)
+  * [updateOrIgnore](#update-or-ignore)
+  * [destroy](#destroy)
+  * [delete](#delete)
+  * [increment](#increment)
+  * [decrement](#decrement)
+  * [min](#min)
+  * [max](#max)
+  * [sum](#sum)
+  * [avg](#avg)
+  * [average](#average)
 * [Fetching Data](#fetching-data)
-    * [Get](#get)
-    * [First](#first)
-    * [First or Create](#first-or-create)
-    * [First or Fail](#first-or-fail)
-    * [Count](#count)
-    * [Paginate](#paginate)
-    * [Exist](#exists)
-    * [Table Exists](#table-exists)
+    * [get](#get)
+    * [first](#first)
+    * [firstOrCreate](#first-or-create)
+    * [firstOrFail](#first-or-fail)
+    * [count](#count)
+    * [paginate](#paginate)
+    * [exists](#exists)
+    * [doesntExist](#doesntExist)
+    * [tableExists](#table-exists)
 * [Collections](#collections)
     * [Collection Methods](#collection-methods)
     * [Collection Usage](#collection-usage)
@@ -55,40 +62,79 @@ was pretty tough. So i decided to create a much more easier way of communicating
     * [Pagination Foreach Numbers](#pagination-foreach-numbers)
     * [Get Pagination](#get-pagination)
 * [Clause](#clause)
-  * [Query](#query)
+  * [query](#query)
   * [select](#select)
   * [selectRaw](#selectRaw)
   * [orderBy](#orderby)
   * [orderByRaw](#orderbyraw)
+  * [orderByDesc](#orderByDesc)
+  * [orderByAsc](#orderByAsc)
   * [latest](#latest)
   * [oldest](#oldest)
   * [inRandomOrder](#inRandomOrder)
   * [random](#random)
   * [limit](#limit)
+  * [take](#take)
   * [offset](#offset)
   * [join](#join)
+  * [joinWhere](#joinWhere)
   * [leftJoin](#leftJoin)
+  * [leftJoinWhere](#leftJoinWhere)
+  * [rightJoin](#rightJoin)
+  * [rightJoinWhere](#rightJoinWhere)
+  * [crossJoin](#crossJoin)
   * [where](#where)
   * [orWhere](#orwhere)
+  * [whereNot](#whereNot)
+  * [orWhereNot](#orWhereNot)
   * [whereRaw](#whereRaw)
   * [whereColumn](#wherecolumn)
+  * [orWhereColumn](#orWhereColumn)
   * [whereNull](#wherenull)
   * [orWhereNull](#orWhereNull)
   * [whereNotNull](#wherenotnull)
   * [orWhereNotNull](#orWhereNotNull)
   * [whereBetween](#wherebetween)
+  * [orWhereBetween](#orWhereBetween)
   * [whereNotBetween](#wherenotbetween)
+  * [orWhereNotBetween](#orWhereNotBetween)
+  * [whereBetweenColumns](#whereBetweenColumns)
+  * [orWhereBetweenColumns](#orWhereBetweenColumns)
+  * [whereNotBetweenColumns](#whereNotBetweenColumns)
+  * [orWhereNotBetweenColumns](#orWhereNotBetweenColumns)
+  * [whereDate](#whereDate)
+  * [orWhereDate](#orWhereDate)
+  * [whereTime](#whereTime)
+  * [orWhereTime](#orWhereTime)
+  * [whereDay](#whereDay)
+  * [orWhereDay](#orWhereDay)
+  * [whereMonth](#whereMonth)
+  * [orWhereMonth](#orWhereMonth)
+  * [whereYear](#whereYear)
+  * [orWhereYear](#orWhereYear)
+  * [having](#having)
+  * [orHaving](#orHaving)
+  * [havingNull](#havingNull)
+  * [orHavingNull](#orHavingNull)
+  * [havingNotNull](#havingNotNull)
+  * [orHavingNotNull](#orHavingNotNull)
+  * [havingBetween](#havingBetween)
+  * [havingRaw](#havingRaw)
   * [whereIn](#wherein)
+  * [orWhereIn](#orWhereIn)
   * [whereNotIn](#wherenotin)
+  * [orWhereNotIn](#orWhereNotIn)
+  * [orHavingRaw](#orHavingRaw)
   * [groupBy](#groupby)
+  * [groupByRaw](#groupByRaw)
 * [Database Migration](#database-migration)
   * [Create Table Schema](#create-table-schema)
   * [Default String Length](#default-string-length)
   * [Update Column Default Value](#update-column-default-value)
   * [Run Migration](#run-migration)
   * [Drop Migration](#drop-migration)
-  * [Drop Table](#drop-table)
-  * [Drop Column](#drop-column)
+  * [dropTable](#drop-table)
+  * [dropColumn](#drop-column)
 * [Get Database Config](#get-database-config)
 * [Get Database Connection](#get-database-connection)
 * [Get Database Name](#get-database-name)
@@ -283,13 +329,27 @@ $db->table('users')
     ]);
 ```
 
-### Delete
+### delete
 - Returns an `int`
 
 ```
 $db->table('users')
     ->where('user_id', 10000001)
     ->delete();
+```
+
+### destroy
+- Take two param as `[value|column]`
+    - Mandatory `value` as mixed value
+    - [optional] `column` as Default is `id`
+    - Returns an `int`
+
+```
+$db->table('posts')->destroy(1);
+// Query: delete from `posts` where `id` = ?
+
+$db->table('posts')->destroy(10, 'post_id');
+// Query: delete from `posts` where `post_id` = ?
 ```
 
 ### Increment
@@ -345,6 +405,31 @@ $db->table('users')
         'first_name' => 'F. Peterson',
         'status'     => 1,
     ]);
+```
+
+### min
+- Take one param as `Expression|string`
+```
+$db->table('blog')->min('amount');
+```
+
+### max
+- Same as min
+```
+$db->table('blog')->max('amount');
+```
+
+### sum
+- Take one param as `Expression|string`
+```
+$db->table('blog')->sum('amount');
+```
+
+### avg
+- Take one param as `Expression|string`
+```
+$db->table('blog')->avg('amount');
+$db->table('blog')->average('amount');
 ```
 
 ## Fetching Data

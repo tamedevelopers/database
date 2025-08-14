@@ -28,13 +28,23 @@ use Tamedevelopers\Database\Schema\Pagination\Paginator;
 trait BuilderTrait{
 
     /**
-     * Builder Compiler Instance
+     * Get Instance Table Name
      * 
      * @return string
      */
     public function tableName()
     {
         return "{$this->connection->tablePrefix}{$this->from}";
+    }
+
+    /**
+     * Get Instance Table Name
+     * 
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->tableName();
     }
 
     /**

@@ -63,6 +63,8 @@ class Builder  {
      * Execute the query strings
      *
      * @return int
+     * 
+     * @throws \Exception
      */
     public function exec()
     {
@@ -112,6 +114,8 @@ class Builder  {
      * [optional] Default direction is `asc`
      * 
      * @return $this
+     * 
+     * @throws \Exception
      */ 
     public function orderBy($column, $direction = 'asc')
     {
@@ -124,6 +128,30 @@ class Builder  {
         $this->orders[] = compact('column', 'direction');
 
         return $this;
+    }
+
+    /**
+     * Add an "order by desc" clause to the query.
+     * 
+     * @param string $column
+     * 
+     * @return $this
+     */ 
+    public function orderByDesc($column)
+    {
+        return $this->orderBy($column, 'desc');
+    }
+
+    /**
+     * Add an "order by asc" clause to the query.
+     * 
+     * @param string $column
+     * 
+     * @return $this
+     */ 
+    public function orderByAsc($column)
+    {
+        return $this->orderBy($column, 'asc');
     }
 
     /**
@@ -152,7 +180,7 @@ class Builder  {
      */
     public function latest(string $column = 'id')
     {
-        $this->orderBy($column, 'desc');
+        $this->orderByDesc($column);
 
         return $this;
     }
@@ -167,7 +195,7 @@ class Builder  {
      */
     public function oldest(string $column = 'id')
     {
-        $this->orderBy($column);
+        $this->orderByAsc($column);
 
         return $this;
     }
@@ -204,7 +232,7 @@ class Builder  {
     }
 
     /**
-     * Set limits
+     * Set limit for query
      * 
      * @param int $value
      * @return $this
@@ -216,6 +244,17 @@ class Builder  {
         }
 
         return $this;
+    }
+
+    /**
+     * Alias for the "limit" method.
+     * 
+     * @param int $value
+     * @return $this
+     */ 
+    public function take($value)
+    {
+        return $this->limit($value);
     }
 
     /**
@@ -666,6 +705,8 @@ class Builder  {
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
+     * 
+     * @throws \Exception
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
@@ -1553,7 +1594,7 @@ class Builder  {
 
         $sql = $this->compile()->compileDelete($this);
 
-        // replace all quoteation to backticks
+        // replace all quotation to backticks
         $sql = str_replace(['`', "'"], "`", $sql);
 
         // delete query
@@ -1568,16 +1609,16 @@ class Builder  {
      * Destroy records from the database.
      * [performing where clause under the hood]
      *
-     * @param mixed $id
+     * @param mixed $value
      *
      * @param string $column
      * [default column name is 'id']
      * 
      * @return int
      */
-    public function destroy($id, $column = 'id')
+    public function destroy($value, $column = 'id')
     {
-        return $this->where($column, $id)->delete();
+        return $this->where($column, $value)->delete();
     }
 
     /**
