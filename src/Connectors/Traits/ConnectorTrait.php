@@ -13,6 +13,18 @@ use Tamedevelopers\Database\Connectors\PostgresConnector;
 trait ConnectorTrait{
 
     /**
+     * Check if config key is isset and not empty
+     *
+     * @param mixed $config
+     * @param string $key
+     * @return bool
+     */
+    protected static function checkIssetEmpty($config, $key)
+    {
+        return isset($config[$key]) && !empty($config[$key]);
+    }
+
+    /**
      * Get supported database instance
      * @param string $driver
      * 

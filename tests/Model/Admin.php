@@ -9,10 +9,13 @@ class Admin extends Model{
     
     public function getUsers()
     {
-        dd(
-            $this->getTableName(),
-            $this->average('user_id')
-        );
+        // dd(
+        //     $this->getTableName(),
+        //     $this->average('user_id'),
+        //     $this,
+        // );
+
+        return $this->where('is_active', '1')->get();
         
         return $this->where('active', 1)
                     ->join('tb_orders_payment', 'tb_orders_payment.user_id', '=', 'tb_user.user_id')

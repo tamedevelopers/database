@@ -1,6 +1,7 @@
 <?php 
 
 use Tamedevelopers\Database\DB;
+use Tamedevelopers\Database\DBExport;
 use Tamedevelopers\Database\DBImport;
 use Tamedevelopers\Database\AutoLoader;
 use Tamedevelopers\Database\Migrations\Schema;
@@ -48,11 +49,14 @@ if (! function_exists('db_connection')) {
      * @param string|null $type
      * - [optional]  reponse|message|driver
      * 
+     * @param string|null $name
+     * - [name] of connections in [config/database.php] file
+     * 
      * @return mixed
      */
-    function db_connection($type = null)
+    function db_connection($type = null, $name = null)
     {
-        return db()->dbConnection($type);
+        return db($name)->dbConnection($type);
     }
 }
 
@@ -72,17 +76,30 @@ if (! function_exists('import')) {
     /**
      * Database Importation
      * 
-     * @param string $path_to_sql
+     * @param string $path
      * @param string|null $connection
      * 
-     * @return object
-     * [status, message]
+     * @return \Tamedevelopers\Database\DBImport
      */
-    function import($path_to_sql, $connection = null)
+    function import($path, $connection = null)
     {
-        $import = new DBImport($connection);
+        return new DBImport($path, $connection);
+    }
+}
 
-        return $import->import($path_to_sql);
+if (! function_exists('export')) {
+    /**
+     * Database Exportation
+     * 
+     * @param string|null $saveAsFileType — Save the backup file as [zip|rar]
+     * @param string|null $connection
+     * @param int $retentionDays — Days to keep backups before deletion
+     * 
+     * @return \Tamedevelopers\Database\DBExport
+     */
+    function export($saveAsFileType = null, $connection = 'default', int $retentionDays = 7)
+    {
+        return new DBExport($saveAsFileType, $connection, $retentionDays);
     }
 }
 

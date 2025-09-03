@@ -1460,7 +1460,7 @@ class Builder  {
      * @param int $value
      * [default column name is `id`]
      *
-     * @return null\Tamedevelopers\Database\Collections\Collection
+     * @return null|\Tamedevelopers\Database\Collections\Collection
      */
     public function find(int $value)
     {
@@ -1469,7 +1469,7 @@ class Builder  {
 
     /**
      * Execute the query and get the first result.
-     * @return null\Tamedevelopers\Database\Collections\Collection
+     * @return null|\Tamedevelopers\Database\Collections\Collection
      */
     public function first()
     {
@@ -1478,7 +1478,7 @@ class Builder  {
 
     /**
      * Execute the query and get the first result or throw an exception.
-     * @return null\Tamedevelopers\Database\Collections\Collection
+     * @return null|\Tamedevelopers\Database\Collections\Collection
      */
     public function firstOrIgnore()
     {
@@ -1487,7 +1487,7 @@ class Builder  {
 
     /**
      * Execute the query and get the first result or throw an exception.
-     * @return void\Tamedevelopers\Database\Collections\Collection
+     * @return void|\Tamedevelopers\Database\Collections\Collection
      */
     public function firstOrFail()
     {
@@ -1554,7 +1554,7 @@ class Builder  {
      * Insert new records into the database while ignoring errors.
      *
      * @param  array  $values
-     * @return null\Tamedevelopers\Database\Collections\Collection
+     * @return null|\Tamedevelopers\Database\Collections\Collection
      */
     public function insertOrIgnore(array $values)
     {

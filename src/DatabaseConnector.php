@@ -137,6 +137,7 @@ class DatabaseConnector{
      */
     private static function supportedDrivers()
     {
+        // ['mysql', 'pgsql', 'sqlite']
         return ['mysql', 'pgsql'];
     }
 

@@ -10,18 +10,19 @@ include_once __DIR__ . "/../vendor/autoload.php";
 AppManager::bootLoader();
 
 
-$import = new DBImport();
-
+$import = new DBImport(base_path('tests/database/orm.sql'), 'woocommerce');
 
 // do this 
-$response = $import->import('orm.sql');
+$response = $import->run();
 
 // of function helper
-$same = import('orm.sql');
+// 'woocommerce' is the database connection name you want to use
+// $same = import('orm.sql', 'woocommerce');
+// $same->run()
 
 
 dump( 
-    $response['message'] 
+    $response
 );
 
 ?>

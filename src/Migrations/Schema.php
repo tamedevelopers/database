@@ -262,7 +262,7 @@ class Schema{
     {
         // convert default values to string
         if(is_array($value)){
-            $defaultValue = array_walk($defaultValue, function(&$value){
+            $defaultValue = array_walk($value, function(&$value){
                 return "'{$value}'";
             });
         } elseif(is_null($value)){

@@ -51,6 +51,9 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Collections](#collections)
     * [Collection Methods](#collection-methods)
     * [Collection Usage](#collection-usage)
+* [Auth](#auth)
+    * [Auth Methods](#auth-methods)
+    * [Auth Usage](#auth-usage)
 * [Pagination](#pagination)
     * [Global Configuration](#global-configuration)
     * [Pagination Query](#pagination-query)
@@ -166,12 +169,13 @@ composer require tamedevelopers/database
 ## Instantiate
 
 **Step 1** — `Require composer autoload`:
-```
+```php
 require_once __DIR__ . '/vendor/autoload.php';
 ```
 
 **Step 2** — Call `the below method() and Run once in browser`
 - This will auto setup your entire application on a `go!`
+    - It's helper class can be called, using -- `autoloader_start()`
 
 |  Description                                                                                  | 
 |-----------------------------------------------------------------------------------------------|
@@ -181,15 +185,10 @@ require_once __DIR__ . '/vendor/autoload.php';
 | Files you'll see after you reload browser:                                                    |
 | `.env` `.env.example` `.gitignore` `.htaccess` `.user.ini` `init.php`                         |
 
-```
+```php
 use Tamedevelopers\Database\AutoLoader;
 
 AutoLoader::start();
-```
-
-- or -- `Helpers Function`
-```
-autoloader_start();
 ```
 
 ## Init.php File
@@ -205,15 +204,11 @@ autoloader_start();
 - If you do not want to include or use the `init.php` file
     - All you need do is call the bootloader, to start your application.
 
-```
+```php
 use Tamedevelopers\Database\Capsule\AppManager;
 
 AppManager::bootLoader();
-```
-
-- or -- `Helpers Function`
-```
-app_manager()->bootLoader();
+// app_manager()->bootLoader();
 ```
 
 ## Database Connection
@@ -221,7 +216,7 @@ app_manager()->bootLoader();
     - First navigate to [config/database.php] file and add a configuration
     - Takes two (2) params `key` as `string` and `array` [optional]
 
-```
+```php
 DB::connection('connName', [optional]);
 ```
 
@@ -229,14 +224,14 @@ DB::connection('connName', [optional]);
 - If you want to connect to already connected database, You first need to disconnect
     - Takes one param as `string`
 
-```
+```php
 DB::disconnect('connName');
 ```
 
 ## Database Reconnect
 - same as `Database Connection`
 
-```
+```php
 DB::reconnect('connName', [optional]);
 ```
 
@@ -274,7 +269,7 @@ DB::reconnect('connName', [optional]);
 
 ### Table
 - Takes a parameter as `string` table_name
-```
+```php
 $db->table('users');
 ```
 
@@ -282,7 +277,7 @@ $db->table('users');
 - Takes one parameter as assoc array `column_name => value`
     - It returns an object on success or error
 
-```
+```php
 $db->table('users')->insert([
     'user_id'    => 10000001,
     'first_name' => 'Alfred',
@@ -298,7 +293,7 @@ $db->table('users')->insert([
 - Same as `insert()` method
     - It returns an object of created data or `false` on error
 
-```
+```php
 $db->table('users')->insertOrIgnore([
     'user_id'    => 10000001,
     'first_name' => 'Alfred',
@@ -309,7 +304,7 @@ $db->table('users')->insertOrIgnore([
 - Takes one parameter as assoc array `column_name => value`
     - Returns an `int` numbers of affected rows or error
 
-```
+```php
 $db->table('users')
     ->where('user_id', 10000001)
     ->update([
@@ -321,7 +316,7 @@ $db->table('users')
 - Same as `update()` method
     - Returns an `int` numbers of affected rows or `0` on error
 
-```
+```php
 $db->table('users')
     ->where('user_id', 10000001)
     ->updateOrIgnore([
@@ -332,7 +327,7 @@ $db->table('users')
 ### delete
 - Returns an `int`
 
-```
+```php
 $db->table('users')
     ->where('user_id', 10000001)
     ->delete();
@@ -344,7 +339,7 @@ $db->table('users')
     - [optional] `column` as Default is `id`
     - Returns an `int`
 
-```
+```php
 $db->table('posts')->destroy(1);
 // Query: delete from `posts` where `id` = ?
 
@@ -364,20 +359,20 @@ $db->table('posts')->destroy(10, 'post_id');
 | param             |  array          |
 
 1 By default if the the second param not passed, this will increment by 1
-```
+```php
 $db->table('users')
     ->where('user_id', 10000001)
     ->increment('wallet_bal');
 ```
 
-```
+```php
 $db->table('users')
     ->where('user_id', 10000001)
     ->increment('wallet_bal', 10);
 ```
 
 - You can also pass in a second or third parameter to update additional columns
-```
+```php
 $db->table('users')
     ->where('user_id', 10000001)
     ->increment('wallet_bal', 100.23, [
@@ -387,7 +382,7 @@ $db->table('users')
 ```
 
 - You can ommit the second param and it'll be automatically seen as update param (If an array)
-```
+```php
 $db->table('users')
     ->where('user_id', 10000001)
     ->increment('wallet_bal', [
@@ -398,7 +393,7 @@ $db->table('users')
 
 ### Decrement
 - Same as Increment
-```
+```php
 $db->table('users')
     ->where('user_id', 10000001)
     ->decrement('wallet_bal', [
@@ -409,25 +404,25 @@ $db->table('users')
 
 ### min
 - Take one param as `Expression|string`
-```
+```php
 $db->table('blog')->min('amount');
 ```
 
 ### max
 - Same as min
-```
+```php
 $db->table('blog')->max('amount');
 ```
 
 ### sum
 - Take one param as `Expression|string`
-```
+```php
 $db->table('blog')->sum('amount');
 ```
 
 ### avg
 - Take one param as `Expression|string`
-```
+```php
 $db->table('blog')->avg('amount');
 $db->table('blog')->average('amount');
 ```
@@ -448,12 +443,12 @@ $db->table('blog')->average('amount');
 | tableExists()     |  boolean `true` \| `false`        |
 
 ### GET
-```
+```php
 $db->table('users')->get();
 ```
 
 ### First
-```
+```php
 $db->table('users')->first();
 ```
 
@@ -466,14 +461,14 @@ $db->table('users')->first();
     If fails, then it merge the `$conditions` to `$data` value to create new records
 
 
-```
+```php
 $db->table('users')->firstOrCreate(
     ['email' => 'example.com']
 );
 ```
 - or -- `Example 2`
 
-```
+```php
 $db->table('users')->firstOrCreate(
     ['email' => 'example.com'],
     [
@@ -487,22 +482,22 @@ $db->table('users')->firstOrCreate(
 ### First or Fail
 - Same as `first()` method but exit with error code 404, if data not found
 
-```
+```php
 $db->table('users')->firstOrFail();
 ```
 
 ### Count
-```
+```php
 $db->table('users')->count();
 ```
 
 ### Paginate
 - Takes param as `int` `$per_page`
     - By default if no param is given, then it displays 10 per page
-```
+
+```php
 $users = $db->table('users')
             ->paginate(40);
-
 
 $users // this will return the data objects
 $users->links() // this will return the paginations links view
@@ -512,7 +507,7 @@ $users->showing() // Display items of total results
 ### Exists
 - Returns boolean `true \| false`
 
-```
+```php
 $db->table('users')
     ->where('email', 'email@gmail.com')
     ->orWhere('name', 'Mandison')
@@ -521,13 +516,13 @@ $db->table('users')
 
 ### Table Exists
 - Takes param as `string` `$table_name`
-```
+```php
 $db->tableExists('users');
 ```
 
 ## Collections
 - You can directly use `methods` of `Collections Instance` on any of the below
-    - All the below `methods` are received by Collection `class`
+- All the below `methods` are received by Collection `class`
     1. get()
     2. find()
     2. first()
@@ -556,7 +551,7 @@ $db->tableExists('users');
     - With this you can access data as an `object\|array` key property
     - If no data found then it returns null on `->first()` method only
 
-```
+```php
 $user = $db->tableExists('users')
             ->first();
 
@@ -571,7 +566,7 @@ $user->getAttributes()
 
 - Example two(2) `->get() \| ->paginate()` Request
 
-```
+```php
 $users = $db->tableExists('users')
             ->where('is_active', 1),
             ->random(),
@@ -587,8 +582,57 @@ if($users->isNotEmpty()){
 }
 ```
 
+## Auth
+- Lightweight guard-based authentication similar to Laravel.
+- attempt() only validates and sets in-memory user; call login() to persist to session.
+
+### Auth Methods
+- **guard(string $table, ?string $connection = null)**: Create a guard bound to a table and optional connection.
+- **attempt(array $credentials): bool**: Validate credentials, set in-memory user on success; does not persist to session.
+- **login(array|null $userData = null, bool $persist = true): void**: Persist the current user (or provided array) to session. If userData is not an array, it’s ignored.
+- **user(): ?array**: Get the in-memory user or rehydrate from session if available.
+- **check(): bool**: True if a user is authenticated for the current guard.
+- **id(string $key = 'id')**: Get the authenticated user’s id (or custom key).
+- **logout(): void**: Clear in-memory user and remove from session.
+
+### Auth Usage
+```php
+use Tamedevelopers\Database\Auth;
+
+// Create guards
+$admin = (new Auth)->guard('tb_admin');
+$user  = (new Auth)->guard('tb_user', 'woocommerce');
+
+// Credentials (password is required in attempt)
+$credentials = [
+    'email' => 'peter.blosom@gmail.com',
+    'status' => '1',
+    'password' => 'tagged',
+];
+
+// 1) Validate credentials only (no session persistence)
+if ($user->attempt($credentials)) {
+    // In-memory user available
+    $user->check();          // true
+    $user->id();             // e.g., 123
+    $user->user();           // full user array
+}
+
+// 2) Persist explicitly (similar to Laravel Auth::login())
+$user->login($user->user());   // stores sanitized user in session (no password)
+
+// 3) Retrieve later in another request
+$another = (new Auth)->guard('tb_user', 'woocommerce');
+$another->user();    // rehydrated from session
+$another->check();   // true if session had user
+
+// 4) Logout
+$another->logout();  // clears in-memory and session
+```
+
 ## Pagination
 - Configuring Pagination
+    - It's helper class can be called, using -- `config_pagination()`
 
 | key       | Data Type                 |  Description    |
 |-----------|---------------------------|-----------------|
@@ -608,7 +652,8 @@ if($users->isNotEmpty()){
 
 ### Global Configuration 
 - 1 Setup global pagination on ENV autostart `most preferred` method
-```
+
+```php
 AutoLoader::configPagination([
     'allow' => true, 
     'prev'  => 'Prev Page', 
@@ -619,26 +664,19 @@ AutoLoader::configPagination([
 ]);
 ```
 
-- or -- `Helpers Function`
-```
-config_pagination([
-    'allow' => true,
-]);
-```
-
 ### Pagination Query
-```
+```php
 $users = $db->table('users')->paginate(40);
 ```
 
 ### Pagination Data
-```
+```php
 $users
 // This will return `Collections` of pagination data
 ```
 
 ### Pagination Links
-```
+```php
 $users->links();
 // This will return pagination links view
 ```
@@ -649,7 +687,8 @@ $users->links();
 - You can directly configure pagination links
     - Note: If `configPagination()` `allow` is set to `true`
     - It'll override every other settings
-```
+
+```php
 $users->links([
     'first' => 'First Page',
     'last'  => 'Last Page',
@@ -660,7 +699,7 @@ $users->links([
 </details>
 
 ### Pagination Showing
-```
+```php
 $users->showing();
 
 // This will create a span html element with text
@@ -673,7 +712,7 @@ $users->showing();
 <details><summary>Read more...</summary>
 
 - You can configure showing text directly as well
-```
+```php
 $users->showing([
     'showing'  => 'Showing',
     'of'       => 'out of',
@@ -688,7 +727,7 @@ $users->showing([
     - This will format all pagination items collections
     - On each page, it starts counting from last pagination item number
 
-```
+```php
 $users = $db->table('users')->paginate(20);
 
 foreach($users as $user){
@@ -708,7 +747,7 @@ foreach($users as $user){
 | perPage       | Pagination per page count `int`   |
 | totalCount    | Pagination total items count `int`|
 
-```
+```php
 $users = $db->table('users')->paginate(20);
 
 $users->getPagination();
@@ -721,7 +760,7 @@ $users->getPagination();
 - Allows the use direct sql query `SQL query syntax`
     - Or direct query exec()
 
-```
+```php
 $db->query("SHOW COLUMNS FROM users")
     ->limit(10)
     ->get();
@@ -734,11 +773,11 @@ $db->query("ALTER TABLE `langs` ADD COLUMN es TEXT; UPDATE `langs` SET es = en;"
 ### Select
 - Used to select needed columns from database
 
-```
+```php
 $db->table('users')
     ->where('user_id', 10000001)
     ->select(['first_name', 'email'])
-    ->select('email, 'name')
+    ->select('email', 'name')
     ->first();
 ```
 
@@ -746,7 +785,7 @@ $db->table('users')
 - Takes two param `$column` and `$direction`
     - By default  `$direction` param is set to `ASC`
 
-```
+```php
 $db->table('wallet')
     ->orderBy('date', 'DESC')
     ->get();
@@ -755,7 +794,7 @@ $db->table('wallet')
 ### orderByRaw
 - Takes one param `$query`
 
-```
+```php
 $db->table('wallet')
     ->orderByRaw('CAST(`amount` AS UNSIGNED) DESC')
     ->get();
@@ -764,7 +803,8 @@ $db->table('wallet')
 
 ### Latest
 - Takes one param `$column` by default the column used is `id`
-```
+
+```php
 $db->table('wallet')
     ->latest('date')
     ->get();
@@ -772,14 +812,14 @@ $db->table('wallet')
 
 ### Oldest
 - Takes one param `$column` by default the column used is `id`
-```
+```php
 $db->table('wallet')
     ->oldest()
     ->get();
 ```
 
 ### inRandomOrder
-```
+```php
 $db->table('wallet')
     ->inRandomOrder()
     ->get();
@@ -789,7 +829,7 @@ $db->table('wallet')
 <details><summary>Read more...</summary>
 
 - Same as `inRandomOrder()`
-```
+```php
 $db->table('wallet')
     ->random()
     ->get();
@@ -798,7 +838,7 @@ $db->table('wallet')
 
 ### limit
 - Takes one param `$limit` as int. By default value is `1`
-```
+```php
 $db->table('wallet')
     ->limit(10)
     ->get();
@@ -808,7 +848,7 @@ $db->table('wallet')
 <details><summary>Read more...</summary>
 
 - Takes one param `$offset` as int. By default value is `0`
-```
+```php
 $db->table('wallet')
     ->limit(3)
     ->offset(2)
@@ -816,7 +856,7 @@ $db->table('wallet')
 ```
 
 - Example 2 (Providing only offset will return as LIMIT without error)
-```
+```php
 $db->table('wallet')
     ->offset(2)
     ->get();
@@ -833,14 +873,14 @@ $db->table('wallet')
 | operator      |  operator sign    |
 | localColumn   | local_table.column|
 
-```
+```php
 $db->table('wallet')
     ->join('users', 'users.user_id', '=', 'wallet.user_id')
     ->get();
 ```
 
 - or
-```
+```php
 $db->table('wallet')
     ->join('users', 'users.user_id', '=', 'wallet.user_id')
     ->where('wallet.email', 'example.com')
@@ -851,7 +891,7 @@ $db->table('wallet')
 ### leftJoin
 - Same as `join`
 
-```
+```php
 $db->table('wallet')
     ->leftJoin('users', 'users.user_id', '=', 'wallet.user_id')
     ->where('wallet.email', 'example.com')
@@ -867,7 +907,7 @@ $db->table('wallet')
 | column    |  string    |
 | operator  |  string    |
 | value     |  string    |
-```
+```php
 $db->table('wallet')
     ->where('user_id', 10000001)
     ->where('amount', '>', 10)
@@ -879,7 +919,7 @@ $db->table('wallet')
 <details><summary>Read more...</summary>
 
 - Same as Where clause
-```
+```php
 $db->table('wallet')
     ->where('user_id', 10000001)
     ->where('amount', '>', 10)
@@ -892,7 +932,7 @@ $db->table('wallet')
 ### whereRaw
 - Allows you to use direct raw `SQL query syntax`
 
-```
+```php
 $date = strtotime('next week');
 
 $db->table("tb_wallet")
@@ -907,7 +947,7 @@ $db->table("tb_wallet")
 
 ### whereColumn
 - Takes three parameter `column` `operator` `column2`
-```
+```php
 $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereColumn('amount', 'tax')
@@ -917,7 +957,7 @@ $db->table('wallet')
 
 ### whereNull
 - Takes one parameter `column`
-```
+```php
 $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereNull('email_status')
@@ -928,7 +968,7 @@ $db->table('wallet')
 <details><summary>Read more...</summary>
 
 - Takes one parameter `column`
-```
+```php
 $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereNotNull('email_status')
@@ -945,7 +985,7 @@ $db->table('wallet')
 | column | string     | `column_name`|
 | param  | array      | [10, 100]    |
 
-```
+```php
 $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereBetween('amount', [0, 100])
@@ -957,7 +997,7 @@ $db->table('wallet')
 
 - Same as `whereBetween()` method
 
-```
+```php
 $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereNotBetween('amount', [0, 100])
@@ -974,7 +1014,7 @@ $db->table('wallet')
 | column | string     | `column_name`|
 | param  | array      | [0, 20, 80]  |
 
-```
+```php
 $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereIn('amount', [10, 20, 40, 100])
@@ -985,7 +1025,7 @@ $db->table('wallet')
 <details><summary>Read more...</summary>
 
 Same as `whereIn()` method
-```
+```php
 $db->table('wallet')
     ->where('user_id', 10000001)
     ->whereNotIn('amount', [10, 20, 40, 100])
@@ -995,7 +1035,7 @@ $db->table('wallet')
 
 ### groupBy
 - Takes one param `$column`
-```
+```php
 $db->table('wallet')
     ->where('user_id', 10000001)
     ->groupBy('amount')
@@ -1011,34 +1051,33 @@ $db->table('wallet')
 | run()         |  Begin migration                  |
 | drop()        |  Drop migration tables            |
 
-```
+```php
 use Tamedevelopers\Database\Migrations\Migration;
 ```
 
 ### Create Table Schema
 - Takes param as `table name`
     - Second parameter `string` `jobs|sessions` (optional) -If passed will create a dummy `jobs|sessions` table schema
+    - It's helper class can be called, using -- `migration()`
 
-```
+```php
 Migration::create('users');
 Migration::create('users_wallet');
 Migration::create('tb_jobs', 'jobs');
 Migration::create('tb_sessions', 'sessions'); 
+// migration()->create('users');
 
-Table `2023_04_19_1681860618_user` has been created successfully
-Table `2023_04_19_1681860618_user_wallet` has been created successfully
-Table `2023_04_19_1681860618_tb_jobs` has been created successfully
-Table `2023_04_19_1681860618_tb_sessions` has been created successfully
+// Table `2023_04_19_1681860618_user` has been created successfully
+// Table `2023_04_19_1681860618_user_wallet` has been created successfully
+// Table `2023_04_19_1681860618_tb_jobs` has been created successfully
+// Table `2023_04_19_1681860618_tb_sessions` has been created successfully
 ```
 
-- or -- `Helpers Function`
-```
-migration()->create('users');
-```
 ![Sample Session Schema](https://raw.githubusercontent.com/tamedevelopers/UltimateOrmDatabase/main/sessions.png)
 
 ### Default String Length
 - In some cases you may want to setup default string legnth to all Migration Tables
+    - It's helper class can be called, using -- `schema()`
 
 |  Description                                                                          | 
 |---------------------------------------------------------------------------------------|
@@ -1048,15 +1087,11 @@ migration()->create('users');
 | This affects only `VACHAR`                                                            |
 | You must define this before start using the migrations                                |
 
-```
+```php
 use Tamedevelopers\Database\Migrations\Schema;
 
 Schema::defaultStringLength(200);
-```
-
-- or -- `Helpers Function`
-```
-schema()->defaultStringLength(2000);
+// schema()->defaultStringLength(2000);
 ```
 
 ### Update Column Default Value
@@ -1066,28 +1101,27 @@ schema()->defaultStringLength(2000);
     - `$column_name` as string
     - `$values` as mixed data `NULL` `NOT NULL\|None` `STRING` `current_timestamp()`
 
-```
+```php
 use Tamedevelopers\Database\Migrations\Schema;
 
-Schema::updateColumnDefaultValue('users_table', 'email_column', 'NOT NULL);
+Schema::updateColumnDefaultValue('users_table', 'email_column', 'NOT NULL');
 Schema::updateColumnDefaultValue('users_table', 'gender_column', []);
 
-or
-
-schema()->updateColumnDefaultValue('users_table', 'gender_column', []);
+// or
+// schema()->updateColumnDefaultValue('users_table', 'gender_column', []);
 ```
 
 ### Run Migration
 - This will execute and run migrations using files located at [root/database/migrations]
 
-```
+```php
 Migration::run();
 
 or
 migration()->run();
 
-Migration runned successfully on `2023_04_19_1681860618_user` 
-Migration runned successfully on `2023_04_19_1681860618_user_wallet` 
+// Migration runned successfully on `2023_04_19_1681860618_user` 
+// Migration runned successfully on `2023_04_19_1681860618_user_wallet` 
 ```
 
 ### Drop Migration
@@ -1095,7 +1129,7 @@ Migration runned successfully on `2023_04_19_1681860618_user_wallet`
 
 - Be careful as this will execute and drop all files table `located in the migration`
 - [optional param] `bool` to force delete of tables
-```
+```php
 Migration::drop();
 
 or
@@ -1107,7 +1141,7 @@ migration()->drop(true);
 <details><summary>Read more...</summary>
 
 - Takes one param as `string` $table_name
-```
+```php
 use Tamedevelopers\Database\Migrations\Schema;
 
 Schema::dropTable('table_name');
@@ -1122,7 +1156,7 @@ schema()->dropTable('table_name');
 
 - To Drop Column `takes two param`
     - This will drop the column available
-```
+```php
 use Tamedevelopers\Database\Migrations\Schema;
 
 Schema::dropColumn('table_name', 'column_name');
@@ -1133,32 +1167,32 @@ schema()->dropColumn('table_name', 'column_name');
 </details>
 
 ## Get Database Config
-```
+```php
 $db->getConfig()
 ```
 
 ## Get Database Connection
-```
+```php
 $db->dbConnection()
 ```
 
 - or -- `Helpers Function`
-```
+```php
 db_connection();
 ```
 
 ## Get Database Name
-```
+```php
 $db->getDatabaseName()
 ```
 
 ## Get Database PDO
-```
+```php
 $db->getPDO()
 ```
 
 ## Get Database TablePrefix
-```
+```php
 $db->getTablePrefix()
 ```
 
@@ -1166,7 +1200,7 @@ $db->getTablePrefix()
 - You can use this class to import .sql into a database programatically
     - Remember the system already have absolute path to your project.
 
-```
+```php
 use Tamedevelopers\Database\DBImport;
 
 $database = new DBImport();
@@ -1174,14 +1208,14 @@ $database = new DBImport();
 // needs absolute path to database file
 $status = $database->import('path_to/orm.sql');
 
-- Status code
-->status == 404 (Failed to read file or File does'nt exists
-->status == 400 (Query to database error
-->status == 200 (Success importing to database
+// - Status code
+// ->status == 404 (Failed to read file or File does'nt exists
+// ->status == 400 (Query to database error
+// ->status == 200 (Success importing to database
 ```
 
 - or -- `Helpers Function`
-```
+```php
 import('path_to/orm.sql');
 ```
 
@@ -1195,20 +1229,16 @@ import('path_to/orm.sql');
 | allow_quote   |  `true` \| `false` - Default is true (Allow quotes within value)  |
 | allow_space   | `true` \| `false`  - Default is false (Allow space between key and value)|
 
-```
+```php
 use Tamedevelopers\Support\Env;
 
 Env::updateENV('DB_PASSWORD', 'newPassword');
 Env::updateENV('APP_DEBUG', false);
 Env::updateENV('DB_CHARSET', 'utf8', false);
 
-Returns - Boolean
-true|false
-```
-
-- or -- `Helpers Function`
-```
-env_update('DB_CHARSET', 'utf8', false);
+// env_update('DB_CHARSET', 'utf8', false);
+// Returns - Boolean
+// true|false
 ```
 
 ## Collation And Charset
@@ -1232,7 +1262,8 @@ env_update('DB_CHARSET', 'utf8', false);
 <details><summary>Read more...</summary>
 
 - You can as well extends the DB Model class directly from other class
-```
+
+```php
 use Tamedevelopers\Database\Model;
 
 class Post extends Model{
@@ -1240,7 +1271,7 @@ class Post extends Model{
     // define your custom model table name
     protected $table = 'posts';
 
-    -- You now have access to the DB public instances
+    // -- You now have access to the DB public instances
     public function getPost(){
         return $this->select(['images', 'title', 'description'])->get();
     }

@@ -6,7 +6,9 @@ namespace Tamedevelopers\Database;
 
 use PDOException;
 use Tamedevelopers\Database\DB;
+use Tamedevelopers\Support\Str;
 use Tamedevelopers\Support\Server;
+use Tamedevelopers\Support\Capsule\File;
 use Tamedevelopers\Database\Traits\DBImportTrait;
 
 
@@ -38,39 +40,72 @@ class DBImport{
     /**
      * Instance of Database Object
      *
-     * @var \Tamedevelopers\Database\DB
+     * @var array
      */
     private $db;
+
+    /**
+     * Instance of Database Object
+     *
+     * @var \Tamedevelopers\Database\Connectors\Connector
+     */
+    protected $conn;
+    
+    /**
+     * Path to sql file
+     *
+     * @var string|null
+     */
+    private $path;
 
        
     /**
      * Construct Instance of Database
-     *
-     * @param  string|null $connection
+     * 
+     * @param string|null $path
+     * @param string|null $connection
      * @return void
      */
-    public function __construct($connection = null) 
+    public function __construct($path = null, $connection = null) 
     {
-        $this->error = Constant::STATUS_404;
-        $this->db = DB::connection($connection)->dbConnection();
+        $this->error    = Constant::STATUS_404;
+        $this->path     = $path;
+
+        $this->conn = DB::connection($connection);
+        $this->db   = $this->conn->dbConnection();
+    }
+    
+    /**
+     * Alias for import() method.
+     * 
+     * @return object
+     * [status, message]
+     */ 
+    public function run()
+    {
+        return $this->import();
     }
 
     /**
-     * Database Importation
-     * @param string path_to_sql
+     * Run the database import process.
+     * @param string|null path
      * 
      * @return object
      * [status, message]
      */
-    public function import($path_to_sql)
+    public function import($path = null)
     {
-        $this->realpath = Server::formatWithBaseDirectory($path_to_sql);
-        
+        // use the provided path or fall back to the instance's path [for older version support]
+        $path = empty($path) ? $this->path : $path;
+        $path = Str::replace(Server::formatWithBaseDirectory(), '', $path);
+
+        $this->realpath = Server::formatWithBaseDirectory($path);
+
         /**
          * If SQL file does'nt exists
          */
-        if(!file_exists($this->realpath) || is_dir($this->realpath)){
-            $this->message = sprintf("Failed to open stream: `%s` does'nt exist.", $this->realpath);
+        if(!File::exists($this->realpath)){
+            $this->message = sprintf("Failed to open stream: [`%s`] does'nt exist.", $this->realpath);
         } else{
 
             // read a file into an array
@@ -78,7 +113,7 @@ class DBImport{
 
             // is readable
             if(!$this->isReadable($readFile)){
-                $this->message = sprintf("Failed to read file or empty data. `%s`", $path_to_sql);
+                $this->message = sprintf("Failed to read file or empty data. [`%s`]", $path);
             } else{
 
                 // check if connection test is okay
@@ -88,7 +123,7 @@ class DBImport{
                         $pdo = $this->db['pdo'];
 
                         // get content
-                        $sql = file_get_contents($this->realpath);
+                        $sql = File::get($this->realpath);
 
                         // Replace Creation of tables
                         $sql = str_replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS", $sql);
@@ -99,7 +134,7 @@ class DBImport{
                         // Replace Creation of triggers
                         $sql = str_replace("CREATE TRIGGER", "CREATE TRIGGER IF NOT EXISTS", $sql);
 
-                        // Replace delimiter
+                        // Remove delimiter
                         $sql = str_replace(['DELIMITER', '$$'], "", $sql);
 
                         // Check if table exists and remove ALTER TABLE queries
@@ -117,11 +152,32 @@ class DBImport{
                             }
                         }
 
-                        // execute query
-                        $pdo->exec($sql);
+                        // Split SQL into individual queries safely (respect quotes and comments)
+                        $statements = $this->splitSqlStatements($sql);
+                        $allSuccess = true;
+                        $errors = [];
 
-                        $this->error    = Constant::STATUS_200;
-                        $this->message  = "- Database has been imported successfully.";
+                        foreach ($statements as $statement) {
+                            $statement = trim($statement);
+                            if ($statement === '') {
+                                continue;
+                            }
+                            try {
+                                $pdo->exec($statement);
+                            } catch (\PDOException $e) {
+                                $allSuccess = false;
+                                $errors[] = $e->getMessage();
+                            }
+                        }
+
+                        // Set status based on execution
+                        if ($allSuccess) {
+                            $this->error   = Constant::STATUS_200;
+                            $this->message = "- Database has been imported successfully.";
+                        } else {
+                            $this->error   = Constant::STATUS_400;
+                            $this->message = "- Database import completed with errors:\n" . implode("\n", $errors);
+                        }
                     } catch(PDOException $e){
                         $this->message  = "- Performing query: <strong style='color: #000'>{$e->getMessage()}</strong>";
                         $this->error    = Constant::STATUS_400;
@@ -140,7 +196,6 @@ class DBImport{
         |   if ->status === 400 (Query to database error
         |   if ->status === 200 (Success importing to database
         */ 
-        
         return (object) [
             'status'    => $this->error, 
             'message'   => is_array($this->message) 

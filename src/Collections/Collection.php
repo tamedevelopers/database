@@ -96,4 +96,34 @@ class Collection extends CollectionProperty implements IteratorAggregate, ArrayA
         }
     }
 
+    /**
+     * Convert data to array
+     * 
+     * @return array
+     */ 
+    public function toArray()
+    {
+        return json_decode( json_encode($this->items), true);
+    }
+    
+    /**
+     * Convert data to object
+     * 
+     * @return object
+     */ 
+    public function toObject()
+    {
+        return json_decode( json_encode($this->items), false);
+    }
+    
+    /**
+     * Convert data to json
+     * 
+     * @return string
+     */ 
+    public function toJson()
+    {
+        return json_encode($this->items);
+    }
+
 }

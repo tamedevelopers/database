@@ -38,7 +38,7 @@ trait BuilderTrait{
     }
 
     /**
-     * Get Instance Table Name
+     * Alias for tableName() method
      * 
      * @return string
      */
@@ -271,7 +271,6 @@ trait BuilderTrait{
      * Add a select expression to the query.
      *
      * @param mixed $columns
-     * 
      * @return $this
      */
     protected function buildSelect(mixed $columns = [])

@@ -1,5 +1,6 @@
 <?php
 
+use Tamedevelopers\Database\DB;
 use Tamedevelopers\Database\Capsule\AppManager;
 
 include_once __DIR__ . "/../vendor/autoload.php";
@@ -14,9 +15,18 @@ AppManager::bootLoader();
 $db = db();
 $admin = new Admin;
 
+$collection = tcollect($db->table('users')->get());
+
+foreach($collection as $user ){
+    // $user
+}
+// using model
+// $admin->getUsers()
+
 dd(
-    $db,
-    $admin->getUsers()
+    DB::select('SHOW TABLES'),
+    DB::selectOne("SHOW CREATE TABLE `admins`"),
+    DB::from("admins")->get(),
 );
 
 // using model

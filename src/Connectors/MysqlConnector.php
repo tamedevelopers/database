@@ -47,18 +47,18 @@ class MysqlConnector implements ConnectorInterface{
             $pdo  = new PDO($dsn, $config['username'], $config['password'], self::$options);
             
             // set charset
-            if (isset($config['charset'])) {
+            if (self::checkIssetEmpty($config, 'charset')) {
                 $pdo->exec("set names {$config['charset']}");
                 $pdo->exec("set collation_connection = '{$config['charset']}_general_ci'");
             }
     
             // set database to use
-            if (isset($config['database'])) {
+            if (self::checkIssetEmpty($config, 'database')) {
                 $pdo->exec("use {$config['database']}");
             }
     
             // set timezone if available
-            if (isset($options['timezone'])) {
+            if (self::checkIssetEmpty($config, 'timezone')) {
                 $pdo->exec("set time_zone = '{$config['timezone']}'");
             }
             

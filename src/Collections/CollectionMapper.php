@@ -8,6 +8,7 @@ use ArrayAccess;
 use Traversable;
 use ArrayIterator;
 use IteratorAggregate;
+use Tamedevelopers\Database\Schema\Builder;
 use Tamedevelopers\Database\Collections\CollectionProperty;
 use Tamedevelopers\Database\Collections\Traits\RelatedTrait;
 
@@ -26,10 +27,10 @@ class CollectionMapper extends CollectionProperty implements IteratorAggregate, 
      *
      * @param  mixed $items
      * @param  mixed $key
-     * @param  \Tamedevelopers\Database\Collections\Collection
+     * @param  \Tamedevelopers\Database\Collections\Collection $collection
      * - Instance of Collection
      */
-    public function __construct(mixed $items = [], mixed $key = 0, Collection $collection = null)
+    public function __construct(mixed $items = [], mixed $key = 0, $collection = null)
     {
         $this->convertOnInit($items);
         $this->key  = ((int) $key + 1);
@@ -45,6 +46,16 @@ class CollectionMapper extends CollectionProperty implements IteratorAggregate, 
     public function getIterator() : Traversable
     {
         return new ArrayIterator($this->items);
+    }
+
+    /**
+     * Get Database Builder Instance
+     *  
+     * @return \Tamedevelopers\Database\Schema\Builder
+     */
+    public function builder()
+    {
+        return $this->builder;
     }
 
     /**

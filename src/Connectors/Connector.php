@@ -139,6 +139,41 @@ class Connector {
     }
 
     /**
+     * Set the table which the query is targeting.
+     *
+     * @param  string  $table
+     * @param  string|null  $as
+     * 
+     * @return \Tamedevelopers\Database\Schema\Builder
+     */
+    public function from($table, $as = null)
+    {
+        return $this->table('')->from($table, $as);
+    }
+
+    /**
+     * Run a SELECT query and return all results.
+     *
+     * @param string $query
+     * @return \Tamedevelopers\Database\Collections\Collection
+     */
+    public function select(string $query)
+    {
+        return $this->query($query)->get();
+    }
+    
+    /**
+     * Run a SELECT query and return a single result.
+     *
+     * @param string $query
+     * @return \Tamedevelopers\Database\Collections\Collection
+     */
+    public function selectOne(string $query)
+    {
+        return $this->query($query)->first();
+    }
+
+    /**
      * Configuring pagination settings 
      * @param array $options
      * [optional]

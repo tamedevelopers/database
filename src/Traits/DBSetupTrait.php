@@ -22,7 +22,7 @@ trait DBSetupTrait{
      */
     public static function table($table)
     {
-        return (new Connector)->table($table);
+        return self::connector()->table($table);
     }
 
     /**
@@ -34,7 +34,63 @@ trait DBSetupTrait{
      */
     public static function tableExists(...$table)
     {
-        return (new Connector)->table('')->tableExists($table);
+        return self::connector()->table('')->tableExists($table);
+    }
+
+    /**
+     * Direct Query Expression
+     *
+     * @param string $query
+     * @return \Tamedevelopers\Database\Schema\Builder
+     */
+    public static function query(string $query)
+    {
+        return self::connector()->query($query);
+    }
+
+    /**
+     * Set the table which the query is targeting.
+     *
+     * @param  string  $table
+     * @param  string|null  $as
+     * 
+     * @return \Tamedevelopers\Database\Schema\Builder
+     */
+    public static function from($table, $as = null)
+    {
+        return self::table('')->from($table, $as);
+    }
+    
+    /**
+     * Run a SELECT query and return all results.
+     *
+     * @param string $query
+     * @return \Tamedevelopers\Database\Collections\Collection
+     */
+    public static function select(string $query)
+    {
+        return self::query($query)->get();
+    }
+    
+    /**
+     * Run a SELECT query and return a single result.
+     *
+     * @param string $query
+     * @return \Tamedevelopers\Database\Collections\Collection
+     */
+    public static function selectOne(string $query)
+    {
+        return self::query($query)->first();
+    }
+
+    /**
+     * Get Connector instance
+     * 
+     * @return \Tamedevelopers\Database\Connectors\Connector
+     */
+    private static function connector()
+    {
+        return new Connector;
     }
     
 }
