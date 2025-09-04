@@ -10,34 +10,47 @@ use Tamedevelopers\Database\Console\Commands\MigrationCommand;
 
 /**
  * Minimal artisan-like dispatcher for Tamedevelopers Database
+ *
+ * Supports Laravel-like syntax:
+ *   php tame <command>[:subcommand] [--flag] [--option=value]
+ * Examples:
+ *   php tame key:generate
+ *   php tame migrate:fresh --seed --database=mysql
  */
 class Artisan
 {
     /**
      * Registered commands map
-     * @var array<string, array{handler: callable, description: string}>
+     * @var array<string, array{instance?: object, handler?: callable, description: string}>
      */
     protected array $commands = [];
 
     public function __construct()
     {
-        // Register built-in commands here with name and description
-        $this->register('scaffold', [new ScaffoldCommand(), 'handle'], 'Generate default scaffolding');
-        $this->register('migrate', [new MigrationCommand(), 'handle'], 'Run database migrations');
-        $this->register('key', [new KeyCommand(), 'handle'], 'Set the application key');
+        // Register built-in commands with class instances (enables subcommands and flags-as-methods)
+        $this->register('scaffold', new ScaffoldCommand(), 'Generate default scaffolding');
+        $this->register('migrate', new MigrationCommand(), 'Run database migrations');
+        $this->register('key', new KeyCommand(), 'Set or manage the application key');
     }
-
-    // key:generate                          Set the application key
 
     /**
      * Register a command by name with description
      *
-     * @param string   $name
-     * @param \Callable|array $handler      function(array $args): int
-     * @param string   $description  Short description for `list`
+     * @param string $name
+     * @param callable|object $handler  Either a callable or a command class instance
+     * @param string $description       Short description for `list`
      */
-    public function register(string $name, $handler, $description = ''): void
+    public function register(string $name, $handler, string $description = ''): void
     {
+        if (\is_object($handler) && !\is_callable($handler)) {
+            $this->commands[$name] = [
+                'instance' => $handler,
+                'description' => $description,
+            ];
+            return;
+        }
+
+        // Fallback to callable handler registration
         $this->commands[$name] = [
             'handler' => $handler,
             'description' => $description,
@@ -50,22 +63,79 @@ class Artisan
     public function run(array $argv): int
     {
         // argv: [php, tame, command, ...args]
-        $command = $argv[2] ?? 'list';
-        $args = array_slice($argv, 3);
+        $commandInput = $argv[2] ?? 'list';
+        $rawArgs = array_slice($argv, 3);
 
-        if ($command === 'list') {
+        if ($commandInput === 'list') {
             $this->renderList();
             return 0;
         }
 
-        if (!isset($this->commands[$command])) {
-            fwrite(STDERR, "Command not found: {$command}\n");
+        // Parse base and optional subcommand: e.g., key:generate -> [key, generate]
+        [$base, $sub] = $this->splitCommand($commandInput);
+
+        if (!isset($this->commands[$base])) {
+            fwrite(STDERR, "Invalid command: {$commandInput}\n\n");
             $this->renderList();
             return 1;
         }
 
-        $handler = $this->commands[$command]['handler'];
-        return (int) ($handler($args) ?? 0);
+        $entry = $this->commands[$base];
+
+        // Parse flags/options once and pass where applicable
+        [$positionals, $options] = $this->parseArgs($rawArgs);
+
+        // If registered with a class instance, we support subcommands and flag-to-method routing
+        if (isset($entry['instance']) && \is_object($entry['instance'])) {
+            $instance = $entry['instance'];
+
+            // Resolve primary method to call
+            $primaryMethod = $sub ?: 'handle';
+            if (!method_exists($instance, $primaryMethod)) {
+                fwrite(STDERR, "Invalid command/subcommand: {$commandInput}\n");
+                // Show small hint for available methods on the instance (public only)
+                $hints = $this->introspectPublicMethods($instance);
+                if ($hints !== '') {
+                    fwrite(STDERR, "Available methods: {$hints}\n\n");
+                } else {
+                    fwrite(STDERR, "\n");
+                }
+                $this->renderList();
+                return 1;
+            }
+
+            $exitCode = (int) ($this->invokeCommandMethod($instance, $primaryMethod, $positionals, $options) ?? 0);
+
+            // Route flags as methods on the same instance
+            $invalidFlags = [];
+            foreach ($options as $flag => $value) {
+                $method = $this->optionToMethodName($flag);
+                // Skip if this flag matches the already-run primary method
+                if ($method === $primaryMethod) {
+                    continue;
+                }
+                if (method_exists($instance, $method)) {
+                    $this->invokeCommandMethod($instance, $method, $positionals, $options, $flag);
+                } else {
+                    $invalidFlags[] = $flag;
+                }
+            }
+
+            if (!empty($invalidFlags)) {
+                fwrite(STDERR, "Invalid option/method: --" . implode(', --', $invalidFlags) . "\n");
+            }
+
+            return $exitCode;
+        }
+
+        // Fallback: callable handler (no subcommands/flags routing)
+        if (isset($entry['handler']) && \is_callable($entry['handler'])) {
+            $handler = $entry['handler'];
+            return (int) ($handler($rawArgs) ?? 0);
+        }
+
+        fwrite(STDERR, "Command not properly registered: {$commandInput}\n");
+        return 1;
     }
 
     /**
@@ -76,11 +146,131 @@ class Artisan
         $names = array_keys($this->commands);
         sort($names);
         echo "Tamedevelopers Database CLI\n\n";
-        echo "Usage: \nphp tame <command> [options]\n\n";
+        echo "Usage: \nphp tame <command>[:subcommand] [options]\n\n";
         echo "Available commands:\n";
         foreach ($names as $name) {
             $desc = $this->commands[$name]['description'] ?? '';
             echo "  - {$name}" . ($desc !== '' ? "  {$desc}" : "") . "\n";
+        }
+    }
+
+    /**
+     * Split command into base and optional subcommand
+     * @return array{0:string,1:?string}
+     */
+    private function splitCommand(string $input): array
+    {
+        $parts = explode(':', $input, 2);
+        $base = $parts[0] ?? '';
+        $sub = $parts[1] ?? null;
+        return [$base, $sub];
+    }
+
+    /**
+     * Parse raw args into positionals and options/flags.
+     * Options like: --name=value, --name value, --flag
+     * Short flags like -abc will be split into a,b,c set to true
+     *
+     * @param array $args
+     * @return array{0:array,1:array<string,mixed>}
+     */
+    private function parseArgs(array $args): array
+    {
+        $positionals = [];
+        $options = [];
+
+        for ($i = 0; $i < count($args); $i++) {
+            $arg = $args[$i];
+
+            if (str_starts_with($arg, '--')) {
+                $eqPos = strpos($arg, '=');
+                if ($eqPos !== false) {
+                    $key = substr($arg, 2, $eqPos - 2);
+                    $val = substr($arg, $eqPos + 1);
+                    $options[$key] = $val;
+                } else {
+                    $key = substr($arg, 2);
+                    // If next token exists and is not an option, treat as value
+                    $next = $args[$i + 1] ?? null;
+                    if ($next !== null && !str_starts_with((string)$next, '-')) {
+                        $options[$key] = $next;
+                        $i++; // consume next
+                    } else {
+                        $options[$key] = true;
+                    }
+                }
+            } elseif (str_starts_with($arg, '-')) {
+                // Short flags cluster: -abc => a=true, b=true, c=true
+                $cluster = substr($arg, 1);
+                foreach (str_split($cluster) as $ch) {
+                    $options[$ch] = true;
+                }
+            } else {
+                $positionals[] = $arg;
+            }
+        }
+
+        return [$positionals, $options];
+    }
+
+    /**
+     * Convert an option name (e.g., "seed" or "database") to a method name (foo-bar => fooBar)
+     */
+    private function optionToMethodName(string $option): string
+    {
+        $name = ltrim($option, '-');
+        $name = preg_replace('/[^a-zA-Z0-9_-]/', '', $name ?? '');
+        $parts = preg_split('/[-_]/', (string)$name) ?: [];
+        $camel = '';
+        foreach ($parts as $idx => $p) {
+            $p = strtolower($p);
+            $camel .= $idx === 0 ? $p : ucfirst($p);
+        }
+        return $camel ?: 'handle';
+    }
+
+    /**
+     * Invoke a command method with flexible signature support.
+     * Method may declare: fn():int, fn(array $args):int, fn(array $args, array $options):int
+     */
+    private function invokeCommandMethod(object $instance, string $method, array $args, array $options, ?string $invokedByFlag = null)
+    {
+        try {
+            $ref = new \ReflectionMethod($instance, $method);
+            $paramCount = $ref->getNumberOfParameters();
+            if ($paramCount >= 2) {
+                return $ref->invoke($instance, $args, $options);
+            }
+            if ($paramCount === 1) {
+                return $ref->invoke($instance, $args);
+            }
+            return $ref->invoke($instance);
+        } catch (\Throwable $e) {
+            $flagInfo = $invokedByFlag ? " (from --{$invokedByFlag})" : '';
+            fwrite(STDERR, "Error running {$method}{$flagInfo}: {$e->getMessage()}\n");
+            return 1;
+        }
+    }
+
+    /**
+     * Introspect public methods (excluding magic/constructor) for hints
+     */
+    private function introspectPublicMethods(object $instance): string
+    {
+        try {
+            $ref = new \ReflectionClass($instance);
+            $methods = [];
+            foreach ($ref->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
+                $name = $m->getName();
+                if ($name === '__construct' || str_starts_with($name, '__')) {
+                    continue;
+                }
+                $methods[] = $name;
+            }
+            sort($methods);
+            return implode(', ', $methods);
+        } catch (\Throwable $e) {
+            return '';
         }
     }
 }
