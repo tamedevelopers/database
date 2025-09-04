@@ -1,6 +1,6 @@
 {
     "name": "tamedevelopers/database",
-    "type": "library",
+    "type": "composer-plugin",
     "description": "Lightweight PHP ORM Database Model.",
     "keywords": ["php orm database", "orm database", "php database", "php orm github"],
     "homepage": "https://github.com/tamedevelopers/database",
@@ -18,15 +18,8 @@
     "require": {
         "php": ">=8.0",
         "tamedevelopers/support": "^5.0",
-        "symfony/console": "^6.0"
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "Tamedevelopers\\Database\\Installer::postInstall"
-        ],
-        "post-update-cmd": [
-            "Tamedevelopers\\Database\\Installer::postUpdate"
-        ]
+        "symfony/console": "^6.0",
+        "composer-plugin-api": "^2.0"
     },
     "autoload": {
         "files": [
@@ -36,6 +29,9 @@
             "Tamedevelopers\\Database\\": "src/"
         },
         "classmap": ["src/*"]
+    },
+    "extra": {
+        "class": "Tamedevelopers\\Database\\ComposerPlugin"
     },
     "minimum-stability": "stable",
     "prefer-stable": true
