@@ -14,15 +14,15 @@ class ScaffoldCommand
     use CommandTrait;
 
     /**
-     * Handle the command
-     * @param array $args
-     * @return int exit code
+     * Default entry when running command
      */
-    public function handle(array $args)
+    public function handle(array $args = [], array $options = [])
     {
-        // Basic args parsing: --name=ModelName
-        $name = $this->getOption($args, 'name') ?? 'example';
 
+        dd(
+            $args,
+            $options
+        );
         // Ensure env and logger are booted
         Env::boot();
         Env::loadOrFail();
@@ -30,7 +30,7 @@ class ScaffoldCommand
         // Example: ensure connection booted (if your manager requires it)
         // Adjust to your initialization flow if different
         $db = new DatabaseManager();
-
+        
         
     }
 

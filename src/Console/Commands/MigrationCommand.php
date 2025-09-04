@@ -13,7 +13,7 @@ class MigrationCommand
     use CommandTrait;
 
     /**
-     * Default entry when running: php tame migrate
+     * Default entry when running command
      */
     public function handle(array $args = [], array $options = []): int
     {
@@ -24,6 +24,7 @@ class MigrationCommand
     }
 
     /**
+     * Drop all tables and re-run all migrations
      * Subcommand: php tame migrate:fresh
      */
     public function fresh(array $args = [], array $options = []): int
@@ -42,12 +43,19 @@ class MigrationCommand
             echo "Add --force to bypass confirmations in production.\n";
         }
 
+
+        dd(
+            'ss'
+        );
+
+        
+
         // TODO: implement the actual drop-all + migrate logic
         echo "[demo] Dropping all tables...\n";
         echo "[demo] Running migrations...\n";
 
         if ($seed) {
-            $this->seed($args, $options);
+            // $this->seed($args, $options);
         }
 
         echo "Migrations completed.\n";
@@ -55,10 +63,9 @@ class MigrationCommand
     }
 
     /**
-     * Example flag/subcommand method: --seed
-     * Can also be invoked as: php tame migrate:seed (if desired)
+     * Show the status of each migration
      */
-    public function seed(array $args = [], array $options = []): int
+    public function status(array $args = [], array $options = []): int
     {
         echo "[demo] Seeding database...\n";
         // TODO: call your seeder pipeline here
@@ -66,18 +73,18 @@ class MigrationCommand
     }
 
     /**
-     * Flag method: --force
+     * Reset and re-run all migrations
      */
-    public function force(array $args = [], array $options = []): int
+    public function refresh(array $args = [], array $options = []): int
     {
         // Could set internal state or skip confirmations
         return 0;
     }
 
     /**
-     * Option method example: --database=mysql => database(["mysql"]) if you prefer
+     * Rollback all database migrations
      */
-    public function database(array $args = [], array $options = []): int
+    public function reset(array $args = [], array $options = []): int
     {
         // No-op placeholder to show that options with values are also routed
         return 0;
