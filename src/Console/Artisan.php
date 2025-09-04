@@ -28,7 +28,7 @@ class Artisan
      * Registered commands map
      * @var array<string, array{instance?: object, handler?: callable, description: string}>
      */
-    protected array $commands = [];
+    protected static array $commands = [];
 
     public function __construct()
     {
@@ -51,7 +51,7 @@ class Artisan
     public function register(string $name, $handler, string $description = ''): void
     {
         if (\is_object($handler) && !\is_callable($handler)) {
-            $this->commands[$name] = [
+            self::$commands[$name] = [
                 'instance' => $handler,
                 'description' => $description,
             ];
@@ -59,7 +59,7 @@ class Artisan
         }
 
         // Fallback to callable handler registration
-        $this->commands[$name] = [
+        self::$commands[$name] = [
             'handler' => $handler,
             'description' => $description,
         ];
@@ -89,13 +89,13 @@ class Artisan
         // Parse base and optional subcommand: e.g., key:generate -> [key, generate]
         [$base, $sub] = $this->splitCommand($commandInput);
 
-        if (!isset($this->commands[$base])) {
+        if (!isset(self::$commands[$base])) {
             Logger::error("Invalid command: {$commandInput}\n\n");
             $this->renderList();
             return 1;
         }
 
-        $entry = $this->commands[$base];
+        $entry = self::$commands[$base];
 
         // Parse flags/options once and pass where applicable
         [$positionals, $options] = $this->parseArgs($rawArgs);
@@ -161,7 +161,7 @@ class Artisan
         echo "Tamedevelopers Database CLI\n\n";
         echo "Usage:\nphp tame <command>[:subcommand] [options]\n\n";
 
-        $grouped = $this->buildGroupedCommandList($this->commands);
+        $grouped = $this->buildGroupedCommandList(self::$commands);
 
         echo "Available commands:\n";
         // Root commands first
