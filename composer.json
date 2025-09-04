@@ -18,7 +18,6 @@
     "require": {
         "php": ">=8.0",
         "tamedevelopers/support": "^5.0",
-        "symfony/console": "^6.0",
         "composer-plugin-api": "^2.0"
     },
     "autoload": {
@@ -32,6 +31,14 @@
     },
     "extra": {
         "class": "Tamedevelopers\\Database\\ComposerPlugin"
+    },
+    "scripts": { 
+        "post-install-cmd": [ 
+            "Tamedevelopers\\Database\\Installer::postInstall" 
+        ], 
+        "post-update-cmd": [ 
+            "Tamedevelopers\\Database\\Installer::postUpdate" 
+        ] 
     },
     "minimum-stability": "stable",
     "prefer-stable": true

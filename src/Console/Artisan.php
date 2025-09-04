@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database\Console;
 
+use Tamedevelopers\Database\Console\Commands\KeyCommand;
 use Tamedevelopers\Database\Console\Commands\ScaffoldCommand;
 use Tamedevelopers\Database\Console\Commands\MigrationCommand;
 
@@ -23,7 +24,10 @@ class Artisan
         // Register built-in commands here with name and description
         $this->register('scaffold', [new ScaffoldCommand(), 'handle'], 'Generate default scaffolding');
         $this->register('migrate', [new MigrationCommand(), 'handle'], 'Run database migrations');
+        $this->register('key', [new KeyCommand(), 'handle'], 'Set the application key');
     }
+
+    // key:generate                          Set the application key
 
     /**
      * Register a command by name with description

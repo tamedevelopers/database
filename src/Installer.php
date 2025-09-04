@@ -52,7 +52,7 @@ class Installer
                 // create for [tame] 
                 self::createTameBash($paths);
 
-                Logger::success("Tamedevelopers-Dummy data has been created automatically!\n\nUsage: \nphp tame <command> [options]\n\n");
+                Logger::success("Tamedevelopers-Data has been created automatically!\n\nUsage: \nphp tame <command> [options]\n\n");
             }
         }
     }

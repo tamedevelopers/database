@@ -9,8 +9,8 @@ use Tamedevelopers\Database\DatabaseManager;
 use Tamedevelopers\Database\Console\Commands\Traits\CommandTrait;
 
 
-class ScaffoldCommand
-{
+class KeyCommand
+{   
     use CommandTrait;
 
     /**
@@ -31,7 +31,9 @@ class ScaffoldCommand
         // Adjust to your initialization flow if different
         $db = new DatabaseManager();
 
-        
+        dd(
+            'sss'
+        );
     }
 
 }
