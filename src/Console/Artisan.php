@@ -110,7 +110,7 @@ class Artisan
                 fwrite(STDERR, "Invalid command/subcommand: {$commandInput}\n");
                 // Show small hint for available methods on the instance (public only)
                 $hints = $this->introspectPublicMethods($instance);
-                if ($hints !== '') {
+                if ( !empty($hints)) {
                     fwrite(STDERR, "Available methods: {$hints}\n\n");
                 } else {
                     fwrite(STDERR, "\n");
@@ -158,29 +158,46 @@ class Artisan
      */
     private function renderList(): void
     {
-        echo "Tamedevelopers Database CLI\n\n";
-        echo "Usage:\nphp tame <command>[:subcommand] [options]\n\n";
+        // echo "Tamedevelopers Database CLI\n\n";
+        // echo "Usage:\nphp tame <command>[:subcommand] [options]\n\n";
+
+        Logger::helpHeader('Tamedevelopers Database CLI');
+        Logger::writeln('<muted>Usage:</muted>');
+        Logger::writeln('  php tame <command>[:subcommand] [options]');
+        Logger::writeln('');
 
         $grouped = $this->buildGroupedCommandList(self::$commands);
-
-        echo "Available commands:\n";
+        
         // Root commands first
         if (isset($grouped['__root'])) {
+            Logger::helpHeader('Available commands:');
             foreach ($grouped['__root'] as $cmd => $desc) {
-                $label = str_pad($cmd, 40, ' ');
-                echo "  {$label} " . ($desc ?: '') . "\n";
+                // Label with color
+                $label = Logger::segments([
+                    ['text' => $cmd, 'style' => 'green'],
+                ]);
+
+                // Pad description to align
+                $visibleLen = strlen(preg_replace('/<\/?[a-zA-Z0-9_-]+>/', '', '  ' . $label) ?? '');
+                $spaces = max(1, 35 - $visibleLen);
+
+                Logger::writeln('  ' . $label . str_repeat(' ', $spaces) . Logger::segments([
+                    ['text' => $desc, 'style' => 'desc'],
+                ]));
             }
-            echo "\n";
+            Logger::writeln('');
             unset($grouped['__root']);
         }
 
         // Then grouped by base (e.g., auth, cache, migrate:*)
         foreach ($grouped as $group => $items) {
-            echo $group . "\n";
-            foreach ($items as $cmd => $desc) {
-                $label = str_pad($cmd, 40, ' ');
-                echo "  {$label} " . ($desc ?: '') . "\n";
+            Logger::helpHeader($group);
+            foreach ($items as $full => $desc) {
+                [$ns, $method] = explode(':', $full, 2);
+                // method (yellow), description (white)
+                Logger::helpItem($ns, $method, null, $desc);
             }
+            Logger::writeln('');
         }
     }
 
