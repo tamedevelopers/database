@@ -11,6 +11,7 @@ use PDOException;
 use DateTimeInterface;
 use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\Forge;
+use Tamedevelopers\Database\Traits\ExceptionTrait;
 use Tamedevelopers\Database\Collections\Collection;
 use Tamedevelopers\Database\Schema\Traits\BuilderTrait;
 use Tamedevelopers\Database\Schema\Pagination\Paginator;
@@ -29,6 +30,7 @@ class Builder  {
     
     use BuilderTrait, 
         MySqlProperties,
+        ExceptionTrait,
         ExpressionTrait;
     
 

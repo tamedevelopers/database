@@ -93,7 +93,7 @@ class DBImport{
      * @return object
      * [status, message]
      */
-    public function import($path = null)
+    protected function import($path = null)
     {
         // use the provided path or fall back to the instance's path [for older version support]
         $path = empty($path) ? $this->path : $path;

@@ -6,6 +6,7 @@ namespace Tamedevelopers\Database\Migrations\Traits;
 
 use Tamedevelopers\Support\Env;
 use Tamedevelopers\Support\Str;
+use Tamedevelopers\Support\Capsule\File;
 
 /**
  * 
@@ -34,17 +35,17 @@ trait MigrationTrait{
         $fileName = sprintf( "%s_%s_%s", date('Y_m_d'), substr((string) time(), 4), "{$case_table}.php" );
 
         // real path
-        $realPath   = str_replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
+        $realPath   = Str::replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
 
         // get directory
         $dummyPath = "{$realPath}/../../Dummy/dummyMigration.dum";
 
 
         // If type creation passed
-        if(!empty($type) && in_array(strtolower($type), ['job', 'jobs'])){
+        if(!empty($type) && in_array(Str::lower($type), ['job', 'jobs'])){
             // create a jobs table
             $dummyPath = "{$realPath}/../../Dummy/dummyJobsMigration.dum";
-        } elseif(!empty($type) && in_array(strtolower($type), ['session', 'sessions'])){
+        } elseif(!empty($type) && in_array(Str::lower($type), ['session', 'sessions'])){
             // create a sessions table
             $dummyPath = "{$realPath}/../../Dummy/dummySessionsMigration.dum";
         }
@@ -57,7 +58,7 @@ trait MigrationTrait{
 
         // check if file exists already
         $style = self::$style;
-        if(file_exists($absoluteFile) && !is_dir($absoluteFile)){
+        if(File::exists($absoluteFile) && !File::isDirectory($absoluteFile)){
             echo sprintf("Table `%s` 
                         <span style='background: #ee0707; {$style}'> 
                             Failed
@@ -96,16 +97,16 @@ trait MigrationTrait{
         self::initStatic();
 
         // check if database folder not exist
-        if(!is_dir(self::$database)){
+        if(!File::isDirectory(self::$database)){
             @mkdir(self::$database, 0777);
 
             // gitignore fle path
             $gitignore = sprintf("%s.gitignore", self::$database);
 
             // create file if not exist
-            if (!file_exists($gitignore) && !is_dir($gitignore)) {
+            if (!File::exists($gitignore) && !is_dir($gitignore)) {
                 // Write the contents to the new file
-                file_put_contents($gitignore, preg_replace(
+                File::put($gitignore, preg_replace(
                     '/^[ \t]+|[ \t]+$/m', '', 
                     ".
                     /database
@@ -115,16 +116,16 @@ trait MigrationTrait{
         }
 
         // if migrations folder not found
-        if(!is_dir(self::$migrations)){
-            @mkdir(self::$migrations, 0777);
+        if(!File::isDirectory(self::$migrations)){
+            File::makeDirectory(self::$migrations, 0777);
         }
 
         // if seeders folder not found
-        if(!is_dir(self::$seeders)){
-            @mkdir(self::$seeders, 0777);
+        if(!File::isDirectory(self::$seeders)){
+            File::makeDirectory(self::$seeders, 0777);
         }
 
-        if(!is_dir(self::$migrations)){
+        if(!File::isDirectory(self::$migrations)){
             throw new \Exception( 
                 sprintf("Path to dabatase[dir] not found ---> `%s`", self::$migrations) 
             );
@@ -142,16 +143,8 @@ trait MigrationTrait{
      */
     private static function initStatic() 
     {
-        // if not defined
-        if ( ! defined('TAME_SERVER_CONNECT') ) {
-            self::$database = (new Env)->getDirectory();
-        } else{
-            // once we run env autoloader
-            // we have access to global Constant TAME_SERVER_CONNECT
-            self::$database = TAME_SERVER_CONNECT['server'];
-        }
-
-        self::$database     .= "database/";
+        // collection of migration and seeders path
+        self::$database     = Env::getServers('server') . "database/";
         self::$migrations   = self::$database . "migrations/";
         self::$seeders      = self::$database . "seeders/";
     }

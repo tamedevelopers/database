@@ -11,15 +11,17 @@ use Tamedevelopers\Database\Schema\Builder;
 use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\DatabaseManager;
 use Tamedevelopers\Support\Capsule\FileCache;
+use Tamedevelopers\Database\Traits\ExceptionTrait;
 use Tamedevelopers\Database\Schema\Pagination\Paginator;
 use Tamedevelopers\Database\Connectors\ConnectionBuilder;
 use Tamedevelopers\Database\Schema\Traits\ExpressionTrait;
 use Tamedevelopers\Database\Connectors\Traits\ConnectorTrait;
 
 
-class Connector {
+class Connector extends DatabaseManager{
     
     use ConnectorTrait, 
+        ExceptionTrait,
         ExpressionTrait;
     
     /**
@@ -68,7 +70,7 @@ class Connector {
      */
     static public function addConnection($name = null, $connection = null, $data = [])
     {
-        $driver = DatabaseManager::driverValidator($name);
+        $driver = static::driverValidator($name);
 
         // driver name
         $driverName = $driver['name'];
@@ -92,7 +94,7 @@ class Connector {
      */
     static public function removeFromConnection($name = null)
     {
-        $driver = DatabaseManager::driverValidator($name);
+        $driver = static::driverValidator($name);
 
         // driver name
         $driverName = $driver['name'];
@@ -212,7 +214,14 @@ class Connector {
 
         // There's no connecton instance set
         if(empty($instance)){
-            throw new Exception("There's no active connection! Unknown connection [{$this->name}].");
+            try {
+                throw new Exception("
+                    There's no active connection! Unknown connection [{$this->name}]. \n\n
+                    Use DB::connection(\$connName), to instatiate connection.
+                ");
+            } catch (\Throwable $th) {
+                $this->errorException($th);
+            }
         }
 
         // set connection
@@ -314,7 +323,7 @@ class Connector {
     private static function getConnectionFromDatabaseFile($name = null, $default = [])
     {
         $data = Server::config(
-            DatabaseManager::getConnectionKey($name), 
+            static::getConnectionKey($name), 
             []
         );
 
@@ -381,9 +390,9 @@ class Connector {
     {
         if(self::isModelExtended()){
             $this->setConnectionName();
-            $key = DatabaseManager::getConnectionKey($this->name);
+            $key = static::getConnectionKey($this->name);
             if (!FileCache::exists($key)) {
-                DatabaseManager::connection($this->name);
+                static::connection($this->name);
             }
         } 
     }

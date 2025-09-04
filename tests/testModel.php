@@ -12,21 +12,26 @@ include_once __DIR__ . "/Model/Admin.php";
 AppManager::bootLoader();
 
 
-$db = db();
+$db = db('woocommerce');
 $admin = new Admin;
 
-$collection = tcollect($db->table('users')->get());
+// $collection = tcollect($db->table('users')->get());
 
-foreach($collection as $user ){
-    // $user
-}
+// foreach($collection as $user ){
+//     // $user
+// }
 // using model
 // $admin->getUsers()
+// 
 
 dd(
-    DB::select('SHOW TABLES'),
-    DB::selectOne("SHOW CREATE TABLE `admins`"),
-    DB::from("admins")->get(),
+    $admin->getUsers(),
+    DB::from("admins")->paginate(1),
+    // Admin::where('id', 2)->first(),
+    // DB::select('SHOW TABLES'),
+    // DB::selectOne("SHOW CREATE TABLE `admins`"),
+    $db->from('t'),
+    // DB::from("admins"),
 );
 
 // using model

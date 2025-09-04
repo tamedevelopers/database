@@ -17,14 +17,17 @@ $user = (new Auth)->guard('tb_user', 'woocommerce');
 
 $data = ['email' => 'peter.blosom@gmail.com', 'status' => '1', 'password' => 'tagged'];
 
-$user->attempt($data);
+// $user->attempt($data);
 // $user->login($user->user());
 // $user->logout();
 
+$web = tauth('admins');
+$web->attempt(['email' => 'tamedevelopers@gmail.com', 'is_active' => '1', 'password' => 'admin']);
+
 dd(
+    $web,
+    $web->check(),
     $user,
     $user->check(),
-    $user->id(),
-    // $user->login($user->user())
 );
 

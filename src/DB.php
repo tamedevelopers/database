@@ -15,7 +15,7 @@ namespace Tamedevelopers\Database;
 use Tamedevelopers\Database\DatabaseManager;
 use Tamedevelopers\Database\Traits\DBSetupTrait;
 use Tamedevelopers\Database\Schema\Traits\ExpressionTrait;
-
+use Tamedevelopers\Database\Traits\ExceptionTrait;
 
 /**
  * @method static \Tamedevelopers\Database\Connectors\Connector connection(string|null $name, mixed $default = null)
@@ -73,6 +73,6 @@ use Tamedevelopers\Database\Schema\Traits\ExpressionTrait;
  */
 class DB extends DatabaseManager{
     
-    use DBSetupTrait, ExpressionTrait;
-    
+    use DBSetupTrait, ExpressionTrait, ExceptionTrait;
+
 }

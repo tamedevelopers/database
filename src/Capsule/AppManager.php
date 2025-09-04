@@ -46,7 +46,7 @@ class AppManager{
         | path => \storage\logs\orm.log
         |--------------------------------------------------------------------------
         */
-        Env::bootLogger();
+        Env::boot();
 
         /*
         |--------------------------------------------------------------------------
@@ -59,10 +59,10 @@ class AppManager{
         /*
         |--------------------------------------------------------------------------
         | Start env configuration
-        | You can configura your pagination text data here if you like
+        | You can configure your pagination text data here if you like
         |--------------------------------------------------------------------------
         */
-        AutoLoader::start();
+        AutoLoader::boot();
     }
 
 }

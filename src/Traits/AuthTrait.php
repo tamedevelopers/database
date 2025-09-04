@@ -118,6 +118,7 @@ trait AuthTrait
         $this->assertPasswordPresent($credentials);
 
         $query = $this->credentialsWithoutPassword($credentials);
+        
         return $this->fetchFirstBy($query);
     }
 
@@ -144,9 +145,11 @@ trait AuthTrait
     protected function fetchFirstBy(array $conditions)
     {
         $db = $this->conn->table($this->table);
+        
         foreach ($conditions as $column => $value) {
             $db->where($column, $value);
         }
+
         return $db->first();
     }
 
@@ -155,6 +158,7 @@ trait AuthTrait
     {
         $query = $credentials;
         unset($query['password']);
+
         return $query;
     }
 
@@ -162,7 +166,11 @@ trait AuthTrait
     protected function assertGuardSet(): void
     {
         if (!$this->table) {
-            throw new \RuntimeException("No guard set. Call Auth::guard('table') first.");
+            try {
+                throw new \RuntimeException("No guard set. Call Auth::guard('table') first.");
+            } catch (\Throwable $th) {
+                $this->errorException($th);
+            }
         }
     }
 
@@ -170,7 +178,11 @@ trait AuthTrait
     protected function assertTableExists(): void
     {
         if (!$this->conn->tableExists($this->table)) {
-            throw new \RuntimeException("Table {$this->table} does not exist.");
+            try {
+                throw new \RuntimeException("Auth guard [{$this->table}] is not defined.");
+            } catch (\Throwable $th) {
+                $this->errorException($th);
+            }
         }
     }
 
@@ -178,7 +190,11 @@ trait AuthTrait
     protected function assertPasswordPresent(array $credentials): void
     {
         if (!isset($credentials['password'])) {
-            throw new \RuntimeException("Password field is required in credentials.");
+            try {
+                throw new \RuntimeException("Password field ['password'] is required in credentials.");
+            } catch (\Throwable $th) {
+                $this->errorException($th);
+            }
         }
     }
 }

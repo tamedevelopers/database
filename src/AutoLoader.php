@@ -8,36 +8,60 @@ use Tamedevelopers\Support\Env;
 use Tamedevelopers\Database\Traits\AutoLoaderTrait;
 use Tamedevelopers\Database\Schema\Pagination\PaginatorAsset;
 
-class AutoLoader{
-
+class AutoLoader
+{
     use AutoLoaderTrait;
 
     protected static $default;
+
+    /**
+     * Boot the AutoLoader::start.
+     * If the constant 'TAME_AUTOLOADER_BOOT' is not defined, 
+     * it defines it and starts the debugger automatically 
+     * 
+     * So that this is only called once in entire application life-cycle
+     * 
+     * @param string|null $path 
+     * @param bool $createDummy 
+     * @return void
+     */
+    public static function boot($path = null, $createDummy = true)
+    {
+        if(!defined('TAME_AUTOLOADER_BOOT')){
+            // start auto loader
+            self::start($path, $createDummy);
+
+            // Define boot logger as true
+            define('TAME_AUTOLOADER_BOOT', 1);
+        } 
+    }
     
     /**
      * Star env configuration
      * 
-     * @param string|null $custom_path 
+     * @param string|null $path 
      * path \Path to .env file
      * - [optional] path \By default we use project root path
      * 
+     * @param bool $createDummy 
+     * 
      * @return void
      */
-    public static function start($custom_path = null)
+    public static function start($path = null, $createDummy = true)
     {
         /*
         |--------------------------------------------------------------------------
         | Instance of class
         |--------------------------------------------------------------------------
         */
-        $Env = new Env($custom_path);
+        $env = new Env($path);
         
         /*
         |--------------------------------------------------------------------------
         | Create a sample .env file if not exist in project
         |--------------------------------------------------------------------------
         */
-        $Env::createOrIgnore();
+        $env::createOrIgnore();
         
         /*
         |--------------------------------------------------------------------------
@@ -47,25 +71,16 @@ class AutoLoader{
         | or exit with error status code 
         |
         */
-        $Env::loadOrFail();
-        
-        /*
-        |--------------------------------------------------------------------------
-        | Storing data into a Constant once everything is successful
-        |--------------------------------------------------------------------------
-        | We can now use on anywhere on our application 
-        | Mostly to get our defined .env root Path
-        */
-        if ( ! defined('TAME_SERVER_CONNECT') ) {
-            define('TAME_SERVER_CONNECT', $Env->getServers());
-        }
+        $env::loadOrFail();
         
         /*
         |--------------------------------------------------------------------------
         | Automatically create dummy files
         |--------------------------------------------------------------------------
         */
-        self::createDummy(realpath(__DIR__));
+        if($createDummy){
+            self::createDummy(realpath(__DIR__));
+        }
     }
 
     /**

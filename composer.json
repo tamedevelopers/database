@@ -17,7 +17,16 @@
     ],
     "require": {
         "php": ">=8.0",
-        "tamedevelopers/support": "*"
+        "tamedevelopers/support": "^5.0",
+        "symfony/console": "^6.0"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "Tamedevelopers\\Database\\Installer::postInstall"
+        ],
+        "post-update-cmd": [
+            "Tamedevelopers\\Database\\Installer::postUpdate"
+        ]
     },
     "autoload": {
         "files": [

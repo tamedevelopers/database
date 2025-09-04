@@ -9,8 +9,10 @@ use Closure;
 use DateTime;
 use Exception;
 use DateTimeInterface;
+use Throwable;
 use Tamedevelopers\Support\Capsule\Forge;
 use Tamedevelopers\Database\Schema\Builder;
+use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Schema\Expression;
 use Tamedevelopers\Database\Schema\JoinClause;
 use Tamedevelopers\Support\Capsule\DebugManager;
@@ -1410,24 +1412,5 @@ trait BuilderTrait{
         // round to 2 decimal
         $this->runtime = round((float) $this->runtime, 2);
     }
-
-    /**
-     * Handle Errors
-     * 
-     * @param mixed $exception
-     * - \Instance of Throwable or PDOException
-     * 
-     * @return mixed
-     */ 
-    protected function errorException(mixed $exception)
-    {
-        if($this->manager::AppDebug()){
-            DebugManager::$whoops->handleException(
-                new \PDOException($exception->getMessage(), (int) $exception->getCode(), $exception),
-            );
-        } 
-        exit(1);
-    }
-    
 } 
 

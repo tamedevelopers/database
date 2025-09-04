@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+
+// Entry point: allows `php tame <command>` when placed at project root
+
+// Ensure Composer autoload
+include_once __DIR__ . "/vendor/autoload.php";
+
+// Run dispatcher
+$artisan = new Tamedevelopers\Database\Console\Artisan();
+exit($artisan->run($argv));

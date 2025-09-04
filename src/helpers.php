@@ -1,6 +1,7 @@
 <?php 
 
 use Tamedevelopers\Database\DB;
+use Tamedevelopers\Database\Auth;
 use Tamedevelopers\Database\DBExport;
 use Tamedevelopers\Database\DBImport;
 use Tamedevelopers\Database\AutoLoader;
@@ -69,6 +70,18 @@ if (! function_exists('app_manager')) {
     function app_manager()
     {
         return (new AppManager);
+    }
+}
+
+if (! function_exists('tauth')) {
+    /**
+     * Get Instance of Auth
+     * 
+     * @return \Tamedevelopers\Database\Auth
+     */
+    function tauth(string $table, $connection = null)
+    {
+        return new Auth($table, $connection);
     }
 }
 

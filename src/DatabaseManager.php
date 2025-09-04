@@ -22,21 +22,21 @@ class DatabaseManager extends DatabaseConnector {
      * @param string|null $name
      * - [name] of connections in [config/database.php] file
      * 
-     * @param array $default 
+     * @param array $options 
      * [optional] The default value to return if the configuration option is not found
      * 
      * @return \Tamedevelopers\Database\Connectors\Connector
      */
-    public static function connection($name = null, $default = [])
+    public static function connection($name = null, $options = [])
     {
-        [$name, $default] = self::prepareValues(
-            $name, $default, func_num_args() === 2
+        [$name, $options] = self::prepareValues(
+            $name, $options, func_num_args() === 2
         );
         
         // connector object
         return Connector::addConnection(
             name: $name,
-            data: $default,
+            data: $options,
         );
     }
 
@@ -64,14 +64,14 @@ class DatabaseManager extends DatabaseConnector {
      *
      * @param string|null $name
      * 
-     * * @param array $default 
+     * * @param array $options 
      * [optional] The default value to return if the configuration option is not found
      * 
      * @return \Tamedevelopers\Database\Connectors\Connector
      */
-    public static function reconnect($name = null, $default = [])
+    public static function reconnect($name = null, $options = [])
     {
-        return self::connection($name, $default);
+        return self::connection($name, $options);
     }
 
     /**

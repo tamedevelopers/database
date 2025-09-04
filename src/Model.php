@@ -14,7 +14,9 @@ namespace Tamedevelopers\Database;
 
 use Exception;
 use Tamedevelopers\Database\DB;
+use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Connectors\Connector;
+use Tamedevelopers\Database\Traits\ExceptionTrait;
 use Tamedevelopers\Database\Connectors\Traits\ConnectorTrait;
 
 
@@ -23,7 +25,7 @@ use Tamedevelopers\Database\Connectors\Traits\ConnectorTrait;
  */
 abstract class Model extends DB{
 
-    use ConnectorTrait;
+    use ConnectorTrait, ExceptionTrait;
 
     /**
      * The table associated with the model.
@@ -35,6 +37,18 @@ abstract class Model extends DB{
      * Model Class Table Initialization alone
      */
     protected $table;
+    
+    /**
+     * Create a new Eloquent model instance.
+     */
+    public function __construct()
+    {
+        // Ensure environment variables are loaded before accessing them
+        Manager::startEnvIFNotStarted();
+        
+        // automatically connect to database when model is instantiated
+        $this->connection();
+    }
     
     /**
      * Handle the calls to non-existent instance methods.
@@ -99,7 +113,11 @@ abstract class Model extends DB{
 
         // unkown method
         if (!method_exists($instance, $method)) {
-            throw new Exception("Method '{$method}' does not exist in class '" . get_class($instance) . "'.");
+            try {
+                throw new Exception("Method [{$method}] does not exist in class '" . get_class($instance) . "'.");
+            } catch (\Throwable $th) {
+                self::staticErrorException($th);
+            }
         }
 
         return $instance->$method(...$args);

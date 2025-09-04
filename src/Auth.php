@@ -8,6 +8,7 @@ use Tamedevelopers\Database\DB;
 use Tamedevelopers\Support\Hash;
 use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Traits\AuthTrait;
+use Tamedevelopers\Database\Traits\ExceptionTrait;
 
 /**
  * Class Auth Manager
@@ -22,7 +23,7 @@ use Tamedevelopers\Database\Traits\AuthTrait;
  */
 class Auth
 {
-    use AuthTrait;
+    use AuthTrait, ExceptionTrait;
 
     /**
      * Instance of Database Object
@@ -44,14 +45,14 @@ class Auth
     /**
      * The table name associated with the current guard.
      *
-     * @var string|null $table
+     * @var string|null
      */
     protected $table;
 
     /**
      * Session key used to store authenticated user data.
      *
-     * @var string $session
+     * @var string
      */
     protected static $session = 'tame_auth_user';
 
@@ -63,6 +64,7 @@ class Auth
      */
     public function __construct($table = null, $connection = null)
     {
+        // Ensure environment variables are loaded before accessing them
         Manager::startEnvIFNotStarted();
 
         $this->table = $table;
@@ -140,6 +142,16 @@ class Auth
     }
 
     /**
+     * Determine if the current user is a guest.
+     *
+     * @return bool
+     */
+    public function guest()
+    {
+        return !$this->check();
+    }
+
+    /**
      * Get the currently authenticated user (from memory or session).
      *
      * @return array|null  The authenticated user or null if not logged in.
@@ -196,7 +208,13 @@ class Auth
     public function __get(string $name)
     {
         if ($name === 'user') {
-            throw new \RuntimeException("Direct access to 'user' is restricted. Use user() method instead.");
+            $className = get_class($this);
+            try {
+                throw new \RuntimeException("
+                Cannot access protected property {$className}::$$name. Use user() method instead.");
+            } catch (\Throwable $th) {
+                $this->errorException($th);
+            }
         }
         return null;
     }

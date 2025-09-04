@@ -11,7 +11,7 @@ use Tamedevelopers\Database\Connectors\SQLiteConnector;
 use Tamedevelopers\Database\Connectors\PostgresConnector;
 
 trait ConnectorTrait{
-
+    
     /**
      * Check if config key is isset and not empty
      *

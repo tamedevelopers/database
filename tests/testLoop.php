@@ -7,12 +7,14 @@ include_once __DIR__ . "/../vendor/autoload.php";
 
 // as long as we're not including the init.php file
 // then we must boot into out app to start using package
-AppManager::bootLoader();
+// AppManager::bootLoader();
 
+$database = DB::connection();
 
-
-$database = new DB();
-
+dd(
+    DB::table('tb_wallet'),
+    $database->table('tb_country'),
+);
 
 $wallets = $database->table('tb_wallet')
                     ->where('amount', '>', 0)

@@ -85,7 +85,7 @@ class DatabaseConnector{
      * 
      * @return string|null
      */
-    public static function findDriver($driver = null)
+    protected static function findDriver($driver = null)
     {
         // collation get
         $driver = Str::lower($driver);
@@ -102,7 +102,7 @@ class DatabaseConnector{
      * 
      * @return string|null
      */
-    public static function findCollation($collation = null)
+    protected static function findCollation($collation = null)
     {
         // collation get
         $collation = Str::lower($collation);
@@ -119,7 +119,7 @@ class DatabaseConnector{
      * 
      * @return string|null
      */
-    public static function findCharset($charset = null)
+    protected static function findCharset($charset = null)
     {
         // charset get
         $charset = Str::lower($charset);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database\Traits;
 
 
+use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Connectors\Connector;
 
 /**
@@ -90,7 +91,15 @@ trait DBSetupTrait{
      */
     private static function connector()
     {
-        return new Connector;
+        // Ensure environment variables are loaded before accessing them
+        Manager::startEnvIFNotStarted();
+
+        $connector = new Connector();
+
+        // automatically connect to database when model is instantiated
+        $connector->connection();
+
+        return $connector;
     }
     
 }
