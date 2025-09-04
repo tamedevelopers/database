@@ -12,5 +12,6 @@
 .gitignore
 .user.ini
 composer.lock
+tame
 test.php 
 init.php 
