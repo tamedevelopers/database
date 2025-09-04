@@ -25,6 +25,7 @@ class Artisan
      */
     protected array $commands = [];
 
+    
     public function __construct()
     {
         // Register built-in commands with class instances (enables subcommands and flags-as-methods)
@@ -62,9 +63,16 @@ class Artisan
      */
     public function run(array $argv): int
     {
-        // argv: [php, tame, command, ...args]
-        $commandInput = $argv[2] ?? 'list';
-        $rawArgs = array_slice($argv, 3);
+        // argv: [tame, command, ...args]
+        // In PHP CLI, $argv[0] is the script name (tame), so command starts at index 1
+        $commandInput = $argv[1] ?? 'list';
+        $rawArgs = array_slice($argv, 2);
+
+        // dd(
+        //     $argv,
+        //     $commandInput,
+        //     $rawArgs
+        // );
 
         if ($commandInput === 'list') {
             $this->renderList();
@@ -273,4 +281,5 @@ class Artisan
             return '';
         }
     }
+
 }

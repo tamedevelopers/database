@@ -11,6 +11,9 @@ namespace Tamedevelopers\Database\Console\Commands\Traits;
  */
 trait CommandTrait{
 
+
+    
+
     /**
      * Get an option value from a list of arguments.
      *
