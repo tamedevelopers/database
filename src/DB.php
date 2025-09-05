@@ -66,7 +66,7 @@ use Tamedevelopers\Database\Traits\ExceptionTrait;
  * @see \Tamedevelopers\Database\Schema\Builder
  * @see \Tamedevelopers\Database\DatabaseManager
  * @see \Tamedevelopers\Database\Schema\Expression
- * @see \Tamedevelopers\Database\Collections\Collection
+ * @see \Tamedevelopers\Support\Collections\Collection
  * @see \Tamedevelopers\Database\Connectors\Connector
  * @see \Tamedevelopers\Database\Traits\DBSetupTrait
  * @see \Tamedevelopers\Database\Schema\Traits\MySqlProperties

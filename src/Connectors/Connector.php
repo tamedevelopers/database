@@ -157,7 +157,7 @@ class Connector extends DatabaseManager{
      * Run a SELECT query and return all results.
      *
      * @param string $query
-     * @return \Tamedevelopers\Database\Collections\Collection
+     * @return \Tamedevelopers\Support\Collections\Collection
      */
     public function select(string $query)
     {
@@ -168,7 +168,7 @@ class Connector extends DatabaseManager{
      * Run a SELECT query and return a single result.
      *
      * @param string $query
-     * @return \Tamedevelopers\Database\Collections\Collection
+     * @return \Tamedevelopers\Support\Collections\Collection
      */
     public function selectOne(string $query)
     {

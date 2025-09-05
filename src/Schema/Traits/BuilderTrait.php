@@ -16,7 +16,7 @@ use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Schema\Expression;
 use Tamedevelopers\Database\Schema\JoinClause;
 use Tamedevelopers\Support\Capsule\DebugManager;
-use Tamedevelopers\Database\Collections\Collection;
+use Tamedevelopers\Support\Collections\Collection;
 use Tamedevelopers\Database\Schema\BuilderCompiler;
 use Tamedevelopers\Database\Schema\Pagination\Paginator;
 
@@ -914,7 +914,7 @@ trait BuilderTrait{
         }
 
         $this->connection->statement = $statement ?? null;
-        $this->query = null;
+        // $this->query = null;
         
         return $this;
     }

@@ -136,34 +136,29 @@ trait AutoLoaderTrait{
     protected static function isDummyNotPresent($paths)
     {
         $present = [false];
-
+        
         // create for database 
-        if(!file_exists($paths['database']['path'])){
-            $present[] = true;
-        }
-
-        // create for tame bash script 
-        if(!file_exists($paths['tame']['path'])){
+        if(!File::exists($paths['database']['path'])){
             $present[] = true;
         }
 
         // create for init 
-        if(!file_exists($paths['init']['path'])){
+        if(!File::exists($paths['init']['path'])){
             $present[] = true;
         }
 
         // create for gitignore
-        if(!file_exists($paths['gitignore']['path'])){
+        if(!File::exists($paths['gitignore']['path'])){
             $present[] = true;
         }
 
         // create for htaccess
-        if(!file_exists($paths['htaccess']['path'])){
+        if(!File::exists($paths['htaccess']['path'])){
             $present[] = true;
         }
 
         // create for userini
-        if(!file_exists($paths['userini']['path'])){
+        if(!File::exists($paths['userini']['path'])){
             $present[] = true;
         }
 

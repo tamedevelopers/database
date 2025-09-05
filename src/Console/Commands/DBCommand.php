@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database\Console\Commands;
 
-use Tamedevelopers\Database\DB;
 use Tamedevelopers\Support\Capsule\Logger;
 use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Console\Commands\CommandHelper;
 
-class DBCommand 
+class DBCommand extends CommandHelper
 {   
-    use CommandHelper;
     
     /**
      * Default entry when running command
@@ -60,14 +58,20 @@ class DBCommand
             $this->warning("Command aborted.\n");
             exit(0);
         }
+
+        $tablesToDelete = ['users', 'posts', 'comments', 'orders'];
+
+        dd(
+            $this->conn->query("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'")
+        );
+
         // proceed
-        $this->progressBar(function ($step) {
-            dd(
-                $step
-            );
+        $this->progressBar(function ($step) use ($tablesToDelete) {
+            $step();
         });
 
         $this->success("Database wiped successfully.");
+
         exit(1);
     }
     

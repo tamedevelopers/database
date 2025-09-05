@@ -12,7 +12,7 @@ use DateTimeInterface;
 use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\Forge;
 use Tamedevelopers\Database\Traits\ExceptionTrait;
-use Tamedevelopers\Database\Collections\Collection;
+use Tamedevelopers\Support\Collections\Collection;
 use Tamedevelopers\Database\Schema\Traits\BuilderTrait;
 use Tamedevelopers\Database\Schema\Pagination\Paginator;
 use Tamedevelopers\Database\Schema\Traits\ExpressionTrait;
@@ -1405,7 +1405,7 @@ class Builder  {
      * Execute the query as a "select" statement.
      *
      * @param  int $limit
-     * @return \Tamedevelopers\Database\Collections\Collection
+     * @return \Tamedevelopers\Support\Collections\Collection
      */
     public function get($limit = null)
     {
@@ -1427,7 +1427,7 @@ class Builder  {
      * @param  string $pageParam
      * [optional] parameter name on url
      * 
-     * @return \Tamedevelopers\Database\Collections\Collection
+     * @return \Tamedevelopers\Support\Collections\Collection
      */
     public function paginate($perPage = 15, $pageParam = 'page')
     {
@@ -1462,7 +1462,7 @@ class Builder  {
      * @param int $value
      * [default column name is `id`]
      *
-     * @return null|\Tamedevelopers\Database\Collections\Collection
+     * @return null|\Tamedevelopers\Support\Collections\Collection
      */
     public function find(int $value)
     {
@@ -1471,7 +1471,7 @@ class Builder  {
 
     /**
      * Execute the query and get the first result.
-     * @return null|\Tamedevelopers\Database\Collections\Collection
+     * @return null|\Tamedevelopers\Support\Collections\Collection
      */
     public function first()
     {
@@ -1480,7 +1480,7 @@ class Builder  {
 
     /**
      * Execute the query and get the first result or throw an exception.
-     * @return null|\Tamedevelopers\Database\Collections\Collection
+     * @return null|\Tamedevelopers\Support\Collections\Collection
      */
     public function firstOrIgnore()
     {
@@ -1489,7 +1489,7 @@ class Builder  {
 
     /**
      * Execute the query and get the first result or throw an exception.
-     * @return void|\Tamedevelopers\Database\Collections\Collection
+     * @return void|\Tamedevelopers\Support\Collections\Collection
      */
     public function firstOrFail()
     {
@@ -1505,7 +1505,7 @@ class Builder  {
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Tamedevelopers\Database\Collections\Collection
+     * @return \Tamedevelopers\Support\Collections\Collection
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
@@ -1545,7 +1545,7 @@ class Builder  {
      * Insert new records into the database.
      *
      * @param  array  $values
-     * @return \Tamedevelopers\Database\Collections\Collection
+     * @return \Tamedevelopers\Support\Collections\Collection
      */
     public function insert(array $values)
     {
@@ -1556,7 +1556,7 @@ class Builder  {
      * Insert new records into the database while ignoring errors.
      *
      * @param  array  $values
-     * @return null|\Tamedevelopers\Database\Collections\Collection
+     * @return null|\Tamedevelopers\Support\Collections\Collection
      */
     public function insertOrIgnore(array $values)
     {
