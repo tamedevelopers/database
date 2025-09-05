@@ -6,11 +6,9 @@ namespace Tamedevelopers\Database\Console\Commands;
 
 use Tamedevelopers\Support\Env;
 use Tamedevelopers\Database\DatabaseManager;
-use Tamedevelopers\Database\Console\Commands\Traits\CommandTrait;
 
 class MigrationCommand
-{   
-    use CommandTrait;
+{
 
     /**
      * Default entry when running command

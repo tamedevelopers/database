@@ -25,9 +25,6 @@ trait AutoLoaderTrait{
             // create for database 
             self::createDatabase($paths);
 
-            // create for [tame] 
-            self::createTameBash($paths);
-
             // create for init.php
             self::createInitPHP($paths);
     
@@ -56,20 +53,6 @@ trait AutoLoaderTrait{
 
             // Write the contents to the new file
             File::put($paths['database']['path'], $dummyContent);
-        }
-    }
-
-    /**
-     * Create [tame] file if not exist
-     */
-    private static function createTameBash($paths) : void
-    {
-        if(!File::exists($paths['tame']['path'])){
-            // Read the contents of the dummy file
-            $dummyContent = File::get($paths['tame']['dummy']);
-
-            // Write the contents to the new file
-            File::put($paths['tame']['path'], $dummyContent);
         }
     }
 
@@ -190,7 +173,7 @@ trait AutoLoaderTrait{
         // All elements in $present are false
         if ($allFalse) {
             return false;
-        } 
+        }
 
         return true;
     }
@@ -227,11 +210,7 @@ trait AutoLoaderTrait{
             'userini' => [
                 'path'  => "{$serverPath}.user.ini",
                 'dummy' => "{$realPath}/Dummy/dummyUserIni.dum",
-            ],
-            'tame' => [
-                'path'  => "{$serverPath}tame",
-                'dummy' => "{$realPath}/Dummy/dummyTame.dum",
-            ],
+            ]
         ];
     }
 

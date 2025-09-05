@@ -7,10 +7,6 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Fredrick Peterson", 
-            "email": "fredi.peterson2000@gmail.com"
-        },
-        {
             "name": "Tame Developers", 
             "email": "tamedevelopers@gmail.com"
         }
@@ -30,16 +26,26 @@
         "classmap": ["src/*"]
     },
     "extra": {
-        "class": "Tamedevelopers\\Database\\ComposerPlugin"
+        "class": "Tamedevelopers\\Database\\ComposerPlugin",
+        "tamedevelopers": {
+            "providers": [
+                "Tamedevelopers\\Database\\Console\\KernalCommand"
+            ]
+        }
     },
     "scripts": { 
         "post-install-cmd": [ 
-            "Tamedevelopers\\Database\\Installer::postInstall" 
+            "Tamedevelopers\\Database\\Installer::install" 
         ], 
         "post-update-cmd": [ 
-            "Tamedevelopers\\Database\\Installer::postUpdate" 
+            "Tamedevelopers\\Database\\Installer::update" 
         ] 
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "tamedevelopers/support": true
+        }
+    }
 }

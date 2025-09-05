@@ -17,7 +17,7 @@ class Installer
     /**
      * Run after composer require/install
      */
-    public static function postInstall()
+    public static function install()
     {
         self::publishDefaults();
     }
@@ -25,7 +25,7 @@ class Installer
     /**
      * Run after composer update
      */
-    public static function postUpdate()
+    public static function update()
     {
         self::publishDefaults();
     }
@@ -46,13 +46,11 @@ class Installer
 
             // only create when files are not present
             if(self::isDummyNotPresent_InSelf($paths)){
+
                 // create for database 
                 self::createDatabase($paths);
 
-                // create for [tame] 
-                self::createTameBash($paths);
-
-                Logger::success("Tamedevelopers-Data has been created automatically!\n\nUsage: \nphp tame <command> [options]\n\n");
+                Logger::success("[config/database.php] has been imported sucessfully!\n");
             }
         }
     }
@@ -64,27 +62,7 @@ class Installer
      */
     private static function isDummyNotPresent_InSelf($paths)
     {
-        $present = [false];
-
-        // create for database 
-        if(!File::exists($paths['database']['path'])){
-            $present[] = true;
-        }
-
-        // create for tame bash script 
-        if(!File::exists($paths['tame']['path'])){
-            $present[] = true;
-        }
-
-        // Check if all elements in $present are false
-        $allFalse = empty(array_filter($present));
-        
-        // All elements in $present are false
-        if ($allFalse) {
-            return false;
-        } 
-
-        return true;
+        return !File::exists($paths['database']['path']);
     }
 
 }
