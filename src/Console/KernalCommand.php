@@ -32,5 +32,5 @@ class KernalCommand implements CommandProviderInterface
         $artisan->register('db', new DBCommand($conn), 'Start a new database CLI session');
     }
 
-    
+
 }
