@@ -69,9 +69,7 @@ trait MigrationTrait{
         $style  = self::$style;
 
         // Date convert
-        $fileName = sprintf( "%s_%s", 
-                    date('Y_m_d'), 
-                    "create_{$table}_table.php" );
+        $fileName = Constant::formatMigrationTableName($table);
 
         // path
         $path = self::getDummyParts();

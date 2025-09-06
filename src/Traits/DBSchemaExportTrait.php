@@ -11,8 +11,6 @@ use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
 use Tamedevelopers\Support\Collections\Collection;
 
-
-
 /**
  * Trait DBSchemaExportTrait
  *
@@ -465,8 +463,8 @@ trait DBSchemaExportTrait
     protected function writeMigration(string $table, string $php, string $migrationsDir): string
     {
         $snake = Str::snake($table);
-        $filename = date('Y_m_d') . '_create_' . $snake . '_table.php';
-        $path = rtrim($migrationsDir, '/\\') . DIRECTORY_SEPARATOR . $filename;
+        $fileName = Constant::formatMigrationTableName($snake);
+        $path = rtrim($migrationsDir, '/\\') . DIRECTORY_SEPARATOR . $fileName;
         File::put($path, $php);
         return $path;
     }
@@ -710,7 +708,6 @@ trait DBSchemaExportTrait
         return $this->createDummyText($table, $body);
     }
 
-
     /**
      * Undocumented function
      *
@@ -730,6 +727,5 @@ trait DBSchemaExportTrait
 
         return $php;
     }
-
 
 }

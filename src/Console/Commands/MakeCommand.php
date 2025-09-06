@@ -31,14 +31,14 @@ class MakeCommand extends CommandHelper
         $table  = $args[0] ?? null;
         $create = $this->getOption($options, 'create');
 
+        // if options is valid and came
+        if(!empty($create)){
+            $table = $create;
+        }
+
         // if no table file name
         if(empty($table)){
             $table = $this->ask("\nWhat should the migration be named?");
-        }
-
-        // replace default table name
-        if(!empty($create)){
-            $table = $create;
         }
 
         $table = $this->extractTableName($table);
