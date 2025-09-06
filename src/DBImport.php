@@ -73,7 +73,7 @@ class DBImport{
         // Ensure environment variables are loaded before accessing them
         Manager::startEnvIFNotStarted();
         
-        $this->error    = Constant::STATUS_404;
+        $this->error    = Constant::STATUS_400;
         $this->path     = $path;
 
         $this->conn = DB::connection($connection);
@@ -205,8 +205,7 @@ class DBImport{
         | ----------------------------------------------------------------------------
         | Database importation use. Below are the status code
         | ----------------------------------------------------------------------------
-        |   if ->status === 404 (Failed to read file or File does'nt exists
-        |   if ->status === 400 (Query to database error
+        |   if ->status === 400 (Error Status
         |   if ->status === 200 (Success importing to database
         */ 
         $message = is_array($this->message) ? implode('\n<br>', $this->message) : $this->message;

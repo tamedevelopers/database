@@ -100,7 +100,7 @@ class DBSchemaExport
             $this->type = $this->frameWorkTypes['default'];
         }
 
-        $this->error    = Constant::STATUS_404;
+        $this->error    = Constant::STATUS_400;
         $this->path     = $path;
         
         $this->conn     = DB::connection($connection);
@@ -129,7 +129,7 @@ class DBSchemaExport
             $real = Server::formatWithBaseDirectory($normalized);
 
             if (!File::exists($real)) {
-                $this->error = Constant::STATUS_404;
+                $this->error = Constant::STATUS_400;
                 $this->message = sprintf("Failed to open stream: [`%s`] doesn't exist.", $real);
                 return $this->makeResponse(null);
             }

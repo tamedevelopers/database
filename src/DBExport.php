@@ -106,7 +106,7 @@ class DBExport
         }
 
         $this->retentionDays = $retentionDays;
-        $this->error = Constant::STATUS_404;
+        $this->error = Constant::STATUS_400;
 
         $this->conn = DB::connection($connection);
         $this->db = $this->conn->dbConnection();
@@ -203,8 +203,7 @@ class DBExport
         | ----------------------------------------------------------------------------
         | Database importation use. Below are the status code
         | ----------------------------------------------------------------------------
-        |   if ->status === 404 (Failed to read file or File does'nt exists
-        |   if ->status === 400 (Query to database error
+        |   if ->status === 400 (Error Status
         |   if ->status === 200 (Success importing to database
         */ 
         $storagePath = is_null($this->saveAsFileType) ? '' : $this->fileStoragePath;

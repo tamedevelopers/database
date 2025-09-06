@@ -15,10 +15,8 @@ use Tamedevelopers\Database\Console\Commands\ScaffoldCommand;
 use Tamedevelopers\Database\Console\Commands\MigrationCommand;
 
 
-
 class KernalCommand implements CommandProviderInterface
 {
-
     /** @inheritDoc */
     public function register(Artisan $artisan)  :void
     {
@@ -31,6 +29,5 @@ class KernalCommand implements CommandProviderInterface
         $artisan->register('key', new KeyCommand($conn), 'Set or manage the application key');
         $artisan->register('db', new DBCommand($conn), 'Start a new database CLI session');
     }
-
 
 }

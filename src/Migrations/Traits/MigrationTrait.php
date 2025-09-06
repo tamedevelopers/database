@@ -8,6 +8,7 @@ use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Env;
 use Tamedevelopers\Support\Str;
 use Tamedevelopers\Support\Capsule\File;
+use Tamedevelopers\Support\Process\HttpRequest;
 
 /**
  * 
@@ -63,8 +64,9 @@ trait MigrationTrait{
     private static function runMigrationCreateTable($table_name, $type = null) 
     {
         // table name
-        $table = Str::snake($table_name);
-        $type = Str::lower($type);
+        $table  = Str::snake($table_name ?? '');
+        $type   = Str::lower($type);
+        $style  = self::$style;
 
         // Date convert
         $fileName = sprintf( "%s_%s", 
@@ -87,14 +89,21 @@ trait MigrationTrait{
         // absolute path
         self::$storagePath = self::$migrations . $fileName;
 
-        // check if file exists already
-        $style = self::$style;
+        // browser break
+        $isConsole = HttpRequest::runningInConsole();
+        $message = [
+            'console_error' => "Migration <b>[%s]</b> already exists.",
+            'console_success' => "Migration <b>[%s]</b> created successfully.",
+            'browser_error' => "<span style='background: #ee0707; {$style}'>already exists.</span><br>",
+            'browser_success' => "<span style='background: #027b02; {$style}'>created successfully.</span><br>",
+        ];
+        
         if(File::exists(self::$storagePath)){
             self::$error = Constant::STATUS_400;
-            self::$message = sprintf("Migration [%s] 
-                                <span style='background: #ee0707; {$style}'> 
-                                already exists.</span> <br>\n", self::$storagePath);
-
+            self::$message = sprintf(
+                $isConsole ? $message['console_error'] : $message['browser_error'],
+                self::$storagePath
+            );
             return self::makeResponse();
         }
 
@@ -103,9 +112,10 @@ trait MigrationTrait{
         File::put(self::$storagePath, $dummyContent);
 
         self::$error = Constant::STATUS_200;
-        self::$message = sprintf("Migration [%s] 
-                            <span style='background: #027b02; {$style}'> 
-                            created successfully.</span> <br>\n", self::$storagePath);
+        self::$message = sprintf(
+            $isConsole ? $message['console_success'] : $message['browser_success'], 
+            self::$storagePath
+        );
 
         return self::makeResponse();
     }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database\Console\Commands;
 
+use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Database\Migrations\Migration;
 use Tamedevelopers\Support\Capsule\CommandHelper;
 
 
@@ -16,7 +18,7 @@ class MakeCommand extends CommandHelper
     {
         echo "Usage examples:\n";
         echo "  php tame make\n";
-        echo "  php tame make:migration [name]\n\n";
+        echo "  php tame make:migration [name] --create=users\n\n";
         return 0;
     }
 
@@ -26,7 +28,32 @@ class MakeCommand extends CommandHelper
     public function migration(array $args = [], array $options = []): int
     {
         // Could set internal state or skip confirmations
-        return 0;
+        $table  = $args[0] ?? null;
+        $create = $this->getOption($options, 'create');
+
+        // if no table file name
+        if(empty($table)){
+            $table = $this->ask("\nWhat should the migration be named?");
+        }
+
+        // replace default table name
+        if(!empty($create)){
+            $table = $create;
+        }
+
+        $table = $this->extractTableName($table);
+
+        $migration = new Migration();
+
+        $response = $migration::create($table);
+
+        if($response['status'] != Constant::STATUS_200){
+            $this->error($response['message']);
+            exit(0);
+        }
+
+        $this->info($response['message']);
+        exit(1);
     }
 
 }
