@@ -10,6 +10,7 @@ use Tamedevelopers\Support\Str;
 use Tamedevelopers\Support\Server;
 use Tamedevelopers\Support\Capsule\File;
 use Tamedevelopers\Database\Traits\DBImportTrait;
+use Tamedevelopers\Support\Collections\Collection;
 
 
 class DBImport{
@@ -42,14 +43,14 @@ class DBImport{
      *
      * @var array
      */
-    private $db;
+    public $db;
 
     /**
      * Instance of Database Object
      *
      * @var \Tamedevelopers\Database\Connectors\Connector
      */
-    protected $conn;
+    public $conn;
     
     /**
      * Path to sql file
@@ -196,12 +197,12 @@ class DBImport{
         |   if ->status === 400 (Query to database error
         |   if ->status === 200 (Success importing to database
         */ 
-        return (object) [
+        $message = is_array($this->message) ? implode('\n<br>', $this->message) : $this->message;
+
+        return new Collection([
             'status'    => $this->error, 
-            'message'   => is_array($this->message) 
-                            ? implode('\n<br>', $this->message)
-                            : $this->message
-        ];
+            'message'   => $message
+        ]);
     }
     
     /**

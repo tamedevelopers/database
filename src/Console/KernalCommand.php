@@ -31,4 +31,6 @@ class KernalCommand implements CommandProviderInterface
         $artisan->register('key', new KeyCommand($conn), 'Set or manage the application key');
         $artisan->register('db', new DBCommand($conn), 'Start a new database CLI session');
     }
+
+    
 }

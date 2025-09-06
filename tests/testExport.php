@@ -11,25 +11,10 @@ include_once __DIR__ . "/../vendor/autoload.php";
 // then we must boot into out app to start using package
 AppManager::bootLoader();
 
-
 // 'woocommerce'
 $export = new DBExport('zip', 'woocommerce');
 
-
-$users = DB::table("user")->paginate();
-
-
-// $users->showing();
-$query = DB::query("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'");
-
 dd(
-    DB::query("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'")
-        ->get()
-        ->pluck('tables_in_test'),
-
-    DB::query("SHOW FULL TABLES WHERE Table_type = 'VIEW'")
-        ->get()
-        ->pluck('tables_in_test'),
-
+    $export->run(),
     'ss',
 );

@@ -282,6 +282,18 @@ class Connector extends DatabaseManager{
     }
 
     /**
+     * Alias for dbConnection() method;
+     * 
+     * @param string|null $mode
+     * 
+     * @return mixed
+     */
+    public function getConnection($mode = null)
+    {
+        return $this->dbConnection($mode);
+    }
+
+    /**
      * Get the PDO instance for the current database driver.
      *
      * @return PDO|null 

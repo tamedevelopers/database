@@ -8,6 +8,7 @@ use Tamedevelopers\Support\Str;
 use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
 use Tamedevelopers\Database\Traits\DBExportTrait;
+use Tamedevelopers\Support\Collections\Collection;
 
 /**
  * Class DBExport
@@ -75,14 +76,14 @@ class DBExport
      *
      * @var array
      */
-    protected $db;
+    public $db;
 
     /**
      * Instance of Database Object
      *
      * @var \Tamedevelopers\Database\Connectors\Connector
      */
-    protected $conn;
+    public $conn;
 
     /**
      * DBExport constructor.
@@ -193,13 +194,15 @@ class DBExport
         |   if ->status === 400 (Query to database error
         |   if ->status === 200 (Success importing to database
         */ 
-        return (object) [
+
+        $storagePath = is_null($this->saveAsFileType) ? '' : $this->fileStoragePath;
+        $message = is_array($this->message) ? implode('\n<br>', $this->message) : $this->message;
+
+        return new Collection([
             'status'    => $this->error, 
-            'path'      => $this->fileStoragePath, 
-            'message'   => is_array($this->message) 
-                            ? implode('\n<br>', $this->message)
-                            : $this->message
-        ];
+            'path'      => $storagePath, 
+            'message'   => $message
+        ]);
     }
 
 }

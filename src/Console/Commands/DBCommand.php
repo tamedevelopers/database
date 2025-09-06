@@ -4,50 +4,111 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database\Console\Commands;
 
+use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Database\DBExport;
+use Tamedevelopers\Database\DBImport;
 use Tamedevelopers\Support\Capsule\Logger;
-use Tamedevelopers\Support\Capsule\Manager;
+use Tamedevelopers\Support\Capsule\CommandHelper;
 use Tamedevelopers\Support\Collections\Collection;
-use Tamedevelopers\Database\Console\Commands\CommandHelper;
 
 class DBCommand extends CommandHelper
-{   
+{
     
     /**
      * Default entry when running command
      */
-    public function handle(array $args = [], array $options = []): int
+    public function handle(array $args = [], array $options = []): mixed
     {
+        // Logger::helpHeader("Description:\n");
         Logger::writeln('<yellow>Usage:</yellow>');
         Logger::writeln('  php tame db:seed');
         Logger::writeln('  php tame db:wipe');
+        Logger::writeln('  php tame db:import');
+        Logger::writeln('  php tame db:export --connection=wocommerce --as=zip --days=5');
         Logger::writeln('');
 
-        return 0;
+        exit(1);
     }
 
     /**
      * Seed the database with records
      * Subcommand: php tame db:seed
      */
-    public function seed(array $args = [], array $options = []): int
+    public function seed(array $args = [], array $options = []): mixed
     {
-        $this->forceChecker($options);
+        $this->info('No Seed: implementation yet!');
+        exit(1);
+    }
 
-        $key = Manager::regenerate();
-        if ( !$key) {
-            Logger::error('Failed to generate the application key.');
-            return 0;
+    /**
+     * Import a Database [.sql] file into the database
+     * Subcommand: php tame db:seed
+     */
+    public function import(array $args = [], array $options = []): mixed
+    {
+        $connection = $this->getOption($options, 'connection');
+        $path       = $this->getOption($options, 'path');
+
+        $import = new DBImport(base_path($path), $connection);
+
+        $this->checkConnection($import->conn);
+
+        $response = null;
+
+        $this->progressBar(function ($report) use ($import, &$response) {
+            $response = $import->run();
+
+            $report();
+        });
+
+        if($response['status'] != Constant::STATUS_200){
+            $this->error($response['message']);
+            exit(0);
         }
 
-        Logger::success("Application key generated: {$key}\n");
-        return 1;
+        $this->success($response['message']);
+        exit(1);
+    }
+
+    /**
+     * Export a Database file into [.sql] and convert to <zip|rar>
+     * Subcommand: php tame db:export
+     */
+    public function export(array $args = [], array $options = []): mixed
+    {
+        $connection = $this->getOption($options, 'connection');
+        $as         = $this->getOption($options, 'as');
+        $days       = $this->getOption($options, 'days');
+
+        $export = new DBExport($as, $connection, (int) $days ?: 7);
+
+        $this->checkConnection($export->conn);
+
+        $response = null;
+
+        $this->progressBar(function ($report) use ($export, &$response) {
+            $response = $export->run();
+
+            $report();
+        });
+
+        if($response['status'] != Constant::STATUS_200){
+            $this->error($response['message']);
+            exit(0);
+        }
+
+        // path
+        $path = empty($response['path']) ? '' : "\n{$response['path']}";
+
+        $this->success("{$response['message']}{$path}");
+        exit(1);
     }
 
     /**
      * Drop all tables, views, and types
      * Subcommand: php tame db:wipe
      */
-    public function wipe(array $args = [], array $options = []): int
+    public function wipe(array $args = [], array $options = []): mixed
     {
         $this->forceChecker($options);
 
@@ -57,26 +118,54 @@ class DBCommand extends CommandHelper
         // ask once
         if (!$confirm) {
             $this->warning("Command aborted.\n");
-            exit(0);
+            return 0;
         }
 
-        $tables  = $this->getTables();
-        $views   = $this->getViews();
-        $types   = $this->getTypes();
-        $allItems = array_merge($tables, $views, $types);
+        // Determine what to drop based on flags. If any drop-* flags are provided,
+        // only drop those categories; otherwise drop all by default.
+        $flags = $this->getFlagTypes($options);
+        $restrictToFlags = !empty($flags);
+        $dropViews  = $restrictToFlags ? in_array('views', $flags, true)  : true;
+        $dropTypes  = $restrictToFlags ? in_array('types', $flags, true)  : true;
 
-        // proceed
-        $this->progressBar(function ($report) use ($tables, $views, $types) {
-            foreach ($tables as $table) {
-                $this->deleteTable($table);
-                $report();
-            }
+        $tables = $this->getTables();
+        $views  = $dropViews  ? $this->getViews()  : [];
+        $types  = $dropTypes  ? $this->getTypes()  : [];
 
+        // Build total for progress bar
+        $allItems = array_merge($views, $tables, $types);
+
+        $driver = $this->conn->getConfig()['driver'] ?? null;
+
+        $this->progressBar(function ($report) use ($views, $tables, $types, $driver) {
+            // Drop views first (safer if they reference tables)
             foreach ($views as $view) {
                 $this->deleteView($view);
                 $report();
             }
 
+            // Disable FK checks for MySQL and SQLite while dropping tables
+            if (!empty($tables)) {
+                if ($driver === 'mysql') {
+                    $this->conn->query("SET FOREIGN_KEY_CHECKS = 0")->exec();
+                } elseif ($driver === 'sqlite') {
+                    $this->conn->query("PRAGMA foreign_keys = OFF")->exec();
+                }
+
+                foreach ($tables as $table) {
+                    $this->deleteTable($table);
+                    $report();
+                }
+
+                // Re-enable FK checks
+                if ($driver === 'mysql') {
+                    $this->conn->query("SET FOREIGN_KEY_CHECKS = 1")->exec();
+                } elseif ($driver === 'sqlite') {
+                    $this->conn->query("PRAGMA foreign_keys = ON")->exec();
+                }
+            }
+
+            // Drop custom types last (mainly for PostgreSQL)
             foreach ($types as $type) {
                 $this->deleteType($type);
                 $report();
@@ -84,7 +173,6 @@ class DBCommand extends CommandHelper
         }, count($allItems));
 
         $this->success("Database wiped successfully.");
-
         exit(1);
     }
 
@@ -93,10 +181,11 @@ class DBCommand extends CommandHelper
      */
     protected function getTables(): array
     {
+        // Use information_schema to avoid relying on database-specific column names
         return $this->conn
-                    ->query("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'")
+                    ->query("SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_type = 'BASE TABLE'")
                     ->get()
-                    ->pluck('tables_in_test')
+                    ->pluck('table_name')
                     ->toArray();
     }
 
@@ -105,9 +194,11 @@ class DBCommand extends CommandHelper
      */
     protected function getViews(): array
     {
+        // Use information_schema to fetch view names reliably
         return $this->conn
-                    ->query("SHOW FULL TABLES WHERE Table_type = 'VIEW'")
+                    ->query("SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_type = 'VIEW'")
                     ->get()
+                    ->pluck('table_name')
                     ->toArray();
     }
 

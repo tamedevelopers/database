@@ -123,15 +123,14 @@ trait DBExportTrait
      */
     protected function getCreateTableStatement(string $table): string
     {
-        
         $row = $this->conn->selectOne("SHOW CREATE TABLE `{$table}`");
-
+        
         // SHOW CREATE TABLE returns two columns: Table, Create Table
         // but their keys differ by PDO driver; let's be defensive:
-        $values = array_values((array) $row)[0] ?? [];
+        $values = $row->toArray();
 
         // PDO driver differences: some return 'Create Table', some 'create table'
-        $createTableSql = $values['Create Table'] ?? $values['create table'];
+        $createTableSql = $values['Create Table'] ?? $values['create table'] ?? '';
         
         return $createTableSql;
     }
