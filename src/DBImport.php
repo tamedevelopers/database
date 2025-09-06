@@ -9,6 +9,7 @@ use Tamedevelopers\Database\DB;
 use Tamedevelopers\Support\Str;
 use Tamedevelopers\Support\Server;
 use Tamedevelopers\Support\Capsule\File;
+use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Traits\DBImportTrait;
 use Tamedevelopers\Support\Collections\Collection;
 
@@ -69,6 +70,9 @@ class DBImport{
      */
     public function __construct($connection = null, $path = null) 
     {
+        // Ensure environment variables are loaded before accessing them
+        Manager::startEnvIFNotStarted();
+        
         $this->error    = Constant::STATUS_404;
         $this->path     = $path;
 
@@ -98,7 +102,7 @@ class DBImport{
     {
         // use the provided path or fall back to the instance's path [for older version support]
         $normalized = empty($path) ? $this->path : $path;
-        $normalized = Str::replace(Server::formatWithBaseDirectory(), '', $path);
+        $normalized = Str::replace(Server::formatWithBaseDirectory(), '', $normalized);
         $this->realpath = Server::formatWithBaseDirectory($normalized);
 
         /**

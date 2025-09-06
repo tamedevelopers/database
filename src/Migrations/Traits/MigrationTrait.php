@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database\Migrations\Traits;
 
+use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Env;
 use Tamedevelopers\Support\Str;
 use Tamedevelopers\Support\Capsule\File;
@@ -17,74 +18,96 @@ trait MigrationTrait{
     private static $database;
     private static $migrations;
     private static $seeders;
-    
+    private static $error;
+    private static $message;
+    private static $storagePath;
+
+
+    /**
+     * Normalize folser structure for migrations and seeders
+     *
+     * @return void
+     */
+    private static function normalizeFolderStructure()
+    {
+        // collection of migration and seeders path
+        self::$database     = Env::getServers('server') . "database/";
+        self::$migrations   = self::$database . "migrations/";
+        self::$seeders      = self::$database . "seeders/";
+    }
+
+    /**
+     * Get Dummy real path data
+     *
+     * @return array
+     */
+    private static function getDummyParts()
+    {
+        // real path
+        $realPath = Str::replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
+
+        return [
+            'default'   => "{$realPath}/../../Dummy/dummyMigration.dum",
+            'job'       => "{$realPath}/../../Dummy/dummyJobsMigration.dum",
+            'session'   => "{$realPath}/../../Dummy/dummySessionsMigration.dum",
+        ];
+    }
     
     /**
      * Run Migrations
      *
      * @param  string $table_name
      * @param  string|null $type
-     * @return void
+     * @return \Tamedevelopers\Support\Collections\Collection
      */
-    private static function runMigration($table_name, $type = null) 
+    private static function runMigrationCreateTable($table_name, $type = null) 
     {
         // table name
-        $case_table = Str::snake($table_name);
+        $table = Str::snake($table_name);
+        $type = Str::lower($type);
 
         // Date convert
-        $fileName = sprintf( "%s_%s_%s", date('Y_m_d'), substr((string) time(), 4), "{$case_table}.php" );
+        $fileName = sprintf( "%s_%s", 
+                    date('Y_m_d'), 
+                    "create_{$table}_table.php" );
 
-        // real path
-        $realPath   = Str::replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
+        // path
+        $path = self::getDummyParts();
 
         // get directory
-        $dummyPath = "{$realPath}/../../Dummy/dummyMigration.dum";
-
-
-        // If type creation passed
-        if(!empty($type) && in_array(Str::lower($type), ['job', 'jobs'])){
-            // create a jobs table
-            $dummyPath = "{$realPath}/../../Dummy/dummyJobsMigration.dum";
-        } elseif(!empty($type) && in_array(Str::lower($type), ['session', 'sessions'])){
-            // create a sessions table
-            $dummyPath = "{$realPath}/../../Dummy/dummySessionsMigration.dum";
-        }
+        $dummyPath = match ($type) {
+            !empty($type) && in_array($type, ['job', 'jobs']) => $path['job'],
+            !empty($type) && in_array($type, ['session', 'sessions']) => $path['session'],
+            default => $path['default'],
+        };
 
         // dummy content
-        $dummyContent = str_replace('dummy_table', $case_table, file_get_contents($dummyPath));
+        $dummyContent = Str::replace('{{TABLE}}', $table, File::get($dummyPath));
 
         // absolute path
-        $absoluteFile = self::$migrations . $fileName;
+        self::$storagePath = self::$migrations . $fileName;
 
         // check if file exists already
         $style = self::$style;
-        if(File::exists($absoluteFile) && !File::isDirectory($absoluteFile)){
-            echo sprintf("Table `%s` 
-                        <span style='background: #ee0707; {$style}'> 
-                            Failed
-                        </span> 
-                        Schema already exists <br> \n", basename($fileName, '.php'));
-            return;
+        if(File::exists(self::$storagePath)){
+            self::$error = Constant::STATUS_400;
+            self::$message = sprintf("Migration [%s] 
+                                <span style='background: #ee0707; {$style}'> 
+                                already exists.</span> <br>\n", self::$storagePath);
+
+            return self::makeResponse();
         }
 
         // start writting
         // Write the contents to the new files
-        file_put_contents($absoluteFile, $dummyContent);
+        File::put(self::$storagePath, $dummyContent);
 
-        // Flush the output buffer
-        ob_flush();
-        flush();
+        self::$error = Constant::STATUS_200;
+        self::$message = sprintf("Migration [%s] 
+                            <span style='background: #027b02; {$style}'> 
+                            created successfully.</span> <br>\n", self::$storagePath);
 
-        sleep(1);
-
-        echo sprintf("Table `%s` has been created
-                    <span style='background: #027b02; {$style}'> 
-                        Successfully
-                    </span> <br> \n", basename($fileName, '.php'));
-
-        // Flush the output buffer again
-        ob_flush();
-        flush();
+        return self::makeResponse();
     }
     
     /**
@@ -94,11 +117,11 @@ trait MigrationTrait{
      */
     private static function initBaseDirectory() 
     {
-        self::initStatic();
+        self::normalizeFolderStructure();
 
         // check if database folder not exist
         if(!File::isDirectory(self::$database)){
-            @mkdir(self::$database, 0777);
+            @File::makeDirectory(self::$database, 0777);
 
             // gitignore fle path
             $gitignore = sprintf("%s.gitignore", self::$database);
@@ -126,27 +149,10 @@ trait MigrationTrait{
         }
 
         if(!File::isDirectory(self::$migrations)){
-            throw new \Exception( 
+            throw new \Exception(
                 sprintf("Path to dabatase[dir] not found ---> `%s`", self::$migrations) 
             );
         } 
-
-        // read file inside folders
-        return self::directoryfiles(self::$migrations);
-    }
-
-    /**
-     * Creating Managers
-     * @param string $tableName 
-     * 
-     * @return void
-     */
-    private static function initStatic() 
-    {
-        // collection of migration and seeders path
-        self::$database     = Env::getServers('server') . "database/";
-        self::$migrations   = self::$database . "migrations/";
-        self::$seeders      = self::$database . "seeders/";
     }
 
     /**
@@ -155,7 +161,7 @@ trait MigrationTrait{
      * 
      * @return array|string
      */
-    private static function directoryfiles($directory)
+    private static function scanDirectoryFiles($directory)
     {
         // read file inside folders
         $readDir = scandir($directory);

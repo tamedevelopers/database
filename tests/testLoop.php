@@ -1,26 +1,22 @@
 <?php
 
 use Tamedevelopers\Database\DB;
-use Tamedevelopers\Database\Capsule\AppManager;
 
 include_once __DIR__ . "/../vendor/autoload.php";
 
-// as long as we're not including the init.php file
-// then we must boot into out app to start using package
-// AppManager::bootLoader();
 
 $database = DB::connection();
 
-dd(
-    DB::table('tb_wallet'),
-    $database->table('tb_country'),
-);
+// dd(
+//     DB::table('wallet'),
+//     $database->table('country'),
+// );
 
-$wallets = $database->table('tb_wallet')
+$wallets = $database->table('wallet')
                     ->where('amount', '>', 0)
-                    ->join('tb_user', 'tb_user.user_id', '=', 'tb_wallet.user_id')
+                    ->join('user', 'user.user_id', '=', 'wallet.user_id')
                     ->latest('date')
-                    ->paginate(2);
+                    ->paginate(3);
 ?>
 
 
@@ -36,9 +32,9 @@ $wallets = $database->table('tb_wallet')
 <body>
 
         <!-- showing 2 of total results -->
-        <?= 
-            $wallets->showing(); 
-        ?>
+        <div style="text-align: center; padding: 30px 0 20px">
+            <?= $wallets->showing() ?>
+        </div>
 
         <div class="wallet-container">
             <?php foreach($wallets as $wallet) {?>
@@ -57,14 +53,14 @@ $wallets = $database->table('tb_wallet')
                         <label>Card:</label>
                         <span>Visa **** **** **** 1234</span>
                     </div>
-                    <div class="footer">Tran Date: <?= date('F d, Y', $wallet->date) ?></div>
+                    <div class="footer">Tran Date: <?= TameTime()->format(null, $wallet->date) ?></div>
                 </div>
             <?php }?>
         </div>
 
         <!-- pagination links -->
-        <?= 
-            $wallets->links();
-        ?>
+        <div>
+            <?= $wallets->links(); ?>
+        </div>
 </body>
 </html>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database\Migrations;
 
 use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Support\Collections\Collection;
 use Tamedevelopers\Database\Migrations\Traits\ManagerTrait;
 use Tamedevelopers\Database\Migrations\Traits\FilePathTrait;
 use Tamedevelopers\Database\Migrations\Traits\MigrationTrait;
@@ -24,7 +25,7 @@ class Migration{
     {
         $instance = new self();
         
-        return $instance->session;
+        // return $instance->session;
     }
 
     /**
@@ -33,15 +34,15 @@ class Migration{
      * @param string|null $type
      * - optional $jobs\To create dummy Jobs table Data
      * 
-     * @return void
+     * @return \Tamedevelopers\Support\Collections\Collection
      */
     public static function create($table_name, $type = null)
     {
-        self::initStatic();
+        self::normalizeFolderStructure();
 
         self::initBaseDirectory();
 
-        self::runMigration($table_name, $type);
+        return self::runMigrationCreateTable($table_name, $type);
     }
 
     /**
@@ -79,7 +80,7 @@ class Migration{
         }
 
         // unset session
-        unset($_SESSION[self::getSession()]);
+        // unset($_SESSION[self::getSession()]);
 
         return [
             'status'    => $errorstatus, 
@@ -92,7 +93,9 @@ class Migration{
      *
      * @return mixed
      */
-    public function up(){}
+    public function up(){
+
+    }
     
     /**
      * Drop database table
@@ -131,6 +134,27 @@ class Migration{
             'status'    => $errorstatus, 
             'message'   => implode("\n", $errorMessage)
         ];
+    }
+
+    /**
+     * Create API Response
+     * @return \Tamedevelopers\Support\Collections\Collection
+     */
+    protected static function makeResponse()
+    {
+        /*
+        | ----------------------------------------------------------------------------
+        | Database importation use. Below are the status code
+        | ----------------------------------------------------------------------------
+        |   if ->status === 404 (Failed to read file or File does'nt exists
+        |   if ->status === 400 (Query to database error
+        |   if ->status === 200 (Success importing to database
+        */ 
+        return new Collection([
+            'status'    => self::$error,
+            'path'      => self::$storagePath, 
+            'message'   => self::$message
+        ]);
     }
 
 }

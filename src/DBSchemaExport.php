@@ -9,6 +9,7 @@ use Tamedevelopers\Support\Str;
 use Tamedevelopers\Support\Server;
 use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
+use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Support\Collections\Collection;
 use Tamedevelopers\Database\Traits\DBSchemaExportTrait;
 
@@ -87,6 +88,9 @@ class DBSchemaExport
      */
     public function __construct($connection = null, $path = null, $type = null)
     {
+        // Ensure environment variables are loaded before accessing them
+        Manager::startEnvIFNotStarted();
+        
         $type = Str::lower($type);
 
         // Check if filetype is valid and set it

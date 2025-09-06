@@ -7,6 +7,7 @@ namespace Tamedevelopers\Database;
 use Tamedevelopers\Support\Str;
 use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
+use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Traits\DBExportTrait;
 use Tamedevelopers\Support\Collections\Collection;
 
@@ -88,12 +89,15 @@ class DBExport
     /**
      * DBExport constructor.
      *  
-     * @param string|null $saveAsFileType Save the backup file as [zip|rar]
      * @param string|null $connection
+     * @param string|null $saveAsFileType Save the backup file as [zip|rar]
      * @param int $retentionDays Days to keep backups before deletion
      */
-    public function __construct($saveAsFileType = null, $connection = 'default', int $retentionDays = 7)
+    public function __construct($connection = null, $saveAsFileType = null, int $retentionDays = 7)
     {
+        // Ensure environment variables are loaded before accessing them
+        Manager::startEnvIFNotStarted();
+        
         $saveAsFileType = Str::lower($saveAsFileType);
 
         // Check if filetype is valid and set it

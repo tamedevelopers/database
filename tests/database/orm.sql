@@ -1157,15 +1157,15 @@ CREATE TABLE `tb_wallet` (
 --
 
 INSERT INTO `tb_wallet` (`id`, `user_id`, `amount`, `charge`, `tax`, `payment_id`, `method`, `note`, `view_mode`, `date`) VALUES
-(1, 616581394, '234.00', '1.20', '0.00', 'YHM039SKJD', 1, NULL, 'disallow', 0),
-(3, 616581394, '87.00', '0.00', '1.00', 'LPIE#UWEY', 1, NULL, 'disallow', 0),
-(4, 616581394, '376.00', '6.00', '1.00', 'PWUWIRTYH345', 1, NULL, 'disallow', 0),
-(5, 616581394, '983.00', '6.00', '1.00', 'UUSDYBFSDFS', 1, NULL, 'disallow', 0),
-(6, 616581394, '38.50', '6.00', '1.00', 'SDNSISDF90329', 1, NULL, 'disallow', 0),
-(7, 616581394, '110.50', '6.00', '1.00', 'SDFJKF2343', 1, NULL, 'disallow', 0),
-(9, 616581394, '2390.50', '6.00', '1.00', 'SDFSDFMSDW32', 1, NULL, 'disallow', 0),
-(10, 616581394, '10.50', '6.00', '1.00', 'SDFSLODF2342', 1, NULL, 'disallow', 0),
-(11, 616581394, '873.00', '0.00', '0.00', 'SDFINSF', 1, NULL, 'disallow', 0);
+(1, 616581394, '234.00', '1.20', '0.00', 'YHM039SKJD', 1, NULL, 'disallow', 1703330257),
+(3, 616581394, '87.00', '0.00', '1.00', 'LPIE#UWEY', 1, NULL, 'disallow', 1703330257),
+(4, 616581394, '376.00', '6.00', '1.00', 'PWUWIRTYH345', 1, NULL, 'disallow', 1703330257),
+(5, 616581394, '983.00', '6.00', '1.00', 'UUSDYBFSDFS', 1, NULL, 'disallow', 1703330257),
+(6, 616581394, '38.50', '6.00', '1.00', 'SDNSISDF90329', 1, NULL, 'disallow', 1703330257),
+(7, 616581394, '110.50', '6.00', '1.00', 'SDFJKF2343', 1, NULL, 'disallow', 1703330257),
+(9, 616581394, '2390.50', '6.00', '1.00', 'SDFSDFMSDW32', 1, NULL, 'disallow', 1703330257),
+(10, 616581394, '10.50', '6.00', '1.00', 'SDFSLODF2342', 1, NULL, 'disallow', 1703330257),
+(11, 616581394, '873.00', '0.00', '0.00', 'SDFINSF', 1, NULL, 'disallow', 1703330257);
 
 --
 -- Indexes for dumped tables

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database;
 
+use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Connectors\Connector;
 
 
@@ -29,6 +30,9 @@ class DatabaseManager extends DatabaseConnector {
      */
     public static function connection($name = null, $options = [])
     {
+        // Ensure environment variables are loaded before accessing them
+        Manager::startEnvIFNotStarted();
+        
         [$name, $options] = self::prepareValues(
             $name, $options, func_num_args() === 2
         );

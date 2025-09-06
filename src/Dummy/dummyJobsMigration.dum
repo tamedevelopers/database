@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('dummy_table', function (Blueprint $table) {
+        Schema::create('{{TABLE}}', function (Blueprint $table) {
             $table->id();
             $table->string('queue')->index();
             $table->longText('payload');
@@ -36,7 +36,7 @@ return new class extends Migration
      */
     public function drop($force = false)
     {
-        return Schema::dropTable('dummy_table', $force);
+        return Schema::dropTable('{{TABLE}}', $force);
     }
 
 };

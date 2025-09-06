@@ -8,9 +8,7 @@ use Exception;
 
 
 trait FilePathTrait{
-
-    private $session = 'orm_temp_migration_query';
-
+    
     /**
      * Get Traceable File name
      * @param string|null $name 
