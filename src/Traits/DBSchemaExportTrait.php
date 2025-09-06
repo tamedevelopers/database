@@ -166,15 +166,7 @@ trait DBSchemaExportTrait
         // Keep body indentation aligned with template (12 spaces)
         $body = implode("\n            ", array_filter($lines));
 
-        // real path
-        $realPath   = Str::replace('\\', '/', rtrim(realpath(__DIR__ . '/../'), "/\\"));
-
-        $templatePath = "{$realPath}/{$this->type}";
-
-        $template = File::get($templatePath);
-        $php = str_replace(['{{TABLE}}', '{{BODY}}'], [$table, $body], $template);
-
-        return $php;
+        return $this->createDummyText($table, $body);
     }
 
     /** Build a single Blueprint line for a column. */
@@ -518,11 +510,12 @@ trait DBSchemaExportTrait
             $body  = $b['body'];
             $php   = $this->generateTableSchemaFromCreate($table, $body);
             $file  = $this->writeMigration($table, $php, $migrationsDir);
-            $generated[] = basename($file);
+            $generated[] = $this->migrationsDir . basename($file);
         }
 
         $this->error = Constant::STATUS_200;
-        $this->message = $baseMessage . "Generated " . count($generated) . " migration(s):\n- " . implode("\n- ", $generated);
+        $this->message = $baseMessage . "Generated " . count($generated) 
+                        . " migration(s):\n- " . implode("\n- ", $generated);
         return $this->makeResponse($migrationsDir);
     }
 
@@ -714,12 +707,26 @@ trait DBSchemaExportTrait
         // Keep body indentation aligned with template (12 spaces in your dum)
         $body = implode("\n            ", array_filter($bodyLines));
 
-        // Use the template file
-        $realPath = Str::replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
-        $templatePath = "{$realPath}/Dummy/dummyScheme.dum";
+        return $this->createDummyText($table, $body);
+    }
+
+
+    /**
+     * Undocumented function
+     *
+     * @param [type] $table
+     * @param [type] $body
+     * @return mixed
+     */
+    private function createDummyText($table, $body)
+    {
+        // real path
+        $realPath   = Str::replace('\\', '/', rtrim(realpath(__DIR__ . '/../'), "/\\"));
+
+        $templatePath = "{$realPath}/{$this->type}";
 
         $template = File::get($templatePath);
-        $php = str_replace(['{{TABLE}}', '{{BODY}}'], [$table, $body], $template);
+        $php = Str::replace(['{{TABLE}}', '{{BODY}}'], [$table, $body], $template);
 
         return $php;
     }

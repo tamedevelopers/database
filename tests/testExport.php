@@ -12,7 +12,8 @@ include_once __DIR__ . "/../vendor/autoload.php";
 AppManager::bootLoader();
 
 // 'woocommerce'
-$export = new DBExport('zip', 'woocommerce');
+// $export = new DBExport('zip', 'woocommerce');
+$export = new DBExport('zip');
 
 dd(
     $export->run(),

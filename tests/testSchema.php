@@ -12,7 +12,8 @@ AppManager::bootLoader();
 
 // 'woocommerce'
 $import = new DBSchemaExport(
-    path: base_path('tests/database/orm.sql')
+    path: base_path('tests/database/orm.sql'),
+    type: 'laravel'
 );
 
 // do this 

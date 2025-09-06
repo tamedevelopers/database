@@ -82,7 +82,7 @@ class DBSchemaExport
 
     /**
      * @param string|null $connection       Connection name as in config/database.php
-     * @param string|null $path
+     * @param string|null $path             If path is provided, it'll generate from the [.sql] file. Default is from the database connecton
      * @param string|null $type             Support for multiple Schema Frameworks Type
      */
     public function __construct($connection = null, $path = null, $type = null)
