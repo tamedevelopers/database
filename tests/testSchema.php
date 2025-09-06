@@ -11,7 +11,9 @@ AppManager::bootLoader();
 
 
 // 'woocommerce'
-$import = new DBSchemaExport();
+$import = new DBSchemaExport(
+    path: base_path('tests/database/orm.sql')
+);
 
 // do this 
 $response = $import->run();

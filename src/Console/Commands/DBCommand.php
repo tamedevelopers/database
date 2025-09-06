@@ -24,9 +24,9 @@ class DBCommand extends CommandHelper
         Logger::writeln('<yellow>Usage:</yellow>');
         Logger::writeln('  php tame db:seed');
         Logger::writeln('  php tame db:wipe');
-        Logger::writeln('  php tame db:schema --connection=wocommerce --path=tests/database/orm.sql');
         Logger::writeln('  php tame db:import --connection=wocommerce --path=tests/database/orm.sql');
         Logger::writeln('  php tame db:export --connection=wocommerce --as=zip --days=5');
+        Logger::writeln('  php tame db:schema --connection= --path= --type=[orm|laravel]');
         Logger::writeln('');
 
         exit(1);
@@ -50,10 +50,12 @@ class DBCommand extends CommandHelper
     {
         $connection = $this->getOption($options, 'connection');
         $path       = $this->getOption($options, 'path');
+        $type       = $this->getOption($options, 'type');
 
         $import = new DBSchemaExport(
             path: !empty($path) ? base_path($path) : $path, 
-            connection: $connection
+            connection: $connection,
+            type: $type,
         );
 
         $this->checkConnection($import->conn);
