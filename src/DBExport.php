@@ -74,7 +74,7 @@ class DBExport
     /**
      * Instance of Database Object
      *
-     * @var array
+     * @var mixed
      */
     public $db;
 
@@ -113,8 +113,8 @@ class DBExport
      *
      * @param string $backupDir Directory to store the backup
      * 
-     * @return object
-     * [status, message]
+     * @return \Tamedevelopers\Support\Collections\Collection
+     * [status, message, path]
      * 
      * @throws \RuntimeException
      */
@@ -185,7 +185,16 @@ class DBExport
                 $this->message  = $this->db['message'];
             }
         }
+        
+        return $this->makeResponse();
+    }
 
+    /**
+     * Create API Response
+     * @return \Tamedevelopers\Support\Collections\Collection
+     */
+    protected function makeResponse()
+    {
         /*
         | ----------------------------------------------------------------------------
         | Database importation use. Below are the status code
@@ -194,7 +203,6 @@ class DBExport
         |   if ->status === 400 (Query to database error
         |   if ->status === 200 (Success importing to database
         */ 
-
         $storagePath = is_null($this->saveAsFileType) ? '' : $this->fileStoragePath;
         $message = is_array($this->message) ? implode('\n<br>', $this->message) : $this->message;
 

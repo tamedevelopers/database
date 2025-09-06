@@ -41,7 +41,7 @@ class DBImport{
     /**
      * Instance of Database Object
      *
-     * @var array
+     * @var mixed
      */
     public $db;
 
@@ -189,6 +189,15 @@ class DBImport{
             }
         }
         
+        return $this->makeResponse();
+    }
+
+    /**
+     * Create API Response
+     * @return \Tamedevelopers\Support\Collections\Collection
+     */
+    protected function makeResponse()
+    {
         /*
         | ----------------------------------------------------------------------------
         | Database importation use. Below are the status code
