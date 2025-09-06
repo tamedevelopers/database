@@ -23,7 +23,7 @@ class DBCommand extends CommandHelper
         Logger::writeln('<yellow>Usage:</yellow>');
         Logger::writeln('  php tame db:seed');
         Logger::writeln('  php tame db:wipe');
-        Logger::writeln('  php tame db:import');
+        Logger::writeln('  php tame db:import --connection=wocommerce --path=tests/database/orm.sql');
         Logger::writeln('  php tame db:export --connection=wocommerce --as=zip --days=5');
         Logger::writeln('');
 
