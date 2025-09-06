@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database\Console\Commands;
 
+use Tamedevelopers\Support\Capsule\CommandHelper;
 
-class MakeCommand
+
+class MakeCommand extends CommandHelper
 {   
     /**
      * Default entry when running command

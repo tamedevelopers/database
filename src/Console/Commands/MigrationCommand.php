@@ -6,8 +6,10 @@ namespace Tamedevelopers\Database\Console\Commands;
 
 use Tamedevelopers\Support\Env;
 use Tamedevelopers\Database\DatabaseManager;
+use Tamedevelopers\Support\Capsule\CommandHelper;
 
-class MigrationCommand
+
+class MigrationCommand extends CommandHelper
 {
 
     /**

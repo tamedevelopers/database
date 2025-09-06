@@ -6,8 +6,9 @@ namespace Tamedevelopers\Database\Console\Commands;
 
 use Tamedevelopers\Support\Capsule\Logger;
 use Tamedevelopers\Support\Capsule\Manager;
+use Tamedevelopers\Support\Capsule\CommandHelper;
 
-class KeyCommand
+class KeyCommand extends CommandHelper
 {   
     /**
      * Default entry when running command
