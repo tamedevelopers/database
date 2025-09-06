@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database;
 
 use Tamedevelopers\Database\DB;
-use Tamedevelopers\Database\Constant;
-use Tamedevelopers\Support\Str;
 use Tamedevelopers\Support\Env;
+use Tamedevelopers\Support\Str;
+use Tamedevelopers\Support\Server;
+use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
 use Tamedevelopers\Support\Collections\Collection;
 
@@ -124,8 +125,8 @@ class DBSchemaExport
             $base = rtrim(getcwd(), '/\\') . DIRECTORY_SEPARATOR;
         }
 
-        $databaseDir   = $base . 'database' . DIRECTORY_SEPARATOR;
-        $migrationsDir = $databaseDir . 'migrations' . DIRECTORY_SEPARATOR;
+        $databaseDir   = Server::pathReplacer($base . 'database' . DIRECTORY_SEPARATOR);
+        $migrationsDir = Server::pathReplacer($databaseDir . 'migrations' . DIRECTORY_SEPARATOR);
 
         if (!File::isDirectory($databaseDir)) {
             if (!@mkdir($databaseDir, 0777) && !is_dir($databaseDir)) {
@@ -235,13 +236,15 @@ class DBSchemaExport
         // Foreign keys (single-column only)
         foreach ($fks as $fk) {
             $col = $fk['column'];
+            $name = $fk['name'] ?? null;
             $refTable = $fk['referenced_table'];
             $refColumn = $fk['referenced_column'];
             $onDelete = $fk['delete_rule'] ?? null;
             $onUpdate = $fk['update_rule'] ?? null;
 
             // Try to use foreignId when possible, else use foreign()->references()->on()
-            $fkLine = "\$table->foreignId('{$col}')->constrained('{$refTable}', '{$refColumn}')";
+            $name = $fk['name'] ?? null;
+            $fkLine = "\$table->foreignId('{$col}')->constrained('{$refTable}', '{$refColumn}', '{$name}')";
             if (!empty($onDelete)) {
                 $fkLine .= "->onDelete('" . Str::upper($onDelete) . "')";
             }

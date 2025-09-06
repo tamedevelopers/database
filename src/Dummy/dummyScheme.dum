@@ -1,0 +1,31 @@
+<?php
+
+use Tamedevelopers\Database\Migrations\Schema;
+use Tamedevelopers\Database\Migrations\Blueprint;
+use Tamedevelopers\Database\Migrations\Migration;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return mixed
+     */
+    public function up()
+    {
+        Schema::create('{{TABLE}}', function (Blueprint $table) {
+            {{BODY}}
+        });
+    }
+
+    /**
+     * Drop database table
+     *
+     * @param bool $force [optional] Default is false
+     * @return mixed
+     */
+    public function drop($force = false)
+    {
+        return Schema::dropTable('{{TABLE}}', $force);
+    }
+};

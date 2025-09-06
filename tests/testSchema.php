@@ -11,7 +11,7 @@ AppManager::bootLoader();
 
 
 // 'woocommerce'
-$import = new DBSchemaExport('woocommerce');
+$import = new DBSchemaExport();
 
 // do this 
 $response = $import->run();
