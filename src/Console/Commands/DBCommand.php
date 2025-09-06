@@ -8,6 +8,7 @@ use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Database\DBExport;
 use Tamedevelopers\Database\DBImport;
 use Tamedevelopers\Support\Capsule\Logger;
+use Tamedevelopers\Database\DBSchemaExport;
 use Tamedevelopers\Support\Capsule\CommandHelper;
 use Tamedevelopers\Support\Collections\Collection;
 
@@ -38,6 +39,39 @@ class DBCommand extends CommandHelper
     public function seed(array $args = [], array $options = []): mixed
     {
         $this->info('No Seed: implementation yet!');
+        exit(1);
+    }
+
+    /**
+     * Generate a migration Schema from a Database using From an[.sql] file into the migrations table
+     * Subcommand: php tame db:seed
+     */
+    public function schema(array $args = [], array $options = []): mixed
+    {
+        $connection = $this->getOption($options, 'connection');
+        $path       = $this->getOption($options, 'path');
+
+        $import = new DBSchemaExport(
+            path: base_path($path), 
+            connection: $connection
+        );
+
+        $this->checkConnection($import->conn);
+
+        $response = null;
+
+        $this->progressBar(function ($report) use ($import, &$response) {
+            $response = $import->run();
+
+            $report();
+        });
+
+        if($response['status'] != Constant::STATUS_200){
+            $this->error($response['message']);
+            exit(0);
+        }
+
+        $this->success($response['message']);
         exit(1);
     }
 

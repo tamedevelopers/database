@@ -97,10 +97,9 @@ class DBImport{
     protected function import($path = null)
     {
         // use the provided path or fall back to the instance's path [for older version support]
-        $path = empty($path) ? $this->path : $path;
-        $path = Str::replace(Server::formatWithBaseDirectory(), '', $path);
-
-        $this->realpath = Server::formatWithBaseDirectory($path);
+        $normalized = empty($path) ? $this->path : $path;
+        $normalized = Str::replace(Server::formatWithBaseDirectory(), '', $path);
+        $this->realpath = Server::formatWithBaseDirectory($normalized);
 
         /**
          * If SQL file does'nt exists

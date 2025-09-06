@@ -83,6 +83,27 @@ class DBSchemaExport
             return $this->makeResponse(null);
         }
 
+        // If a path to an SQL file was provided, attempt to import it first
+        if (!empty($this->path)) {
+            $normalized = Str::replace(Server::formatWithBaseDirectory(), '', (string) $this->path);
+            $real = Server::formatWithBaseDirectory($normalized);
+
+            if (!File::exists($real)) {
+                $this->error = Constant::STATUS_404;
+                $this->message = sprintf("Failed to open stream: [`%s`] doesn't exist.", $real);
+                return $this->makeResponse(null);
+            }
+
+            // Import SQL into the current connection before exporting schemas
+            $import = new DBImport(null, $real);
+            $import->run();
+            if ($import->error !== Constant::STATUS_200) {
+                $this->error = $import->error;
+                $this->message = $import->message;
+                return $this->makeResponse(null);
+            }
+        }
+
         [$migrationsDir, $baseMessage] = $this->ensureMigrationsDir();
         if (!$migrationsDir) {
             return $this->makeResponse(null);
