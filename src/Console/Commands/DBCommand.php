@@ -52,7 +52,7 @@ class DBCommand extends CommandHelper
         $path       = $this->getOption($options, 'path');
 
         $import = new DBSchemaExport(
-            path: base_path($path), 
+            path: !empty($path) ? base_path($path) : $path, 
             connection: $connection
         );
 

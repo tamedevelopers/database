@@ -55,6 +55,13 @@ class DBSchemaExport
     private $path;
 
     /**
+     * Internal migrations directory
+     *
+     * @var string|null
+     */
+    private $migrationsDir;
+
+    /**
      * @param string|null $connection       Connection name as in config/database.php
      * @param string|null $path
      */
@@ -174,6 +181,8 @@ class DBSchemaExport
         if (!File::isDirectory($migrationsDir)) {
             File::makeDirectory($migrationsDir, 0777);
         }
+
+        $this->migrationsDir = $migrationsDir;
 
         return [$migrationsDir, sprintf("- Writing migrations to: %s\n", $migrationsDir)];
     }
