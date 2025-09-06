@@ -43,7 +43,7 @@ class DBCommand extends CommandHelper
     }
 
     /**
-     * Generate a migration Schema from a Database using From an[.sql] file into the migrations table
+     * Generate a migration Schema from a Database using [.sql]
      * Subcommand: php tame db:seed
      */
     public function schema(array $args = [], array $options = []): mixed

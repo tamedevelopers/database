@@ -23,9 +23,9 @@ class KernalCommand implements CommandProviderInterface
         $conn = DB::connection();
 
         // Register built-in commands with class instances (enables subcommands and flags-as-methods)
+        $artisan->register('make', new MakeCommand($conn));
         $artisan->register('scaffold', new ScaffoldCommand($conn), 'Generate default scaffolding');
         $artisan->register('migrate', new MigrationCommand($conn), 'Run database migrations');
-        $artisan->register('make', new MakeCommand($conn), 'Make Artisans');
         $artisan->register('key', new KeyCommand($conn), 'Set or manage the application key');
         $artisan->register('db', new DBCommand($conn), 'Start a new database CLI session');
     }
