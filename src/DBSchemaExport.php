@@ -48,11 +48,21 @@ class DBSchemaExport
     protected $message;
 
     /**
-     * @param string|null $connection  Connection name as in config/database.php
+     * Path to sql file
+     *
+     * @var string|null
      */
-    public function __construct($connection = null)
+    private $path;
+
+    /**
+     * @param string|null $connection       Connection name as in config/database.php
+     * @param string|null $path
+     */
+    public function __construct($connection = null, $path = null)
     {
         $this->error    = Constant::STATUS_404;
+        $this->path     = $path;
+        
         $this->conn     = DB::connection($connection);
         $this->db       = $this->conn->dbConnection();
     }
@@ -244,7 +254,7 @@ class DBSchemaExport
 
             // Try to use foreignId when possible, else use foreign()->references()->on()
             $name = $fk['name'] ?? null;
-            $fkLine = "\$table->foreignId('{$col}')->constrained('{$refTable}', '{$refColumn}', '{$name}')";
+            $fkLine = "\$table->foreignId('{$col}')->constrained('{$refTable}', '{$refColumn}')";
             if (!empty($onDelete)) {
                 $fkLine .= "->onDelete('" . Str::upper($onDelete) . "')";
             }
@@ -255,7 +265,8 @@ class DBSchemaExport
             $lines[] = $fkLine;
         }
 
-        $body = implode("\n                ", array_filter($lines));
+        // Keep body indentation aligned with template (12 spaces)
+        $body = implode("\n            ", array_filter($lines));
 
         // real path
         $realPath   = Str::replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
@@ -265,41 +276,6 @@ class DBSchemaExport
         $template = File::get($templatePath);
         $php = str_replace(['{{TABLE}}', '{{BODY}}'], [$table, $body], $template);
 
-        return $php;
-
-        $php = <<<PHP
-<?php
-
-use Tamedevelopers\Database\Migrations\Schema;
-use Tamedevelopers\Database\Migrations\Blueprint;
-use Tamedevelopers\Database\Migrations\Migration;
-
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return mixed
-     */
-    public function up()
-    {
-        Schema::create('{$table}', function (Blueprint \$table) {
-            {$body}
-        });
-    }
-
-    /**
-     * Drop database table
-     *
-     * @param bool \$force [optional] Default is false
-     * @return mixed
-     */
-    public function drop(\$force = false)
-    {
-        return Schema::dropTable('{$table}', \$force);
-    }
-};
-PHP;
         return $php;
     }
 

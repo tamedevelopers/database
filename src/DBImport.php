@@ -63,11 +63,11 @@ class DBImport{
     /**
      * Construct Instance of Database
      * 
-     * @param string|null $path
      * @param string|null $connection
+     * @param string|null $path
      * @return void
      */
-    public function __construct($path = null, $connection = null) 
+    public function __construct($connection = null, $path = null) 
     {
         $this->error    = Constant::STATUS_404;
         $this->path     = $path;

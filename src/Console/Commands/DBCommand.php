@@ -50,7 +50,10 @@ class DBCommand extends CommandHelper
         $connection = $this->getOption($options, 'connection');
         $path       = $this->getOption($options, 'path');
 
-        $import = new DBImport(base_path($path), $connection);
+        $import = new DBImport(
+            path: base_path($path), 
+            connection: $connection
+        );
 
         $this->checkConnection($import->conn);
 
@@ -81,7 +84,11 @@ class DBCommand extends CommandHelper
         $as         = $this->getOption($options, 'as');
         $days       = $this->getOption($options, 'days');
 
-        $export = new DBExport($as, $connection, (int) $days ?: 7);
+        $export = new DBExport(
+            saveAsFileType: $as, 
+            connection: $connection, 
+            retentionDays: (int) $days ?: 7
+        );
 
         $this->checkConnection($export->conn);
 
