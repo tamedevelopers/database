@@ -257,6 +257,16 @@ class DBSchemaExport
 
         $body = implode("\n                ", array_filter($lines));
 
+        // real path
+        $realPath   = Str::replace('\\', '/', rtrim(realpath(__DIR__), "/\\"));
+
+        $templatePath = "{$realPath}/Dummy/dummyScheme.dum";
+
+        $template = File::get($templatePath);
+        $php = str_replace(['{{TABLE}}', '{{BODY}}'], [$table, $body], $template);
+
+        return $php;
+
         $php = <<<PHP
 <?php
 
