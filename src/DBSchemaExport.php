@@ -158,10 +158,10 @@ class DBSchemaExport
      */
     protected function getTables(string $dbName): array
     {
-        $rows = $this->conn->select('SHOW TABLES');
+        $rows = $this->conn->select('SHOW TABLES')->toArray();
         $key = 'tables_in_' . $dbName;
 
-        return tcollect($rows)->map(fn($row) => $row->$key)->filter()->values()->all();
+        return tcollect($rows)->pluck($key)->all();
     }
 
     /**
@@ -170,7 +170,7 @@ class DBSchemaExport
     protected function generateTableSchema(string $dbName, string $table): string
     {
         // Columns
-        $columns = $this->conn->select("SHOW COLUMNS FROM `{$table}`")->toArray();
+        $columns = $this->conn->select("SHOW COLUMNS FROM `{$table}`");
 
         // Indexes (non-unique and unique)
         $indexes = $this->conn->select("SHOW INDEX FROM `{$table}`")->toArray();
@@ -182,26 +182,27 @@ class DBSchemaExport
         $hasUpdatedAt = false;
 
         $lines = [];
-        $primaryAuto = $this->detectPrimaryAutoIncrement($columns);
+        $primaryAuto = $this->detectPrimaryAutoIncrement($columns->toArray());
 
         // Prefer concise id() if table has single BIGINT auto-increment PK or any auto PK; falls back to detailed mapping
         if ($primaryAuto) {
             // Use id() to ensure primary + unsigned + auto_increment
-            $lines[] = "$table->id();";
+            $lines[] = "\$table->id();";
         }
 
         foreach ($columns as $col) {
+
+            $field  = $col?->Field ?? $col?->field;
+            $type   = Str::lower($col?->Type ?? $col?->type);
+            $null   = Str::lower((string) $col?->Null ?? $col?->null) === 'yes';
+            $key    = Str::lower((string) $col?->Null ?? $col?->null);
+            $extra  = Str::lower((string) $col?->Extra ?? $col?->extra);
+            $default   = $col?->Default ?? $col?->default;
+
             // Skip the primary auto column since id() already added it
-            if ($primaryAuto && Str::lower($col->Field) === 'id') {
+            if ($primaryAuto && Str::lower($field) === 'id') {
                 continue;
             }
-
-            $field = $col->Field;
-            $type  = Str::lower($col->Type);
-            $null  = Str::lower((string) $col->Null) === 'yes';
-            $default = $col->Default;
-            $extra = Str::lower((string) $col->Extra);
-            $key = Str::lower((string) ($col->Key ?? ''));
 
             // timestamps grouping
             if (in_array($field, ['created_at','updated_at'])) {
@@ -215,7 +216,7 @@ class DBSchemaExport
         }
 
         if ($hasCreatedAt && $hasUpdatedAt) {
-            $lines[] = "$table->timestamps();";
+            $lines[] = "\$table->timestamps();";
         } else {
             if ($hasCreatedAt) {
                 $lines[] = $this->toBlueprintLine('created_at', 'timestamp', true, null, '', '');
@@ -240,7 +241,7 @@ class DBSchemaExport
             $onUpdate = $fk['update_rule'] ?? null;
 
             // Try to use foreignId when possible, else use foreign()->references()->on()
-            $fkLine = "$table->foreignId('{$col}')->constrained('{$refTable}', '{$refColumn}')";
+            $fkLine = "\$table->foreignId('{$col}')->constrained('{$refTable}', '{$refColumn}')";
             if (!empty($onDelete)) {
                 $fkLine .= "->onDelete('" . Str::upper($onDelete) . "')";
             }
@@ -270,7 +271,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('{$table}', function (Blueprint \$table) {
-                {$body}
+            {$body}
         });
     }
 
@@ -420,7 +421,7 @@ PHP;
                 break;
         }
 
-        $line = "$table->{$method}(" . implode(', ', $args) . ")";
+        $line = "\$table->{$method}(" . implode(', ', $args) . ")";
 
         // unsigned for numeric types
         if (in_array($baseType, ['bigint','int','smallint','mediumint','tinyint','decimal','double','float']) && $unsigned) {
@@ -499,11 +500,11 @@ PHP;
             }
 
             if ($unique) {
-                $lines[] = "$table->unique()" . ';'; // attaches to last column; but we already generated column lines before, so do separate unique using name
+                $lines[] = "\$table->unique()" . ';'; // attaches to last column; but we already generated column lines before, so do separate unique using name
                 // Better: emit explicit unique index name
-                $lines[count($lines)-1] = "$table->unique('{$col}')" . ';';
+                $lines[count($lines)-1] = "\$table->unique('{$col}')" . ';';
             } else {
-                $lines[] = "$table->index('{$col}')" . ';';
+                $lines[] = "\$table->index('{$col}')" . ';';
             }
         }
 
@@ -567,22 +568,25 @@ PHP;
         $stmt->execute([':db' => $dbName, ':tbl' => $table]);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
 
-        return array_map(function ($r) {
+        $colelction = new Collection($rows);
+
+        return $colelction->map(function ($r) {
             return [
-                'column'            => $r['COLUMN_NAME'],
-                'referenced_table'  => $r['REFERENCED_TABLE_NAME'],
-                'referenced_column' => $r['REFERENCED_COLUMN_NAME'],
-                'update_rule'       => $r['UPDATE_RULE'] ?? null,
-                'delete_rule'       => $r['DELETE_RULE'] ?? null,
+                'name'              => $r['CONSTRAINT_NAME'] ?? $r[Str::lower('CONSTRAINT_NAME')],
+                'column'            => $r['COLUMN_NAME'] ?? $r[Str::lower('COLUMN_NAME')],
+                'referenced_table'  => $r['REFERENCED_TABLE_NAME'] ?? $r[Str::lower('REFERENCED_TABLE_NAME')],
+                'referenced_column' => $r['REFERENCED_COLUMN_NAME'] ?? $r[Str::lower('REFERENCED_COLUMN_NAME')],
+                'update_rule'       => $r['UPDATE_RULE'] ?? $r[Str::lower('UPDATE_RULE')],
+                'delete_rule'       => $r['DELETE_RULE'] ?? $r[Str::lower('DELETE_RULE')],
             ];
-        }, $rows);
+        })->toArray();
     }
 
     /** Write migration file for a table. */
     protected function writeMigration(string $table, string $php, string $migrationsDir): string
     {
         $snake = Str::snake($table);
-        $filename = date('Y_m_d') . '_' . substr((string) time(), 4) . '_' . $snake . '.php';
+        $filename = date('Y_m_d') . '_create_' . $snake . '_table.php';
         $path = rtrim($migrationsDir, '/\\') . DIRECTORY_SEPARATOR . $filename;
         File::put($path, $php);
         return $path;
