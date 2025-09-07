@@ -183,77 +183,182 @@ trait MigrationTrait{
             $value = rtrim($directory, '/') . "/{$value}";
         });
 
-        dd(
-            self::sortParentFiles($files)
-        );
-        
+        // Sort with enhanced dependency-aware ordering
         return self::sortParentFiles($files);
     }
 
     /**
-     * Sort parent files according to their names
+     * Sort parent files according to their names and detected foreign key dependencies
      *
-     * Ensures that base tables (e.g., "ads", "users") are migrated
-     * before their derivative/child tables (e.g., "ads_data", "users_address", "ads_info").
+     * Ensures parent/base tables (e.g., "blogs_categories") are executed before
+     * child tables that reference them (e.g., "blogs" referencing blogs_categories),
+     * while also keeping base-before-derivative ordering (e.g., ads before ads_data/info).
      *
-     * @param array $files
+     * @param array $files Full paths to migration files
      * @return array
      */
     private static function sortParentFiles(array $files)
     {
-        // Robust sort: parent tables before child tables of the same base
-        $parse = function (string $path): array {
+        // Helper: parse name cues from filename
+        $parseNameFromFilename = function (string $path): array {
             $name = basename($path);
-            // extract between "create_" and "_table"
             if (preg_match('/create_(.+)_table\.php$/', $name, $m)) {
-                $full = $m[1];                // e.g., "ads", "ads_data", "users_address"
-                $parts = explode('_', $full); // split by underscore
-                $base = $parts[0];            // the base entity
+                $full = $m[1];
+                $parts = explode('_', $full);
                 return [
+                    'file'      => $path,
                     'name'      => $name,
-                    'full'      => $full,
-                    'base'      => $base,
+                    'full'      => $full,          // e.g., blogs, blogs_categories
                     'parts'     => $parts,
+                    'base'      => $parts[0] ?? $full,
                     'is_parent' => count($parts) === 1,
                 ];
             }
-            // Non-standard name: treat as parent so it runs early
             return [
+                'file'      => $path,
                 'name'      => $name,
                 'full'      => $name,
-                'base'      => $name,
                 'parts'     => [$name],
+                'base'      => $name,
                 'is_parent' => true,
             ];
         };
 
-        usort($files, function (string $a, string $b) use ($parse) {
-            $ai = $parse($a);
-            $bi = $parse($b);
-
-            // Same base entity (e.g., "ads" vs "ads_data", "users" vs "users_address")
-            if ($ai['base'] === $bi['base']) {
-                // Parent must come before children
-                if ($ai['is_parent'] !== $bi['is_parent']) {
-                    return $ai['is_parent'] ? -1 : 1;
-                }
-
-                // Both children or both parents:
-                // fewer segments first (e.g., users_address before users_address_history)
-                $cmpParts = count($ai['parts']) <=> count($bi['parts']);
-                if ($cmpParts !== 0) {
-                    return $cmpParts;
-                }
-
-                // then alphabetical by the entity part for stability
-                return strcmp($ai['full'], $bi['full']);
+        // Helper: extract created table and referenced tables from file content
+        $parseMigrationContent = function (string $path) use ($parseNameFromFilename): array {
+            $info = $parseNameFromFilename($path);
+            try {
+                $content = File::get($path);
+            } catch (\Throwable $e) {
+                $content = '';
             }
 
-            // Different bases: keep natural alphabetical (includes timestamp prefix)
-            return strcmp($ai['name'], $bi['name']);
-        });
+            // Detect created table: Schema::create('table', ...) or Schema::create("table", ...)
+            $creates = null;
+            if (preg_match("/Schema::create\(['\"]([a-zA-Z0-9_]+)['\"]/", $content, $m)) {
+                $creates = $m[1];
+            } else {
+                // fallback to filename cue
+                $creates = $info['full'];
+            }
 
-        return $files;
+            // Detect referenced tables via ->on('table') or ->on("table")
+            $refs = [];
+            if (preg_match_all("/->on\(['\"]([a-zA-Z0-9_]+)['\"]\)/", $content, $mm)) {
+                $refs = array_values(array_unique($mm[1]));
+            }
+
+            return [
+                'file'    => $path,
+                'name'    => $info['name'],
+                'base'    => $info['base'],
+                'full'    => $info['full'],
+                'parts'   => $info['parts'],
+                'is_parent' => $info['is_parent'],
+                'creates' => $creates,
+                'refs'    => $refs,
+            ];
+        };
+
+        // Parse all migrations
+        $nodes = [];
+        foreach ($files as $f) {
+            // only consider php files
+            if (!is_string($f)) continue;
+            if (substr($f, -4) !== '.php') continue;
+            $nodes[] = $parseMigrationContent($f);
+        }
+
+        // Map created table -> node index
+        $creatorIndexByTable = [];
+        foreach ($nodes as $i => $n) {
+            if (!empty($n['creates'])) {
+                $creatorIndexByTable[$n['creates']] = $i;
+            }
+        }
+
+        // Build dependency graph (Kahn): edge creator -> dependent
+        $adj = array_fill(0, count($nodes), []);
+        $inDegree = array_fill(0, count($nodes), 0);
+
+        foreach ($nodes as $i => $n) {
+            foreach ($n['refs'] as $rt) {
+                if (isset($creatorIndexByTable[$rt])) {
+                    $p = $creatorIndexByTable[$rt]; // parent index
+                    if ($p !== $i) {
+                        $adj[$p][] = $i;
+                        $inDegree[$i]++;
+                    }
+                }
+            }
+        }
+
+        // Prepare initial queue (in-degree 0). Use tie-breaker to keep base/parent-first preference
+        $queue = [];
+        foreach ($nodes as $i => $n) {
+            if ($inDegree[$i] === 0) {
+                $queue[] = $i;
+            }
+        }
+
+        $tieBreaker = function (int $a, int $b) use ($nodes) {
+            $na = $nodes[$a];
+            $nb = $nodes[$b];
+            // Same base: parent-first, fewer parts first, then alpha by full
+            if ($na['base'] === $nb['base']) {
+                if ($na['is_parent'] !== $nb['is_parent']) {
+                    return $na['is_parent'] ? -1 : 1;
+                }
+                $cmpParts = count($na['parts']) <=> count($nb['parts']);
+                if ($cmpParts !== 0) return $cmpParts;
+                return strcmp($na['full'], $nb['full']);
+            }
+            // Different bases: alphabetical by created table name fallback
+            return strcmp($na['creates'] ?? $na['name'], $nb['creates'] ?? $nb['name']);
+        };
+
+        usort($queue, $tieBreaker);
+
+        $ordered = [];
+        while (!empty($queue)) {
+            $curr = array_shift($queue);
+            $ordered[] = $curr;
+            foreach ($adj[$curr] as $v) {
+                $inDegree[$v]--;
+                if ($inDegree[$v] === 0) {
+                    $queue[] = $v;
+                }
+            }
+            // keep queue stable
+            if (!empty($queue)) {
+                usort($queue, $tieBreaker);
+            }
+        }
+
+        // If there is a cycle or unresolved deps, append remaining in a safe order
+        if (count($ordered) < count($nodes)) {
+            $remaining = [];
+            foreach ($nodes as $i => $_) {
+                if (!in_array($i, $ordered, true)) {
+                    $remaining[] = $i;
+                }
+            }
+            usort($remaining, $tieBreaker);
+            $ordered = array_merge($ordered, $remaining);
+        }
+
+        // Map back to file paths in computed order
+        $result = [];
+        foreach ($ordered as $idx) {
+            $result[] = $nodes[$idx]['file'];
+        }
+
+        // Fallback: if for some reason result is empty, use filename-based ordering
+        if (empty($result)) {
+            $result = $files; // as-is
+        }
+
+        return $result;
     }
 
     /**
