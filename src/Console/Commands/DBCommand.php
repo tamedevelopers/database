@@ -38,7 +38,6 @@ class DBCommand extends CommandHelper
     public function seed(array $args = [], array $options = [])
     {
         $this->info('No Seed: implementation yet!');
-        exit(1);
     }
 
     /**
@@ -63,17 +62,15 @@ class DBCommand extends CommandHelper
 
         $this->progressBar(function ($report) use ($import, &$response) {
             $response = $import->run();
-
             $report();
         });
 
         if($response['status'] != Constant::STATUS_200){
             $this->error($response['message']);
-            exit(0);
+            return;
         }
 
         $this->success($response['message']);
-        exit(1);
     }
 
     /**
@@ -102,11 +99,10 @@ class DBCommand extends CommandHelper
 
         if($response['status'] != Constant::STATUS_200){
             $this->error($response['message']);
-            exit(0);
+            return;
         }
 
         $this->success($response['message']);
-        exit(1);
     }
 
     /**
@@ -137,86 +133,115 @@ class DBCommand extends CommandHelper
 
         if($response['status'] != Constant::STATUS_200){
             $this->error($response['message']);
-            exit(0);
+            return;
         }
 
         // path
         $path = empty($response['path']) ? '' : "\n{$response['path']}";
 
         $this->success("{$response['message']}{$path}");
-        exit(1);
     }
 
     /**
-     * Drop all tables, views, and types
+     * Drop all tables, views, and types (--drop-types --drop-views)
      * Subcommand: php tame db:wipe
      */
     public function wipe(array $args = [], array $options = [])
     {
-        $this->forceChecker($options);
+        $force = $this->option('force');
+        $response = $this->option('response');
 
-        // prompt for confirmation before proceeding
-        $confirm = $this->confirm('Proceed with db:wipe?');
+        $this->forceChecker();
+        
+        if(!$force){
+            // prompt for confirmation before proceeding
+            $confirm = $this->confirm('Proceed with db:wipe?');
 
-        // ask once
-        if (!$confirm) {
-            $this->warning("Command aborted.\n");
-            return 0;
+            // ask once
+            if (!$confirm) {
+                $this->warning("Command aborted.\n");
+                return 0;
+            }
         }
-
-        // Determine what to drop based on flags. If any drop-* flags are provided,
-        // only drop those categories; otherwise drop all by default.
-        $flags = $this->flag($options);
-        $restrictToFlags = !empty($flags);
-        $dropViews  = $restrictToFlags ? in_array('views', $flags, true)  : true;
-        $dropTypes  = $restrictToFlags ? in_array('types', $flags, true)  : true;
-
+        
         $tables = $this->getTables();
-        $views  = $dropViews  ? $this->getViews()  : [];
-        $types  = $dropTypes  ? $this->getTypes()  : [];
+        $views  = $this->getViews();
+        $types  = $this->getTypes();
 
         // Build total for progress bar
         $allItems = array_merge($views, $tables, $types);
-
+        
+        // only display response when needed
+        if($this->shouldResponseReturn($response)){
+            $this->progressBar(function ($report) use ($views, $tables, $types) {
+                $this->processWipeData($views, $tables, $types, $report);
+            }, count($allItems));
+            
+            $this->success("Database wiped successfully.");
+        } else{
+            $this->processWipeData($views, $tables, $types);
+        }
+    }
+        
+    /**
+     * Process Wipe Data
+     *
+     * @param  mixed $views
+     * @param  mixed $tables
+     * @param  mixed $types
+     * @param  Callable|null $report
+     * @return void
+     */
+    protected function processWipeData($views, $tables, $types, $report = null)
+    {
         $driver = $this->conn->getConfig()['driver'] ?? null;
 
-        $this->progressBar(function ($report) use ($views, $tables, $types, $driver) {
-            // Drop views first (safer if they reference tables)
-            foreach ($views as $view) {
-                $this->deleteView($view);
+        // Drop views first (safer if they reference tables)
+        foreach ($views as $view) {
+            $this->deleteView($view);
+            if(is_callable($report))
                 $report();
+        }
+
+        // Disable FK checks for MySQL and SQLite while dropping tables
+        if (!empty($tables)) {
+            if ($driver === 'mysql') {
+                $this->conn->query("SET FOREIGN_KEY_CHECKS = 0")->exec();
+            } elseif ($driver === 'sqlite') {
+                $this->conn->query("PRAGMA foreign_keys = OFF")->exec();
             }
 
-            // Disable FK checks for MySQL and SQLite while dropping tables
-            if (!empty($tables)) {
-                if ($driver === 'mysql') {
-                    $this->conn->query("SET FOREIGN_KEY_CHECKS = 0")->exec();
-                } elseif ($driver === 'sqlite') {
-                    $this->conn->query("PRAGMA foreign_keys = OFF")->exec();
-                }
-
-                foreach ($tables as $table) {
-                    $this->deleteTable($table);
+            foreach ($tables as $table) {
+                $this->deleteTable($table);
+                if(is_callable($report))
                     $report();
-                }
-
-                // Re-enable FK checks
-                if ($driver === 'mysql') {
-                    $this->conn->query("SET FOREIGN_KEY_CHECKS = 1")->exec();
-                } elseif ($driver === 'sqlite') {
-                    $this->conn->query("PRAGMA foreign_keys = ON")->exec();
-                }
             }
 
-            // Drop custom types last (mainly for PostgreSQL)
-            foreach ($types as $type) {
-                $this->deleteType($type);
+            // Re-enable FK checks
+            if ($driver === 'mysql') {
+                $this->conn->query("SET FOREIGN_KEY_CHECKS = 1")->exec();
+            } elseif ($driver === 'sqlite') {
+                $this->conn->query("PRAGMA foreign_keys = ON")->exec();
+            }
+        }
+
+        // Drop custom types last (mainly for PostgreSQL)
+        foreach ($types as $type) {
+            $this->deleteType($type);
+            if(is_callable($report))
                 $report();
-            }
-        }, count($allItems));
+        }
+    }
 
-        $this->success("Database wiped successfully.");
-        exit(1);
+    /**
+     * If response should be returned
+     *
+     * @param string|null $response
+     * @return bool
+     */
+    protected function shouldResponseReturn($response)
+    {
+        return (is_null($response) || $response != '0');
     }
 
     /**

@@ -6,6 +6,7 @@ namespace Tamedevelopers\Database\Console\Commands;
 
 use Tamedevelopers\Support\Env;
 use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Support\Capsule\Artisan;
 use Tamedevelopers\Database\DatabaseManager;
 use Tamedevelopers\Database\Migrations\Migration;
 use Tamedevelopers\Support\Capsule\CommandHelper;
@@ -37,6 +38,10 @@ class MigrationCommand extends CommandHelper
         $force = $this->option('force');
         $seed  = $this->option('seed');
 
+        if($force){
+            Artisan::call('db:wipe --force --drop-types --drop-views --response=0');
+        }
+
         $migration = new Migration();
 
         $response = $migration->run();
@@ -51,21 +56,20 @@ class MigrationCommand extends CommandHelper
     }
 
     /**
+     * Reset and re-run all migrations
+     */
+    public function refresh(array $args = [], array $options = [])
+    {
+        Artisan::call('migrate:fresh --force --drop-types --drop-views');
+    }
+
+    /**
      * Show the status of each migration
      */
     public function status(array $args = [], array $options = [])
     {
         echo "[demo] Seeding database...\n";
         // TODO: call your seeder pipeline here
-        return 0;
-    }
-
-    /**
-     * Reset and re-run all migrations
-     */
-    public function refresh(array $args = [], array $options = [])
-    {
-        // Could set internal state or skip confirmations
         return 0;
     }
 
