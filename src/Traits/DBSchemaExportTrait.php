@@ -751,6 +751,16 @@ trait DBSchemaExportTrait
             }
         }
 
+        // Build single-column index map for inline chaining
+        $singleIndexMap = [];
+        foreach ($indexes as $idx) {
+            if (($idx['type'] ?? '') === 'primary') { continue; }
+            if (isset($idx['columns']) && count($idx['columns']) === 1) {
+                $c = $idx['columns'][0];
+                $singleIndexMap[$c] = (($idx['type'] ?? '') === 'unique') ? 'uni' : 'mul';
+            }
+        }
+
         // Build blueprint lines
         $bodyLines = [];
 
@@ -766,7 +776,8 @@ trait DBSchemaExportTrait
             if (in_array($field, ['created_at', 'updated_at'], true)) {
                 continue;
             }
-            $bodyLines[] = $this->toBlueprintLine($field, $type, (bool)$nullable, $default, (string)$extra, (string)$key);
+            $hint = $singleIndexMap[$field] ?? '';
+            $bodyLines[] = $this->toBlueprintLine($field, $type, (bool)$nullable, $default, (string)$extra, (string)$hint);
         }
 
         if ($hasCreatedAt && $hasUpdatedAt) {
@@ -780,21 +791,13 @@ trait DBSchemaExportTrait
             }
         }
 
-        // Indexes (single-column)
+        // Indexes (single-column) already inlined; process only multi-column here
         foreach ($indexes as $idx) {
-            if ($idx['type'] === 'primary') {
-                // handled by id() if it was id+auto; otherwise skip (multi-col not supported here)
-                continue;
-            }
-            if (count($idx['columns']) === 1) {
-                $col = $idx['columns'][0];
-                if ($idx['type'] === 'unique') {
-                    $bodyLines[] = "\$table->unique('{$col}');";
-                } else {
-                    // Treat index() as unique() per requirement
-                    $bodyLines[] = "\$table->unique('{$col}');";
-                }
-            }
+            if ($idx['type'] === 'primary') { continue; }
+            if (count($idx['columns']) <= 1) { continue; }
+            $colsList = "['" . implode("','", $idx['columns']) . "']";
+            // Treat index as unique per requirement
+            $bodyLines[] = "\$table->unique({$colsList});";
         }
 
         // FKs (single-column)
