@@ -419,9 +419,16 @@ trait DBSchemaExportTrait
     /** Extract enum values from a type like "enum('a','b')" and return PHP array syntax. */
     protected function extractEnumValues(string $type): string
     {
-        if (preg_match("/enum\\((.*)\\)/i", $type, $m)) {
-            $vals = $m[1];
-            return '[' . $vals . ']'; // already quoted in SHOW COLUMNS
+        // Use non-greedy capture and allow spaces around parentheses
+        $trimmed = trim($type);
+        if (preg_match("/^enum\s*\((.*?)\)\s*$/i", $trimmed, $m)) {
+            $vals = trim($m[1]);
+            return '[' . $vals . ']';
+        }
+        // Fallback broader search within the string
+        if (preg_match("/enum\s*\((.*?)\)/i", $type, $m2)) {
+            $vals = trim($m2[1]);
+            return '[' . $vals . ']';
         }
         return '[]';
     }
