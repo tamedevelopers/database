@@ -20,7 +20,8 @@ class MakeCommand extends CommandHelper
     public function handle()
     {
         Logger::helpHeader('<yellow>Usage:</yellow>');
-        Logger::writeln('  php tame make:migration [name] --create=users');
+        Logger::writeln('  php tame make:migration admins');
+        Logger::writeln('  php tame make:migration create_users_table --create=users');
         Logger::writeln('');
     }
 
@@ -47,7 +48,7 @@ class MakeCommand extends CommandHelper
 
         $migration = new Migration();
 
-        $response = $migration::create($table);
+        $response = $migration->create($table);
 
         if($response['status'] != Constant::STATUS_200){
             $this->error($response['message']);

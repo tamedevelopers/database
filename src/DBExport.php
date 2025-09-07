@@ -7,7 +7,6 @@ namespace Tamedevelopers\Database;
 use Tamedevelopers\Support\Str;
 use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
-use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Traits\DBExportTrait;
 use Tamedevelopers\Support\Collections\Collection;
 
@@ -95,9 +94,6 @@ class DBExport
      */
     public function __construct($connection = null, $saveAsFileType = null, int $retentionDays = 7)
     {
-        // Ensure environment variables are loaded before accessing them
-        Manager::startEnvIFNotStarted();
-        
         $saveAsFileType = Str::lower($saveAsFileType);
 
         // Check if filetype is valid and set it

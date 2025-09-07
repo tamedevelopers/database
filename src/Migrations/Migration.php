@@ -9,23 +9,20 @@ use Tamedevelopers\Support\Collections\Collection;
 use Tamedevelopers\Database\Migrations\Traits\ManagerTrait;
 use Tamedevelopers\Database\Migrations\Traits\FilePathTrait;
 use Tamedevelopers\Database\Migrations\Traits\MigrationTrait;
+use Tamedevelopers\Database\Migrations\Schema;
 
 class Migration{
 
     use FilePathTrait,
         ManagerTrait,
         MigrationTrait;
-    
+
     /**
-     * Returns Session String
-     * 
-     * @return string
+     * constructor.
      */
-    public static function getSession()
+    public function __construct($connection = null)
     {
-        $instance = new self();
-        
-        // return $instance->session;
+        self::$error = Constant::STATUS_400;
     }
 
     /**
@@ -50,42 +47,49 @@ class Migration{
      * @param string $type 
      * @param string $column 
      * 
-     * @return array
+     * @return \Tamedevelopers\Support\Collections\Collection
      */
     public static function run()
     {
         // read file inside folders
-        $files = self::initBaseDirectory();
+        self::initBaseDirectory();
+
+        // scan migration folder to get all files
+        $files = self::scanDirectoryFiles(self::$migrations);
+
+        $errorMessage = [];
+        $errorstatus = Constant::STATUS_200;
 
         // run migration methods of included file
-        $errorMessage   = [];
-        $errorstatus    = Constant::STATUS_200;
         foreach($files as $file){
             $migration = include_once "{$file}";
 
-            // error
-            $migration->up();
-
-            // handle migration query data
-            $handle = json_decode($_SESSION[self::getSession()] ?? "", true);
+            $handle = $migration->up();
+            if ($handle instanceof Collection) {
+                $handle = $handle->toArray();
+            }
+            
+            // If migration didn't return a result, fallback to last Schema result
+            if (!is_array($handle)) {
+                $handle = Schema::getLastResult();
+            }
 
             // store all messages
-            $errorMessage[] = $handle['message'];
+            if (is_array($handle) && isset($handle['message'])) {
+                $errorMessage[] = $handle['message'];
+            }
             
             // error occured stop code execution
-            if($handle['status'] != Constant::STATUS_200){
-                $errorstatus = Constant::STATUS_404;
+            if(is_array($handle) && isset($handle['status']) && $handle['status'] != Constant::STATUS_200){
+                $errorstatus = $handle['status'];
                 break;
             }
         }
 
-        // unset session
-        // unset($_SESSION[self::getSession()]);
-
-        return [
+        return new Collection([
             'status'    => $errorstatus, 
             'message'   => implode("\n", $errorMessage)
-        ];
+        ]);
     }
     
     /**
@@ -94,7 +98,7 @@ class Migration{
      * @return mixed
      */
     public function up(){
-
+        return null;
     }
     
     /**
@@ -104,12 +108,15 @@ class Migration{
      * [optional] Default is false
      * Force drop all tables or throw an error on Foreign keys
      * 
-     * @return mixed
+     * @return \Tamedevelopers\Support\Collections\Collection
      */
     public function drop($force = false)
     {
         // read file inside folders
-        $files = self::initBaseDirectory();
+        self::initBaseDirectory();
+
+        // scan migration folder to get all files
+        $files = self::scanDirectoryFiles(self::$migrations);
         
         // run migration methods of included file
         $errorMessage   = [];
@@ -130,30 +137,9 @@ class Migration{
             }
         }
 
-        return [
+        return new Collection([
             'status'    => $errorstatus, 
             'message'   => implode("\n", $errorMessage)
-        ];
-    }
-
-    /**
-     * Create API Response
-     * @return \Tamedevelopers\Support\Collections\Collection
-     */
-    protected static function makeResponse()
-    {
-        /*
-        | ----------------------------------------------------------------------------
-        | Database importation use. Below are the status code
-        | ----------------------------------------------------------------------------
-        |   if ->status === 404 (Failed to read file or File does'nt exists
-        |   if ->status === 400 (Query to database error
-        |   if ->status === 200 (Success importing to database
-        */ 
-        return new Collection([
-            'status'    => self::$error,
-            'path'      => self::$storagePath, 
-            'message'   => self::$message
         ]);
     }
 

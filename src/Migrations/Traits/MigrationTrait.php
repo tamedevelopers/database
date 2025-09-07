@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database\Migrations\Traits;
 
-use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Env;
 use Tamedevelopers\Support\Str;
+use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
 use Tamedevelopers\Support\Process\HttpRequest;
+use Tamedevelopers\Support\Collections\Collection;
 
 /**
  * 
@@ -92,8 +93,8 @@ trait MigrationTrait{
         $message = [
             'console_error' => "Migration <b>[%s]</b> already exists.",
             'console_success' => "Migration <b>[%s]</b> created successfully.",
-            'browser_error' => "<span style='background: #ee0707; {$style}'>already exists.</span><br>",
-            'browser_success' => "<span style='background: #027b02; {$style}'>created successfully.</span><br>",
+            'browser_error' => "<span style='background: #ee0707; {$style}'>Migration %s already exists.</span><br>",
+            'browser_success' => "<span style='background: #027b02; {$style}'>Migration %s created successfully.</span><br>",
         ];
         
         if(File::exists(self::$storagePath)){
@@ -183,6 +184,26 @@ trait MigrationTrait{
         });
         
         return $readDir;
+    }
+
+    /**
+     * Create API Response
+     * @return \Tamedevelopers\Support\Collections\Collection
+     */
+    protected static function makeResponse()
+    {
+        /*
+        | ----------------------------------------------------------------------------
+        | Database importation use. Below are the status code
+        | ----------------------------------------------------------------------------
+        |   if ->status === 400 (Error Status
+        |   if ->status === 200 (Success importing to database
+        */ 
+        return new Collection([
+            'status'    => self::$error,
+            'path'      => self::$storagePath, 
+            'message'   => self::$message
+        ]);
     }
 
 }

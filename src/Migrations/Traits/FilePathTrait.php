@@ -21,10 +21,10 @@ trait FilePathTrait{
         $exception = (new Exception)->getTrace();
 
         // get traceable file name
-        $fileName = $exception[3]['file'] ?? null;
+        $fileName = $exception[2]['file'] ?? null;
         
         if(!is_null($fileName)){
-            $fileName = basename($fileName, '.php');
+            // $fileName = basename($fileName, '.php');
             $table = $fileName;
         }else{
             // add table name to end of string

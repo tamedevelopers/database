@@ -6,7 +6,6 @@ namespace Tamedevelopers\Database;
 
 use Tamedevelopers\Database\DB;
 use Tamedevelopers\Support\Hash;
-use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Traits\AuthTrait;
 use Tamedevelopers\Database\Traits\ExceptionTrait;
 
@@ -64,9 +63,6 @@ class Auth
      */
     public function __construct($table = null, $connection = null)
     {
-        // Ensure environment variables are loaded before accessing them
-        Manager::startEnvIFNotStarted();
-
         $this->table = $table;
         $this->conn = DB::connection($connection);
 

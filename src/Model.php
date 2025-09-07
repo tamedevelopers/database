@@ -14,7 +14,6 @@ namespace Tamedevelopers\Database;
 
 use Exception;
 use Tamedevelopers\Database\DB;
-use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Connectors\Connector;
 use Tamedevelopers\Database\Traits\ExceptionTrait;
 use Tamedevelopers\Database\Connectors\Traits\ConnectorTrait;
@@ -43,9 +42,6 @@ abstract class Model extends DB{
      */
     public function __construct()
     {
-        // Ensure environment variables are loaded before accessing them
-        Manager::startEnvIFNotStarted();
-        
         // automatically connect to database when model is instantiated
         $this->connection();
     }

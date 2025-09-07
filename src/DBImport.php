@@ -9,7 +9,6 @@ use Tamedevelopers\Database\DB;
 use Tamedevelopers\Support\Str;
 use Tamedevelopers\Support\Server;
 use Tamedevelopers\Support\Capsule\File;
-use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Traits\DBImportTrait;
 use Tamedevelopers\Support\Collections\Collection;
 
@@ -70,9 +69,6 @@ class DBImport{
      */
     public function __construct($connection = null, $path = null) 
     {
-        // Ensure environment variables are loaded before accessing them
-        Manager::startEnvIFNotStarted();
-        
         $this->error    = Constant::STATUS_400;
         $this->path     = $path;
 

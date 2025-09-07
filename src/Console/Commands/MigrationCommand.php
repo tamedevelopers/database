@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database\Console\Commands;
 
 use Tamedevelopers\Support\Env;
+use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Database\DatabaseManager;
+use Tamedevelopers\Database\Migrations\Migration;
 use Tamedevelopers\Support\Capsule\CommandHelper;
 
 
@@ -20,53 +22,38 @@ class MigrationCommand extends CommandHelper
     public function handle()
     {
         echo "Usage examples:\n";
-        echo "  php tame migrate\n";
-        echo "  php tame migrate:fresh [--seed] [--force] [--database=mysql]\n\n";
+        echo "  php tame migrate:fresh --seed --force\n";
+        echo "  php tame migrate:refresh --seed --force\n";
+        echo "  php tame migrate:status\n";
+        echo "  php tame migrate:reset\n";
     }
 
     /**
      * Drop all tables and re-run all migrations
      * Subcommand: php tame migrate:fresh
      */
-    public function fresh(array $args = [], array $options = []): int
+    public function fresh(array $args = [], array $options = [])
     {
-        Env::boot();
-        Env::loadOrFail();
+        $force = $this->option('force');
+        $seed  = $this->option('seed');
 
-        $db = new DatabaseManager();
+        $migration = new Migration();
 
-        $database = $options['database'] ?? null;
-        $force = isset($options['force']) && $options['force'] !== false;
-        $seed = isset($options['seed']) && $options['seed'] !== false;
+        $response = $migration->run();
 
-        echo "Running migrations: FRESH" . ($database ? " on connection '{$database}'" : "") . "\n";
-        if (!$force) {
-            echo "Add --force to bypass confirmations in production.\n";
+        if($response['status'] != Constant::STATUS_200){
+            $this->error($response['message']);
+            exit(0);
         }
 
-
-        dd(
-            'ss'
-        );
-
-        
-
-        // TODO: implement the actual drop-all + migrate logic
-        echo "[demo] Dropping all tables...\n";
-        echo "[demo] Running migrations...\n";
-
-        if ($seed) {
-            // $this->seed($args, $options);
-        }
-
-        echo "Migrations completed.\n";
-        return 0;
+        $this->info($response['message']);
+        exit(1);
     }
 
     /**
      * Show the status of each migration
      */
-    public function status(array $args = [], array $options = []): int
+    public function status(array $args = [], array $options = [])
     {
         echo "[demo] Seeding database...\n";
         // TODO: call your seeder pipeline here
@@ -76,7 +63,7 @@ class MigrationCommand extends CommandHelper
     /**
      * Reset and re-run all migrations
      */
-    public function refresh(array $args = [], array $options = []): int
+    public function refresh(array $args = [], array $options = [])
     {
         // Could set internal state or skip confirmations
         return 0;
@@ -85,9 +72,10 @@ class MigrationCommand extends CommandHelper
     /**
      * Rollback all database migrations
      */
-    public function reset(array $args = [], array $options = []): int
+    public function reset(array $args = [], array $options = [])
     {
         // No-op placeholder to show that options with values are also routed
         return 0;
     }
+
 }

@@ -7,13 +7,13 @@ namespace Tamedevelopers\Database\Migrations;
 use PDOException;
 use Tamedevelopers\Database\DB;
 use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Support\Process\HttpRequest;
 use Tamedevelopers\Database\Migrations\Traits\SchemaTrait;
 use Tamedevelopers\Database\Migrations\Traits\ManagerTrait;
 use Tamedevelopers\Database\Migrations\Traits\FilePathTrait;
 use Tamedevelopers\Database\Migrations\Traits\SchemaCollectionTrait;
 use Tamedevelopers\Database\MigrationTrait\Traits\TableStructureTrait;
 use Tamedevelopers\Database\Migrations\Traits\SchemaConfigurationTrait;
-
 
 class Blueprint{
     
@@ -46,16 +46,21 @@ class Blueprint{
     private function MySQLTemplate()
     {
         $checkPrimary = array_column($this->columns, 'primary');
+        
+        // check for primary keys
         if(count($checkPrimary) > 1){
-            return [
-                'status'    => Constant::STATUS_404,
-                'message'   => sprintf("Primary Key can not be more than one in `%s` @table", $this->tableName),
-            ];
+            $status = Constant::STATUS_404;
+            $message = sprintf(
+                        "Primary Key can not be more than one in `%s` @table", 
+                        $this->tableName);
+        } else{
+            $status = Constant::STATUS_200;
+            $message = $this->toMySQLQuery();
         }
         
         return [
-            'status'    => Constant::STATUS_200,
-            'message'   => $this->toMySQLQuery()
+            'status'    => $status,
+            'message'   => $message
         ];
     }
 
@@ -64,16 +69,16 @@ class Blueprint{
      * 
      * @return array
      */
-    public function handle() 
+    public function handleBlueprint() 
     {
         // create traceable table
         $traceTable = $this->traceableTableFileName($this->tableName);
 
-        // handle error
-        $handle = self::checkDBConnect();
-        if(is_array($handle)){
-            return $handle;
-        } 
+        // handle db conn error
+        $conn = self::checkDBConnect();
+        if($conn['status'] != Constant::STATUS_200){
+            return $conn;
+        }
 
         // primary key error
         $mysqlHandle = $this->MySQLTemplate();
@@ -84,69 +89,56 @@ class Blueprint{
         // style css
         $style = self::$style;
 
+        // browser break
+        $isConsole = HttpRequest::runningInConsole();
+        $messageTpl = [
+            'console_error' => "Migration Failed: Table exist on <b>[%s]</b>.",
+            'console_success' => "Migration run successfully on <b>[%s]</b>.",
+            'browser_error' => "<span style='background: #ee0707; {$style}'>Migration Failed: Table exist on %s.</span><br>",
+            'browser_success' => "<span style='background: #027b02; {$style}'>Migration run successfully on %s.</span><br>",
+        ];
+
         // Handle query
         try{
             // check if table already exist
             if($this->db->tableExists($this->tableName)){
-                $message = "Migration 
-                                <span style='background: #ee0707; {$style}'>
-                                    Failed
-                                </span> Table exist on `{$traceTable}` <br>\n";
-            }else{
-                $this->status_runned = true;
-                $message = "Migration runned 
-                                <span style='background: #027b02; {$style}'>
-                                    Successfully
-                                </span> on
-                                `{$traceTable}` <br>\n";
-            }
-
-            // execute query
-            if($this->status_runned){
+                $message = sprintf(
+                    $isConsole ? $messageTpl['console_error'] : $messageTpl['browser_error'],
+                    $this->tableName
+                );
+            } else{
+                // execute query
                 $this->db->getPDO()->exec($mysqlHandle['message']);
+                $message = sprintf(
+                    $isConsole ? $messageTpl['console_success'] : $messageTpl['browser_success'],
+                    $this->tableName
+                );
             }
-
-            return [
-                'status'    => Constant::STATUS_200,
-                'message'   => $message,
-            ];
+            
+            $status = Constant::STATUS_200;
         } catch (PDOException $e){
-            return ['status' => Constant::STATUS_404, 'message' => $e->getMessage()];
+            $status = Constant::STATUS_400;
+            $message = $e->getMessage() . " {$traceTable}";
         }
-    }
 
-    /**
-     * Save query data into sessions
-     * 
-     * @return void
-     */
-    public function __destruct() 
-    {
-        $this->tempMigrationQuery($this->handle());
+        return [
+            'status'   => $status,
+            'message'  => $message,
+        ];
     }
 
     /**
      * Check database connection error
      * 
-     * @return mixed
+     * @return array
      */
     private function checkDBConnect()
     {
-        // style css
-        $style = self::$style;
-
-        // if database connection is okay
-        $dbConnection = $this->db->dbConnection();
-        if($dbConnection['status'] !== Constant::STATUS_200){
-            return [
-                'status'    => Constant::STATUS_404,
-                'message'   => "Connection Error 
-                                    <span style='background: #ee0707; {$style}'>
-                                        Database Connection Error
-                                    </span>
-                                    `{$dbConnection['message']}` <br>\n",
-            ];
-        }
+        $conn = $this->db->dbConnection();
+        return [
+            'status'   => $conn['status'],
+            'message'  => $conn['message'],
+        ];
     }
 
 }

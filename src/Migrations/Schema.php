@@ -30,6 +30,22 @@ class Schema{
      */
     private static $pdo;
 
+    /**
+     * Stores the last result from a schema operation
+     *
+     * @var array|null
+     */
+    private static $lastResult = null;
+
+    /**
+     * Get last schema operation result
+     *
+     * @return array|null
+     */
+    public static function getLastResult()
+    {
+        return self::$lastResult;
+    }
 
     /**
      * Creating Instance of Database
@@ -74,7 +90,11 @@ class Schema{
      */
     public static function create($tableName, callable $callback) 
     {
-        $callback(new Blueprint($tableName));
+        $blueprint = new Blueprint($tableName);
+        $callback($blueprint);
+        $result = $blueprint->handleBlueprint();
+        self::$lastResult = $result;
+        return $result;
     }
 
     /**
@@ -165,6 +185,7 @@ class Schema{
         // handle error
         $handle = self::checkDBConnect();
         if(is_array($handle)){
+            self::$lastResult = $handle;
             return $handle;
         } 
 
@@ -179,21 +200,19 @@ class Schema{
                 self::$pdo->query( "DROP TABLE {$tableName};" )->execute();
             }
 
-            return [
+            $result = [
                 'status'    => Constant::STATUS_200,
-                'message'   => "Table `{$tableName}` dropped successfully <br> \n",
+                'message'   => "Table `{$tableName}` dropped successfully",
             ];
+            self::$lastResult = $result;
+            return $result;
         } catch (PDOException $e){
-            return [
+            $result = [
                 'status'    => Constant::STATUS_404,
-                'message'   => preg_replace(
-                    '/^[ \t]+|[ \t]+$/m', '', 
-                    sprintf("<<\\Error %s>> 
-                        <br>
-                        <<\\PDO::ERROR>> %s  \n
-                    ", Constant::STATUS_404, $e->getMessage())
-                ),
+                'message'   => $e->getMessage(),
             ];
+            self::$lastResult = $result;
+            return $result;
         }
     }
 
@@ -289,20 +308,11 @@ class Schema{
      */
     private static function checkDBConnect()
     {
-        $style = self::$style;
-
-        // if database connection is okay
-        $dbConnection = self::$db->dbConnection();
-        if($dbConnection['status'] !== Constant::STATUS_200){
-            return [
-                'status'    => Constant::STATUS_404,
-                'message'   => "Connection Error 
-                                    <span style='background: #ee0707; {$style}'>
-                                        Database Connection Error
-                                    </span>
-                                    `{$dbConnection['message']}` <br>\n",
-            ];
-        }
+        $conn = self::$db->dbConnection();
+        return [
+            'status'   => $conn['status'],
+            'message'  => $conn['message'],
+        ];
     }
     
 }
