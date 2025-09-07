@@ -16,10 +16,13 @@ return new class extends Migration
     {
         Schema::create('{{TABLE}}', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->index()->nullable();
             $table->string('ip_address', 45)->nullable();
-            $table->json('user_agent')->nullable();
-            $table->json('payload');
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->bigInteger('uid')->nullable()->index();
+            $table->string('browser', 50)->nullable()->index();
+            $table->string('platform', 50)->nullable()->index();
+            $table->text('platform_details')->nullable();
             $table->integer('last_activity')->index();
         });
     }

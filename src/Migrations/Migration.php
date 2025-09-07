@@ -28,8 +28,8 @@ class Migration{
     /**
      * Create migration name
      * @param string $table_name 
-     * @param string|null $type
-     * - optional $jobs\To create dummy Jobs table Data
+     * @param string|null $type         
+     * - [optional] <jobs, sessions> create schema with dummy Data
      * 
      * @return \Tamedevelopers\Support\Collections\Collection
      */
@@ -132,7 +132,7 @@ class Migration{
             
             // error occured stop code execution
             if($handle['status'] != Constant::STATUS_200){
-                $errorstatus = Constant::STATUS_404;
+                $errorstatus = $handle['status'];
                 break;
             }
         }

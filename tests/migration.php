@@ -12,7 +12,7 @@ $migration = new Migration();
 
 
 dump( 
-    $migration::create('users')
+    $migration::create('usersr')
 );
 
 ?>

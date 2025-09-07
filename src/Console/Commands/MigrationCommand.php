@@ -65,6 +65,27 @@ class MigrationCommand extends CommandHelper
     }
 
     /**
+     * Rollback all database migrations
+     */
+    public function reset()
+    {
+        // Require --force in production environments
+        $this->forceChecker();
+
+        $force = (bool) $this->option('force'); 
+
+        $migration = new Migration();
+        $response = $migration->drop($force);
+
+        if ($response['status'] != Constant::STATUS_200) {
+            $this->error($response['message']);
+            return;
+        }
+
+        $this->info($response['message']);
+    }
+
+    /**
      * Show the status of each migration
      */
     public function status()
@@ -92,11 +113,12 @@ class MigrationCommand extends CommandHelper
             return 0;
         }
 
-        Logger::info("Migration status:");
+        // Build a single table output
+        $rows = [];
         foreach ($files as $file) {
             $fullPath = $migrationsDir . $file;
 
-            // Try to detect created table from file content first
+            // Detect created table from file content or filename
             $table = null;
             $content = File::get($fullPath) ?: '';
             if (preg_match("/Schema::create\\(['\"]([a-zA-Z0-9_]+)['\"]/", $content, $m)) {
@@ -111,35 +133,40 @@ class MigrationCommand extends CommandHelper
             }
 
             $exists = (bool) $conn->tableExists($table);
-            if ($exists) {
-                $this->success(sprintf("%-30s %s", $table, '[OK]'));
-            } else {
-                $this->warning(sprintf("%-30s %s", $table, '[MISSING]'));
-            }
+            $rows[] = [$file, $table, $exists ? 'OK' : 'MISSING'];
         }
 
-        return 0;
-    }
-
-    /**
-     * Rollback all database migrations
-     */
-    public function reset()
-    {
-        // Require --force in production environments
-        $this->forceChecker();
-
-        $force = (bool) $this->option('force');
-
-        $migration = new Migration();
-        $response = $migration->drop($force);
-
-        if ($response['status'] != Constant::STATUS_200) {
-            $this->error($response['message']);
+        if (empty($rows)) {
+            $this->info("No detectable migration tables.");
             return 0;
         }
 
-        $this->info($response['message']);
+        // Compute column widths
+        $headers = ['Migration', 'Table', 'Status'];
+        $w0 = strlen($headers[0]);
+        $w1 = strlen($headers[1]);
+        $w2 = strlen($headers[2]);
+        foreach ($rows as [$f, $t, $s]) {
+            $w0 = max($w0, strlen((string)$f));
+            $w1 = max($w1, strlen((string)$t));
+            $w2 = max($w2, strlen((string)$s));
+        }
+
+        // Helpers to draw lines
+        $sep = '+' . str_repeat('-', $w0 + 2) . '+' . str_repeat('-', $w1 + 2) . '+' . str_repeat('-', $w2 + 2) . '+';
+        $rowFn = static function ($a, $b, $c) use ($w0, $w1, $w2) {
+            return sprintf('| %-' . $w0 . 's | %-' . $w1 . 's | %-' . $w2 . 's |', $a, $b, $c);
+        };
+
+        // Render table
+        Logger::writeln($sep);
+        Logger::writeln($rowFn($headers[0], $headers[1], $headers[2]));
+        Logger::writeln($sep);
+        foreach ($rows as [$f, $t, $s]) {
+            Logger::writeln($rowFn($f, $t, $s));
+        }
+        Logger::writeln($sep);
+
         return 0;
     }
 

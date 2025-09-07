@@ -115,11 +115,11 @@ class Schema{
     {
         self::initSchemaDatabase();
 
-        // handle error
-        $handle = self::checkDBConnect();
-        if(is_array($handle)){
-            return $handle;
-        } 
+        // handle db conn error
+        $conn = self::checkDBConnect();
+        if($conn['status'] != Constant::STATUS_200){
+            return $conn;
+        }
 
         // Handle query
         try{
@@ -182,12 +182,12 @@ class Schema{
     {
         self::initSchemaDatabase();
 
-        // handle error
-        $handle = self::checkDBConnect();
-        if(is_array($handle)){
-            self::$lastResult = $handle;
-            return $handle;
-        } 
+        // handle db conn error
+        $conn = self::checkDBConnect();
+        if($conn['status'] != Constant::STATUS_200){
+            self::$lastResult = $conn;
+            return $conn;
+        }
 
         // Handle query
         try{
