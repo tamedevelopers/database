@@ -192,10 +192,10 @@ trait DBSchemaExportTrait
                 . "->references('{$refColumn}')"
                 . "->on('{$refTable}')";
             if (!empty($onDelete)) {
-                $fkLine .= "->onDelete('" . Str::lower($onDelete) . "')";
+                $fkLine .= "->onDelete('" . str_replace(' ', '_', Str::lower($onDelete)) . "')";
             }
             if (!empty($onUpdate)) {
-                $fkLine .= "->onUpdate('" . Str::lower($onUpdate) . "')";
+                $fkLine .= "->onUpdate('" . str_replace(' ', '_', Str::lower($onUpdate)) . "')";
             }
             $fkLine .= ';';
             $lines[] = $fkLine;
@@ -740,8 +740,8 @@ trait DBSchemaExportTrait
             // CONSTRAINT `fk_name` FOREIGN KEY (`col`) REFERENCES `tbl`(`ref`) [ON DELETE x] [ON UPDATE y]
             if (preg_match('/^constraint\s+`(?P<name>[^`]+)`\s+foreign\s+key\s+\(`(?P<col>[^`]+)`\)\s+references\s+`(?P<rtbl>[^`]+)`\s*\(`(?P<rcol>[^`]+)`\)(?P<actions>.*)$/i', $ln, $fm)) {
                 $onDelete = null; $onUpdate = null;
-                if (preg_match('/on\s+delete\s+(\w+)/i', $fm['actions'], $dm)) { $onDelete = $dm[1]; }
-                if (preg_match('/on\s+update\s+(\w+)/i', $fm['actions'], $um)) { $onUpdate = $um[1]; }
+                if (preg_match('/on\s+delete\s+(cascade|restrict|set\s+null|no\s+action)/i', $fm['actions'], $dm)) { $onDelete = $dm[1]; }
+                if (preg_match('/on\s+update\s+(cascade|restrict|set\s+null|no\s+action)/i', $fm['actions'], $um)) { $onUpdate = $um[1]; }
 
                 $fks[] = [
                     'name' => $fm['name'],
@@ -820,10 +820,10 @@ trait DBSchemaExportTrait
                 . "->references('{$refColumn}')"
                 . "->on('{$refTable}')";
             if (!empty($onDelete)) {
-                $fkLine .= "->onDelete('" . Str::lower($onDelete) . "')";
+                $fkLine .= "->onDelete('" . str_replace(' ', '_', Str::lower($onDelete)) . "')";
             }
             if (!empty($onUpdate)) {
-                $fkLine .= "->onUpdate('" . Str::lower($onUpdate) . "')";
+                $fkLine .= "->onUpdate('" . str_replace(' ', '_', Str::lower($onUpdate)) . "')";
             }
             $fkLine .= ';';
             $bodyLines[] = $fkLine;
