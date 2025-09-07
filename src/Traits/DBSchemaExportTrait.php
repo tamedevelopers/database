@@ -192,10 +192,10 @@ trait DBSchemaExportTrait
                 . "->references('{$refColumn}')"
                 . "->on('{$refTable}')";
             if (!empty($onDelete)) {
-                $fkLine .= "->onDelete('" . str_replace(' ', '_', Str::lower($onDelete)) . "')";
+                $fkLine .= "->onDelete('" . Str::lower($onDelete) . "')";
             }
             if (!empty($onUpdate)) {
-                $fkLine .= "->onUpdate('" . str_replace(' ', '_', Str::lower($onUpdate)) . "')";
+                $fkLine .= "->onUpdate('" . Str::lower($onUpdate) . "')";
             }
             $fkLine .= ';';
             $lines[] = $fkLine;
@@ -820,10 +820,10 @@ trait DBSchemaExportTrait
                 . "->references('{$refColumn}')"
                 . "->on('{$refTable}')";
             if (!empty($onDelete)) {
-                $fkLine .= "->onDelete('" . str_replace(' ', '_', Str::lower($onDelete)) . "')";
+                $fkLine .= "->onDelete('" . Str::lower($onDelete) . "')";
             }
             if (!empty($onUpdate)) {
-                $fkLine .= "->onUpdate('" . str_replace(' ', '_', Str::lower($onUpdate)) . "')";
+                $fkLine .= "->onUpdate('" . Str::lower($onUpdate) . "')";
             }
             $fkLine .= ';';
             $bodyLines[] = $fkLine;
