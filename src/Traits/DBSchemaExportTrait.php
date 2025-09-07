@@ -572,9 +572,53 @@ trait DBSchemaExportTrait
         $hasCreatedAt = false;
         $hasUpdatedAt = false;
 
-        // Tokenize top-level definitions by commas/newlines (safe enough for common dumps)
-        $rawLines = preg_split('/,(?=(?:[^\'"]|\'[^\']*\'|"[^"]*")*$)/', $createBody);
-        $rawLines = array_map(fn($l) => trim($l), $rawLines);
+        // Tokenize top-level definitions by commas NOT inside quotes/backticks or parentheses
+        $body = strtr($createBody, [
+            '‘' => "'", '’' => "'", '‚' => "'", '‛' => "'",
+            '“' => '"', '”' => '"', '„' => '"', '‟' => '"',
+        ]);
+
+        $rawLines = [];
+        $buf = '';
+        $inSingle = false;
+        $inDouble = false;
+        $inBacktick = false;
+        $escape = false;
+        $depth = 0;
+        $len = strlen($body);
+
+        for ($i = 0; $i < $len; $i++) {
+            $ch = $body[$i];
+
+            if ($escape) { $buf .= $ch; $escape = false; continue; }
+
+            // escape handling only inside ' or "
+            if (($inSingle || $inDouble) && $ch === '\\') {
+                $escape = true;
+                $buf .= $ch;
+                continue;
+            }
+
+            if (!$inDouble && !$inBacktick && $ch === "'") { $inSingle = !$inSingle; $buf .= $ch; continue; }
+            if (!$inSingle && !$inBacktick && $ch === '"') { $inDouble = !$inDouble; $buf .= $ch; continue; }
+            if (!$inSingle && !$inDouble && $ch === '`') { $inBacktick = !$inBacktick; $buf .= $ch; continue; }
+
+            if (!$inSingle && !$inDouble && !$inBacktick) {
+                if ($ch === '(') { $depth++; $buf .= $ch; continue; }
+                if ($ch === ')') { if ($depth > 0) $depth--; $buf .= $ch; continue; }
+                if ($ch === ',' && $depth === 0) {
+                    $t = trim($buf);
+                    if ($t !== '') $rawLines[] = $t;
+                    $buf = '';
+                    continue;
+                }
+            }
+
+            $buf .= $ch;
+        }
+
+        $t = trim($buf);
+        if ($t !== '') $rawLines[] = $t;
 
         $columns = [];
         $indexes = []; // ['type' => 'primary'|'unique'|'index', 'columns' => [..]]
