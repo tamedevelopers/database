@@ -319,11 +319,10 @@ trait DBSchemaExportTrait
 
         // default
         if ($default !== null) {
-            $isNumeric = in_array($baseType, ['bigint','int','smallint','mediumint','tinyint','decimal','double','float']);
             $defaultStr = is_string($default) ? Str::lower(trim((string) $default)) : $default;
 
-            // If default is NULL and type is non-numeric, omit ->default('NULL') and ensure nullable()
-            if (!$isNumeric && is_string($defaultStr) && $defaultStr === 'null') {
+            // If default is NULL (string), omit ->default('NULL') for any type and ensure nullable()
+            if (is_string($defaultStr) && $defaultStr === 'null') {
                 if (strpos($line, '->nullable()') === false) {
                     $line .= '->nullable()';
                 }
