@@ -22,7 +22,6 @@ class DBCommand extends CommandHelper
      */
     public function handle()
     {
-        // Logger::helpHeader("Description:\n");
         Logger::writeln('<yellow>Usage:</yellow>');
         Logger::writeln('  php tame db:seed');
         Logger::writeln('  php tame db:wipe');
