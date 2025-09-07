@@ -108,11 +108,14 @@ trait DBSchemaExportTrait
                 $byIndexName[$idxName]['unique'] = true;
             }
         }
-        foreach ($byIndexName as $idx) {
+        foreach ($byIndexName as $name => $idx) {
             if (count($idx['cols']) === 1) {
                 $c = $idx['cols'][0];
-                // Prefer unique if detected
-                $singleIndexMap[$c] = $idx['unique'] ? 'uni' : 'mul';
+                // Prefer unique if detected and store name for chaining
+                $singleIndexMap[$c] = [
+                    'kind' => $idx['unique'] ? 'uni' : 'mul',
+                    'name' => $name,
+                ];
             }
         }
 
@@ -151,8 +154,11 @@ trait DBSchemaExportTrait
             }
 
             // Map type (pass index hint from singleIndexMap when available)
-            $indexHint = $singleIndexMap[$field] ?? (($key === 'uni') ? 'uni' : ''); // only single-col indexes
-            $lines[] = $this->toBlueprintLine($field, $type, $null, $default, $extra, $indexHint);
+            $indexInfo = $singleIndexMap[$field] ?? (
+                $key === 'uni' ? ['kind' => 'uni', 'name' => null] : (
+                ($key === 'mul') ? ['kind' => 'mul', 'name' => null] : ['kind' => '', 'name' => null])
+            );
+            $lines[] = $this->toBlueprintLine($field, $type, $null, $default, $extra, (string)$indexInfo['kind'], $indexInfo['name']);
         }
 
         if ($hasCreatedAt && $hasUpdatedAt) {
@@ -202,7 +208,7 @@ trait DBSchemaExportTrait
     }
 
     /** Build a single Blueprint line for a column. */
-    protected function toBlueprintLine(string $field, string $type, bool $nullable, $default, string $extra, string $key): string
+    protected function toBlueprintLine(string $field, string $type, bool $nullable, $default, string $extra, string $key, ?string $indexName = null): string
     {
         $unsigned = str_contains($type, 'unsigned');
         [$baseType, $length, $scale] = $this->parseType($type);
@@ -371,10 +377,9 @@ trait DBSchemaExportTrait
 
         // reflect single-column index inline (from map or Key)
         if ($key === 'uni') {
-            $line .= "->unique()";
+            $line .= $indexName ? "->unique('{$indexName}')" : "->unique()";
         } elseif ($key === 'mul') {
-            // Treat non-unique index as unique() when inline as requested
-            $line .= "->unique()";
+            $line .= $indexName ? "->index('{$indexName}')" : "->index()";
         }
 
         // auto_increment is covered when we used id(); otherwise, ignored here
@@ -430,8 +435,7 @@ trait DBSchemaExportTrait
             if ($data['unique']) {
                 $lines[] = "\$table->unique({$colsList}, '{$name}')" . ';';
             } else {
-                // Treat index() as unique() per requirement
-                $lines[] = "\$table->unique({$colsList}, '{$name}')" . ';';
+                $lines[] = "\$table->index({$colsList}, '{$name}')" . ';';
             }
         }
 
@@ -796,8 +800,11 @@ trait DBSchemaExportTrait
             if ($idx['type'] === 'primary') { continue; }
             if (count($idx['columns']) <= 1) { continue; }
             $colsList = "['" . implode("','", $idx['columns']) . "']";
-            // Treat index as unique per requirement
-            $bodyLines[] = "\$table->unique({$colsList});";
+            if (($idx['type'] ?? '') === 'unique') {
+                $bodyLines[] = "\$table->unique({$colsList});";
+            } else {
+                $bodyLines[] = "\$table->index({$colsList});";
+            }
         }
 
         // FKs (single-column)
