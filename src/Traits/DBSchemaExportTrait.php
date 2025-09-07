@@ -85,6 +85,32 @@ trait DBSchemaExportTrait
         // Foreign keys
         $fks = $this->getForeignKeys($dbName, $table);
 
+        // Build a map of single-column indexes so we can chain ->unique() / ->index() inline
+        $singleIndexMap = [];
+        $byIndexName = [];
+        foreach ($indexes as $ix) {
+            $idxName   = $ix->Key_name ?? $ix->key_name ?? null;
+            $colName   = $ix->Column_name ?? $ix->column_name ?? null;
+            $nonUnique = (int) ($ix->Non_unique ?? $ix->non_unique ?? 1);
+            if (!$idxName || !$colName) { continue; }
+            if (Str::lower((string) $idxName) === 'primary') { continue; }
+            if (!isset($byIndexName[$idxName])) {
+                $byIndexName[$idxName] = ['cols' => [], 'unique' => ($nonUnique === 0)];
+            }
+            $byIndexName[$idxName]['cols'][] = $colName;
+            // If any row shows unique, keep it unique (Non_unique = 0)
+            if ($nonUnique === 0) {
+                $byIndexName[$idxName]['unique'] = true;
+            }
+        }
+        foreach ($byIndexName as $idx) {
+            if (count($idx['cols']) === 1) {
+                $c = $idx['cols'][0];
+                // Prefer unique if detected
+                $singleIndexMap[$c] = $idx['unique'] ? 'uni' : 'mul';
+            }
+        }
+
         $hasCreatedAt = false;
         $hasUpdatedAt = false;
 
@@ -102,8 +128,9 @@ trait DBSchemaExportTrait
             $field  = $col?->Field ?? $col?->field;
             $type   = Str::lower($col?->Type ?? $col?->type);
             $null   = Str::lower((string) $col?->Null ?? $col?->null) === 'yes';
-            $key    = Str::lower((string) $col?->Null ?? $col?->null);
-            $extra  = Str::lower((string) $col?->Extra ?? $col?->extra);
+            // Key type should come from Key column not Null
+            $key    = Str::lower((string) ($col?->Key ?? $col?->key ?? ''));
+            $extra  = Str::lower((string) ($col?->Extra ?? $col?->extra ?? ''));
             $default   = $col?->Default ?? $col?->default;
 
             // Skip the primary auto column since id() already added it
@@ -118,8 +145,9 @@ trait DBSchemaExportTrait
                 continue; // we'll add as $table->timestamps() later if both exist
             }
 
-            // Map type
-            $lines[] = $this->toBlueprintLine($field, $type, $null, $default, $extra, $key);
+            // Map type (pass index hint from singleIndexMap when available)
+            $indexHint = $singleIndexMap[$field] ?? (($key === 'uni') ? 'uni' : ''); // only single-col indexes
+            $lines[] = $this->toBlueprintLine($field, $type, $null, $default, $extra, $indexHint);
         }
 
         if ($hasCreatedAt && $hasUpdatedAt) {
@@ -133,7 +161,7 @@ trait DBSchemaExportTrait
             }
         }
 
-        // Indexes (single-column only)
+        // Indexes (multi-column only). Single-column handled inline via toBlueprintLine.
         $indexStatements = $this->buildIndexLines($indexes, $primaryAuto);
         foreach ($indexStatements as $stmt) {
             $lines[] = $stmt;
@@ -148,9 +176,9 @@ trait DBSchemaExportTrait
             $onDelete = $fk['delete_rule'] ?? null;
             $onUpdate = $fk['update_rule'] ?? null;
 
-            // Try to use foreignId when possible, else use foreign()->references()->on()
-            $name = $fk['name'] ?? null;
-            $fkLine = "\$table->foreignId('{$col}')->constrained('{$refTable}', '{$refColumn}')";
+            // Use foreign()->references()->on() to avoid re-declaring column or id()
+            $fkLine = "\$table->foreign('{$col}')->references('{$refColumn}', '{$name}')";
+            $fkLine .= "->on('{$refTable}')";
             if (!empty($onDelete)) {
                 $fkLine .= "->onDelete('" . Str::upper($onDelete) . "')";
             }
@@ -332,9 +360,11 @@ trait DBSchemaExportTrait
             }
         }
 
-        // key (non-unique index handled later); unique can be reflected here if single-column
+        // reflect single-column index inline (from map or Key)
         if ($key === 'uni') {
             $line .= "->unique()";
+        } elseif ($key === 'mul') {
+            $line .= "->index()";
         }
 
         // auto_increment is covered when we used id(); otherwise, ignored here
@@ -363,41 +393,34 @@ trait DBSchemaExportTrait
         return [$base, $length, $scale];
     }
 
-    /** Build index lines for single-column indexes. */
+    /** Build index lines for multi-column indexes only. */
     protected function buildIndexLines(array $indexes, bool $primaryAuto): array
     {
         $lines = [];
-        // Group by column
-        $byCol = [];
+
+        // Group by index name to detect multi-column indexes
+        $byIndexName = [];
         foreach ($indexes as $idx) {
-            $col = $idx->Column_name ?? $idx->column_name ?? null;
-            if (!$col) { continue; }
-            $byCol[$col][] = $idx;
+            $idxName   = $idx->Key_name ?? $idx->key_name ?? null;
+            $col       = $idx->Column_name ?? $idx->column_name ?? null;
+            $nonUnique = (int) ($idx->Non_unique ?? $idx->non_unique ?? 1);
+            if (!$idxName || !$col) { continue; }
+            if (Str::lower((string) $idxName) === 'primary') { continue; }
+            if (!isset($byIndexName[$idxName])) {
+                $byIndexName[$idxName] = ['cols' => [], 'unique' => ($nonUnique === 0)];
+            }
+            $byIndexName[$idxName]['cols'][] = $col;
+            if ($nonUnique === 0) { $byIndexName[$idxName]['unique'] = true; }
         }
 
-        foreach ($byCol as $col => $rows) {
-            // skip primary auto handled by id()
-            $isPrimary = false;
-            foreach ($rows as $r) {
-                $isPrimary = $isPrimary || (Str::lower((string)($r->Key_name ?? $r->key_name ?? '')) === 'primary');
-            }
-            if ($primaryAuto && $isPrimary && Str::lower($col) === 'id') {
-                continue;
-            }
-
-            // determine uniqueness for single-column cases
-            $unique = false;
-            foreach ($rows as $r) {
-                $non = (int) ($r->Non_unique ?? $r->non_unique ?? 1);
-                if ($non === 0) { $unique = true; break; }
-            }
-
-            if ($unique) {
-                $lines[] = "\$table->unique()" . ';'; // attaches to last column; but we already generated column lines before, so do separate unique using name
-                // Better: emit explicit unique index name
-                $lines[count($lines)-1] = "\$table->unique('{$col}')" . ';';
+        foreach ($byIndexName as $name => $data) {
+            // Only handle multi-column indexes here; single-column handled inline
+            if (count($data['cols']) <= 1) { continue; }
+            $colsList = "['" . implode("','", $data['cols']) . "']";
+            if ($data['unique']) {
+                $lines[] = "\$table->unique({$colsList}, '{$name}')" . ';';
             } else {
-                $lines[] = "\$table->index('{$col}')" . ';';
+                $lines[] = "\$table->index({$colsList}, '{$name}')" . ';';
             }
         }
 
