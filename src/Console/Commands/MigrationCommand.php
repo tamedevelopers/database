@@ -6,6 +6,7 @@ namespace Tamedevelopers\Database\Console\Commands;
 
 use Tamedevelopers\Support\Env;
 use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Support\Capsule\File;
 use Tamedevelopers\Support\Capsule\Artisan;
 use Tamedevelopers\Database\DatabaseManager;
 use Tamedevelopers\Database\Migrations\Migration;
@@ -67,8 +68,55 @@ class MigrationCommand extends CommandHelper
      */
     public function status()
     {
-        echo "[demo] status database...\n";
-        // TODO: call your seeder pipeline here
+        // Resolve migrations directory
+        $migrationsDir = Env::getServers('server') . "database/migrations/";
+
+        if (!is_dir($migrationsDir)) {
+            $this->warning("Migrations directory not found: {$migrationsDir}");
+            return 0;
+        }
+
+        // Connect to DB and validate connection
+        $conn = DatabaseManager::connection();
+        $this->checkConnection($conn);
+
+        // Gather migration files
+        $files = array_values(array_filter(scandir($migrationsDir), static function ($f) use ($migrationsDir) {
+            return is_file($migrationsDir . $f) && str_ends_with($f, '.php');
+        }));
+        sort($files);
+
+        if (empty($files)) {
+            $this->info("No migration files found in: {$migrationsDir}");
+            return 0;
+        }
+
+        $this->info("Migration status:");
+        foreach ($files as $file) {
+            $fullPath = $migrationsDir . $file;
+
+            // Try to detect created table from file content first
+            $table = null;
+            $content = File::get($fullPath) ?: '';
+            if (preg_match("/Schema::create\\(['\"]([a-zA-Z0-9_]+)['\"]/", $content, $m)) {
+                $table = $m[1];
+            } elseif (preg_match('/create_(.+)_table\\.php$/', $file, $m)) {
+                $table = $m[1];
+            }
+
+            if (!$table) {
+                $this->warning("Unable to detect table for migration: {$file}");
+                continue;
+            }
+
+            $exists = (bool) $conn->tableExists($table);
+            if ($exists) {
+                $this->success(sprintf("%-30s %s", $table, '[OK]'));
+            } else {
+                $this->warning(sprintf("%-30s %s", $table, '[MISSING]'));
+            }
+        }
+
         return 0;
     }
 
@@ -77,7 +125,20 @@ class MigrationCommand extends CommandHelper
      */
     public function reset()
     {
-        // No-op placeholder to show that options with values are also routed
+        // Require --force in production environments
+        $this->forceChecker();
+
+        $force = (bool) $this->option('force');
+
+        $migration = new Migration();
+        $response = $migration->drop($force);
+
+        if ($response['status'] != Constant::STATUS_200) {
+            $this->error($response['message']);
+            return 0;
+        }
+
+        $this->info($response['message']);
         return 0;
     }
 
