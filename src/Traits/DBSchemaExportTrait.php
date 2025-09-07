@@ -176,7 +176,13 @@ trait DBSchemaExportTrait
         $method = null;
         $args = [];
 
-        switch ($baseType) {
+        // Robust enum handling: if raw type starts with enum(...), force enum mapping
+        if (preg_match('/^enum\s*\(/i', trim($type))) {
+            $method = 'enum';
+            $args[] = "'{$field}'";
+            $args[] = $this->extractEnumValues($type);
+        } else {
+            switch ($baseType) {
             case 'bigint':
                 $method = 'bigInteger';
                 $args[] = "'{$field}'";
@@ -297,6 +303,7 @@ trait DBSchemaExportTrait
                 if ($length) { $args[] = (string) (int) $length; }
                 break;
         }
+        }
 
         $line = "\$table->{$method}(" . implode(', ', $args) . ")";
 
@@ -312,7 +319,7 @@ trait DBSchemaExportTrait
 
         // default
         if ($default !== null) {
-            $isNumeric = in_array($baseType, ['biginteger','unsignedbiginteger','int','smallint','mediumint','tinyint','decimal','double','float']);
+            $isNumeric = in_array($baseType, ['bigint','int','smallint','mediumint','tinyint','decimal','double','float']);
             $defaultStr = is_string($default) ? Str::lower(trim((string) $default)) : $default;
 
             // If default is NULL and type is non-numeric, omit ->default('NULL') and ensure nullable()
@@ -425,8 +432,9 @@ trait DBSchemaExportTrait
     {
         if ($default === null) return 'null';
 
-        // CURRENT_TIMESTAMP and similar should be passed as strings here (Schema will quote it)
-        if (is_numeric($default) && !in_array($baseType, ['varchar','char','text','longtext','mediumtext','tinytext','json'])) {
+        // Treat enum/set and text-ish types as strings; numeric types can be raw
+        $stringish = ['varchar','char','text','longtext','mediumtext','tinytext','json','enum','set'];
+        if (is_numeric($default) && !in_array($baseType, $stringish, true)) {
             return (string) $default;
         }
 
