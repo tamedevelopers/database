@@ -7,6 +7,7 @@ namespace Tamedevelopers\Database\Console\Commands;
 use Tamedevelopers\Support\Env;
 use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
+use Tamedevelopers\Support\Capsule\Logger;
 use Tamedevelopers\Support\Capsule\Artisan;
 use Tamedevelopers\Database\DatabaseManager;
 use Tamedevelopers\Database\Migrations\Migration;
@@ -91,7 +92,7 @@ class MigrationCommand extends CommandHelper
             return 0;
         }
 
-        $this->info("Migration status:");
+        Logger::info("Migration status:");
         foreach ($files as $file) {
             $fullPath = $migrationsDir . $file;
 
