@@ -419,14 +419,24 @@ trait DBSchemaExportTrait
     /** Extract enum values from a type like "enum('a','b')" and return PHP array syntax. */
     protected function extractEnumValues(string $type): string
     {
-        // Use non-greedy capture and allow spaces around parentheses
-        $trimmed = trim($type);
-        if (preg_match("/^enum\s*\((.*?)\)\s*$/i", $trimmed, $m)) {
-            $vals = trim($m[1]);
+        $s = trim($type);
+        // Normalize curly quotes
+        $s = strtr($s, [
+            '‘' => "'", '’' => "'", '‚' => "'", '‛' => "'",
+            '“' => '"', '”' => '"', '„' => '"', '‟' => '"',
+        ]);
+
+        // Find first '(' and last ')' to capture inside regardless of spaces
+        $posL = strpos($s, '(');
+        $posR = strrpos($s, ')');
+        if ($posL !== false && $posR !== false && $posR > $posL && preg_match('/^\s*enum\b/i', $s)) {
+            $vals = substr($s, $posL + 1, $posR - $posL - 1);
+            $vals = trim($vals);
             return '[' . $vals . ']';
         }
-        // Fallback broader search within the string
-        if (preg_match("/enum\s*\((.*?)\)/i", $type, $m2)) {
+
+        // Fallback regex
+        if (preg_match("/enum\s*\((.*?)\)/i", $s, $m2)) {
             $vals = trim($m2[1]);
             return '[' . $vals . ']';
         }
@@ -627,7 +637,8 @@ trait DBSchemaExportTrait
 
         foreach ($rawLines as $ln) {
             // Column definition: `field` type ... 
-            if (preg_match('/^`(?P<field>[^`]+)`\s+(?P<type>[^\s,]+(?:\([^)]+\))?(?:\s+unsigned)?)\s*(?P<rest>.*)$/i', $ln, $cm)) {
+            // Fix type capture to allow commas inside parentheses (e.g., enum('0','1'), decimal(15,2))
+            if (preg_match('/^`(?P<field>[^`]+)`\s+(?P<type>[a-zA-Z0-9_]+(?:\([^)]+\))?(?:\s+unsigned)?)\s*(?P<rest>.*)$/i', $ln, $cm)) {
                 $field = $cm['field'];
                 $type  = Str::lower(trim($cm['type']));
                 $rest  = Str::lower(trim($cm['rest']));
