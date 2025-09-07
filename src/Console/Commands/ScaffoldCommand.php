@@ -13,14 +13,15 @@ class ScaffoldCommand extends CommandHelper
 {
 
     /**
-     * Default entry when running command
+     * Default entry when running commands.
+     *
+     * @return void
      */
-    public function handle(array $args = [], array $options = [])
+    public function handle()
     {
 
         dd(
-            $args,
-            $options
+            'scaffold command'
         );
         // Ensure env and logger are booted
         Env::boot();

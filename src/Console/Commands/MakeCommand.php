@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database\Console\Commands;
 
 use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Support\Capsule\Logger;
 use Tamedevelopers\Database\Migrations\Migration;
 use Tamedevelopers\Support\Capsule\CommandHelper;
 
@@ -12,24 +13,25 @@ use Tamedevelopers\Support\Capsule\CommandHelper;
 class MakeCommand extends CommandHelper
 {   
     /**
-     * Default entry when running command
+     * Default entry when running commands.
+     *
+     * @return void
      */
-    public function handle(array $args = [], array $options = []): int
+    public function handle()
     {
-        echo "Usage examples:\n";
-        echo "  php tame make\n";
-        echo "  php tame make:migration [name] --create=users\n\n";
-        return 0;
+        Logger::helpHeader('<yellow>Usage:</yellow>');
+        Logger::writeln('  php tame make:migration [name] --create=users');
+        Logger::writeln('');
     }
 
     /**
      * Create a new migration file
      */
-    public function migration(array $args = [], array $options = []): int
+    public function migration(array $args = [], array $options = [])
     {
         // Could set internal state or skip confirmations
         $table  = $args[0] ?? null;
-        $create = $this->getOption($options, 'create');
+        $create = $this->option('create');
 
         // if options is valid and came
         if(!empty($create)){

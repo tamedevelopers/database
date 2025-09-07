@@ -11,13 +11,14 @@ use Tamedevelopers\Support\Capsule\CommandHelper;
 class KeyCommand extends CommandHelper
 {   
     /**
-     * Default entry when running command
+     * Default entry when running commands.
+     *
+     * @return void
      */
-    public function handle(array $args = [], array $options = []): int
+    public function handle()
     {
         echo "Usage:\n";
         echo "  php tame key:generate\n\n";
-        return 0;
     }
 
     /**

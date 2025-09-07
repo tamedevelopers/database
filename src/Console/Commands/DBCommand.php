@@ -16,9 +16,11 @@ class DBCommand extends CommandHelper
 {
     
     /**
-     * Default entry when running command
+     * Default entry when running commands.
+     *
+     * @return void
      */
-    public function handle(array $args = [], array $options = []): mixed
+    public function handle()
     {
         // Logger::helpHeader("Description:\n");
         Logger::writeln('<yellow>Usage:</yellow>');
@@ -28,8 +30,6 @@ class DBCommand extends CommandHelper
         Logger::writeln('  php tame db:export --connection=wocommerce --as=zip --days=5');
         Logger::writeln('  php tame db:schema --connection= --path= --type=[orm|laravel]');
         Logger::writeln('');
-
-        exit(1);
     }
 
     /**
@@ -48,9 +48,9 @@ class DBCommand extends CommandHelper
      */
     public function schema(array $args = [], array $options = []): mixed
     {
-        $connection = $this->getOption($options, 'connection');
-        $path       = $this->getOption($options, 'path');
-        $type       = $this->getOption($options, 'type');
+        $connection = $this->option('connection');
+        $path       = $this->option('path');
+        $type       = $this->option('type');
 
         $import = new DBSchemaExport(
             path: !empty($path) ? base_path($path) : $path, 
@@ -83,8 +83,8 @@ class DBCommand extends CommandHelper
      */
     public function import(array $args = [], array $options = []): mixed
     {
-        $connection = $this->getOption($options, 'connection');
-        $path       = $this->getOption($options, 'path');
+        $connection = $this->option('connection');
+        $path       = $this->option('path');
 
         $import = new DBImport(
             path: base_path($path), 
@@ -116,9 +116,9 @@ class DBCommand extends CommandHelper
      */
     public function export(array $args = [], array $options = []): mixed
     {
-        $connection = $this->getOption($options, 'connection');
-        $as         = $this->getOption($options, 'as');
-        $days       = $this->getOption($options, 'days');
+        $connection = $this->option('connection');
+        $as         = $this->option('as');
+        $days       = $this->option('days');
 
         $export = new DBExport(
             saveAsFileType: $as, 
@@ -167,7 +167,7 @@ class DBCommand extends CommandHelper
 
         // Determine what to drop based on flags. If any drop-* flags are provided,
         // only drop those categories; otherwise drop all by default.
-        $flags = $this->getFlagTypes($options);
+        $flags = $this->flag($options);
         $restrictToFlags = !empty($flags);
         $dropViews  = $restrictToFlags ? in_array('views', $flags, true)  : true;
         $dropTypes  = $restrictToFlags ? in_array('types', $flags, true)  : true;

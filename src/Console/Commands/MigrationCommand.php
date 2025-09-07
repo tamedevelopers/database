@@ -13,14 +13,15 @@ class MigrationCommand extends CommandHelper
 {
 
     /**
-     * Default entry when running command
+     * Default entry when running commands.
+     *
+     * @return void
      */
-    public function handle(array $args = [], array $options = []): int
+    public function handle()
     {
         echo "Usage examples:\n";
         echo "  php tame migrate\n";
         echo "  php tame migrate:fresh [--seed] [--force] [--database=mysql]\n\n";
-        return 0;
     }
 
     /**
