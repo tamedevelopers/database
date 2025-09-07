@@ -305,6 +305,11 @@ trait DBSchemaExportTrait
             $line .= "->unsigned()";
         }
 
+        dump(
+            $nullable,
+            $baseType
+        );
+
         // nullable
         if ($nullable) {
             $line .= "->nullable()";
@@ -320,8 +325,9 @@ trait DBSchemaExportTrait
             $line .= "->unique()";
         }
 
-        // auto_increment is covered when we used id(); otherwise, ignored here
+        exit();
 
+        // auto_increment is covered when we used id(); otherwise, ignored here
         return $line . ';';
     }
 
@@ -421,7 +427,7 @@ trait DBSchemaExportTrait
         }
 
         // escape single quotes
-        $val = str_replace("'", "\\'", (string) $default);
+        $val = str_replace("'", "", (string) $default);
         return "'{$val}'";
     }
 
