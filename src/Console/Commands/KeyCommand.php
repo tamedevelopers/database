@@ -25,7 +25,7 @@ class KeyCommand extends CommandHelper
      * Generate and display a new application key
      * Subcommand: php tame key:generate
      */
-    public function generate(array $args = [], array $options = [])
+    public function generate()
     {
         $key = Manager::regenerate();
         if ( !$key) {

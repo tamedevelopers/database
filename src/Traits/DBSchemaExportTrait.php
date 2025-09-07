@@ -18,6 +18,11 @@ use Tamedevelopers\Support\Collections\Collection;
  */
 trait DBSchemaExportTrait
 {
+    /** Resolve the default string length from Schema config (ORM_MAX_STRING_LENGTH) or fallback to 255. */
+    protected function defaultStringLength(): int
+    {
+        return \defined('ORM_MAX_STRING_LENGTH') ? (int) ORM_MAX_STRING_LENGTH : 255;
+    }
 
     /** Ensure database/migrations directory exists and return its path. */
     protected function ensureMigrationsDir(): array
@@ -176,14 +181,15 @@ trait DBSchemaExportTrait
             $onDelete = $fk['delete_rule'] ?? null;
             $onUpdate = $fk['update_rule'] ?? null;
 
-            // Use foreign()->references()->on() to avoid re-declaring column or id()
-            $fkLine = "\$table->foreign('{$col}')->references('{$refColumn}', '{$name}')";
-            $fkLine .= "->on('{$refTable}')";
+            // Use foreign() style, expecting the column already defined above
+            $fkLine = "\$table->foreign('{$col}')"
+                . "->references('{$refColumn}')"
+                . "->on('{$refTable}')";
             if (!empty($onDelete)) {
-                $fkLine .= "->onDelete('" . Str::upper($onDelete) . "')";
+                $fkLine .= "->onDelete('" . Str::lower($onDelete) . "')";
             }
             if (!empty($onUpdate)) {
-                $fkLine .= "->onUpdate('" . Str::upper($onUpdate) . "')";
+                $fkLine .= "->onUpdate('" . Str::lower($onUpdate) . "')";
             }
             $fkLine .= ';';
             $lines[] = $fkLine;
@@ -235,12 +241,14 @@ trait DBSchemaExportTrait
             case 'varchar':
                 $method = 'string';
                 $args[] = "'{$field}'";
-                if ($length) { $args[] = (string) (int) $length; }
+                $maxLen = $this->defaultStringLength();
+                if ($length !== null && (int)$length !== (int)$maxLen) { $args[] = (string) (int) $length; }
                 break;
             case 'char':
                 $method = 'char';
                 $args[] = "'{$field}'";
-                $args[] = (string) ((int) ($length ?: 255));
+                $maxLen = $this->defaultStringLength();
+                if ($length !== null && (int)$length !== (int)$maxLen) { $args[] = (string) (int) $length; }
                 break;
             case 'text':
                 $method = 'text';
@@ -281,7 +289,8 @@ trait DBSchemaExportTrait
             case 'binary':
                 $method = 'binary';
                 $args[] = "'{$field}'";
-                $args[] = (string) ((int) ($length ?: 255));
+                $maxLen = $this->defaultStringLength();
+                if ($length !== null && (int)$length !== (int)$maxLen) { $args[] = (string) (int) $length; }
                 break;
             case 'blob':
                 $method = 'blob';
@@ -364,7 +373,8 @@ trait DBSchemaExportTrait
         if ($key === 'uni') {
             $line .= "->unique()";
         } elseif ($key === 'mul') {
-            $line .= "->index()";
+            // Treat non-unique index as unique() when inline as requested
+            $line .= "->unique()";
         }
 
         // auto_increment is covered when we used id(); otherwise, ignored here
@@ -420,7 +430,8 @@ trait DBSchemaExportTrait
             if ($data['unique']) {
                 $lines[] = "\$table->unique({$colsList}, '{$name}')" . ';';
             } else {
-                $lines[] = "\$table->index({$colsList}, '{$name}')" . ';';
+                // Treat index() as unique() per requirement
+                $lines[] = "\$table->unique({$colsList}, '{$name}')" . ';';
             }
         }
 
@@ -780,7 +791,8 @@ trait DBSchemaExportTrait
                 if ($idx['type'] === 'unique') {
                     $bodyLines[] = "\$table->unique('{$col}');";
                 } else {
-                    $bodyLines[] = "\$table->index('{$col}');";
+                    // Treat index() as unique() per requirement
+                    $bodyLines[] = "\$table->unique('{$col}');";
                 }
             }
         }
@@ -793,12 +805,15 @@ trait DBSchemaExportTrait
             $onDelete = $fk['delete_rule'] ?? null;
             $onUpdate = $fk['update_rule'] ?? null;
 
-            $fkLine = "\$table->foreignId('{$col}')->constrained('{$refTable}', '{$refColumn}')";
+            // Use foreign() style, expecting the column already defined above
+            $fkLine = "\$table->foreign('{$col}')"
+                . "->references('{$refColumn}')"
+                . "->on('{$refTable}')";
             if (!empty($onDelete)) {
-                $fkLine .= "->onDelete('" . Str::upper($onDelete) . "')";
+                $fkLine .= "->onDelete('" . Str::lower($onDelete) . "')";
             }
             if (!empty($onUpdate)) {
-                $fkLine .= "->onUpdate('" . Str::upper($onUpdate) . "')";
+                $fkLine .= "->onUpdate('" . Str::lower($onUpdate) . "')";
             }
             $fkLine .= ';';
             $bodyLines[] = $fkLine;

@@ -31,7 +31,6 @@ trait ExceptionTrait
             // hand over the original exception to Whoops
             $debugger::$whoops->handleException($exception);
         }
-
         exit(1);
     }
 

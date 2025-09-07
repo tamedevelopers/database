@@ -28,10 +28,10 @@ class MakeCommand extends CommandHelper
     /**
      * Create a new migration file
      */
-    public function migration(array $args = [], array $options = [])
+    public function migration()
     {
         // Could set internal state or skip confirmations
-        $table  = $args[0] ?? null;
+        $table  = $this->arguments(0);
         $create = $this->option('create');
 
         // if options is valid and came
@@ -56,7 +56,6 @@ class MakeCommand extends CommandHelper
         }
 
         $this->info($response['message']);
-        exit(1);
     }
 
 }

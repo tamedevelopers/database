@@ -33,7 +33,7 @@ class MigrationCommand extends CommandHelper
      * Drop all tables and re-run all migrations
      * Subcommand: php tame migrate:fresh
      */
-    public function fresh(array $args = [], array $options = [])
+    public function fresh()
     {
         $force = $this->option('force');
         $seed  = $this->option('seed');
@@ -52,13 +52,12 @@ class MigrationCommand extends CommandHelper
         }
 
         $this->info($response['message']);
-        exit(1);
     }
 
     /**
      * Reset and re-run all migrations
      */
-    public function refresh(array $args = [], array $options = [])
+    public function refresh()
     {
         Artisan::call('migrate:fresh --force --drop-types --drop-views');
     }
@@ -66,7 +65,7 @@ class MigrationCommand extends CommandHelper
     /**
      * Show the status of each migration
      */
-    public function status(array $args = [], array $options = [])
+    public function status()
     {
         echo "[demo] Seeding database...\n";
         // TODO: call your seeder pipeline here
@@ -76,7 +75,7 @@ class MigrationCommand extends CommandHelper
     /**
      * Rollback all database migrations
      */
-    public function reset(array $args = [], array $options = [])
+    public function reset()
     {
         // No-op placeholder to show that options with values are also routed
         return 0;
