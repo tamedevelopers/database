@@ -312,7 +312,18 @@ trait DBSchemaExportTrait
 
         // default
         if ($default !== null) {
-            $line .= "->default(" . $this->phpifyDefault($default, $baseType) . ")";
+            $isNumeric = in_array($baseType, ['biginteger','unsignedbiginteger','int','smallint','mediumint','tinyint','decimal','double','float']);
+            $defaultStr = is_string($default) ? Str::lower(trim((string) $default)) : $default;
+
+            // If default is NULL and type is non-numeric, omit ->default('NULL') and ensure nullable()
+            if (!$isNumeric && is_string($defaultStr) && $defaultStr === 'null') {
+                if (strpos($line, '->nullable()') === false) {
+                    $line .= '->nullable()';
+                }
+                // no default() call
+            } else {
+                $line .= "->default(" . $this->phpifyDefault($default, $baseType) . ")";
+            }
         }
 
         // key (non-unique index handled later); unique can be reflected here if single-column

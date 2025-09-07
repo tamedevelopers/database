@@ -23,9 +23,10 @@ class Constant{
      */
     public static function formatMigrationTableName($migration)
     {
-        return sprintf("%s_%s_%s", 
+        // "%s_%s_%s"
+        return sprintf("%s_%s", 
             date('Y_m_d'), 
-            substr((string) time(), -6),
+            // substr((string) time(), 4),
             "create_{$migration}_table.php");
     }
 }
