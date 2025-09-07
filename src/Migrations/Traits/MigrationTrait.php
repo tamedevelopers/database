@@ -182,6 +182,13 @@ trait MigrationTrait{
         array_walk($readDir, function(&$value, $index) use($directory) {
             $value = rtrim($directory, '/') . "/{$value}";
         });
+
+        // sort alphabetically (ensures ads comes before ads_data, users before users_address, etc.)
+        sort($readDir);
+
+        dd(
+            $readDir
+        );
         
         return $readDir;
     }
