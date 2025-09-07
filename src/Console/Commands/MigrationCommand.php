@@ -67,7 +67,7 @@ class MigrationCommand extends CommandHelper
      */
     public function status()
     {
-        echo "[demo] Seeding database...\n";
+        echo "[demo] status database...\n";
         // TODO: call your seeder pipeline here
         return 0;
     }

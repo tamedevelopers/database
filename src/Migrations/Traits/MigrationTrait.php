@@ -182,6 +182,10 @@ trait MigrationTrait{
         array_walk($files, function(&$value, $index) use($directory) {
             $value = rtrim($directory, '/') . "/{$value}";
         });
+
+        dd(
+            self::sortParentFiles($files)
+        );
         
         return self::sortParentFiles($files);
     }
@@ -189,28 +193,64 @@ trait MigrationTrait{
     /**
      * Sort parent files according to their names
      *
+     * Ensures that base tables (e.g., "ads", "users") are migrated
+     * before their derivative/child tables (e.g., "ads_data", "users_address", "ads_info").
+     *
      * @param array $files
-     * @return void
+     * @return array
      */
     private static function sortParentFiles(array $files)
     {
-        // Custom sort: parent tables before child tables
-        usort($files, function ($a, $b) {
-            $aName = basename($a);
-            $bName = basename($b);
+        // Robust sort: parent tables before child tables of the same base
+        $parse = function (string $path): array {
+            $name = basename($path);
+            // extract between "create_" and "_table"
+            if (preg_match('/create_(.+)_table\.php$/', $name, $m)) {
+                $full = $m[1];                // e.g., "ads", "ads_data", "users_address"
+                $parts = explode('_', $full); // split by underscore
+                $base = $parts[0];            // the base entity
+                return [
+                    'name'      => $name,
+                    'full'      => $full,
+                    'base'      => $base,
+                    'parts'     => $parts,
+                    'is_parent' => count($parts) === 1,
+                ];
+            }
+            // Non-standard name: treat as parent so it runs early
+            return [
+                'name'      => $name,
+                'full'      => $name,
+                'base'      => $name,
+                'parts'     => [$name],
+                'is_parent' => true,
+            ];
+        };
 
-            // ensure "ads_table" comes before "ads_data_table"
-            if (preg_match('/create_(\w+)_data_table/', $aName, $am) &&
-                preg_match('/create_' . $am[1] . '_table/', $bName)) {
-                return 1; // b before a
+        usort($files, function (string $a, string $b) use ($parse) {
+            $ai = $parse($a);
+            $bi = $parse($b);
+
+            // Same base entity (e.g., "ads" vs "ads_data", "users" vs "users_address")
+            if ($ai['base'] === $bi['base']) {
+                // Parent must come before children
+                if ($ai['is_parent'] !== $bi['is_parent']) {
+                    return $ai['is_parent'] ? -1 : 1;
+                }
+
+                // Both children or both parents:
+                // fewer segments first (e.g., users_address before users_address_history)
+                $cmpParts = count($ai['parts']) <=> count($bi['parts']);
+                if ($cmpParts !== 0) {
+                    return $cmpParts;
+                }
+
+                // then alphabetical by the entity part for stability
+                return strcmp($ai['full'], $bi['full']);
             }
 
-            if (preg_match('/create_(\w+)_data_table/', $bName, $bm) &&
-                preg_match('/create_' . $bm[1] . '_table/', $aName)) {
-                return -1; // a before b
-            }
-
-            return strcmp($aName, $bName); // fallback alphabetical
+            // Different bases: keep natural alphabetical (includes timestamp prefix)
+            return strcmp($ai['name'], $bi['name']);
         });
 
         return $files;
