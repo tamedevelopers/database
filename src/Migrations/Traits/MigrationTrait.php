@@ -188,6 +188,21 @@ trait MigrationTrait{
     }
 
     /**
+     * Getting all files in directory (descending dependency order)
+     * For dropping tables safely: ensures children are processed before parents.
+     * @param string $directory
+     * @return array|string
+     */
+    private static function scanDirectoryFilesDesc($directory)
+    {
+        // Ascending, dependency-aware order (parents before children)
+        $asc = self::scanDirectoryFiles($directory);
+
+        // Reverse to get children before parents
+        return array_reverse($asc);
+    }
+
+    /**
      * Sort parent files according to their names and detected foreign key dependencies
      *
      * Ensures parent/base tables (e.g., "blogs_categories") are executed before

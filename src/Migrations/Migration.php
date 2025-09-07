@@ -115,8 +115,9 @@ class Migration{
         // read file inside folders
         self::initBaseDirectory();
 
-        // scan migration folder to get all files
-        $files = self::scanDirectoryFiles(self::$migrations);
+        // scan migration folder to get all files in reverse dependency order
+        // children first, then parents, to avoid foreign key constraint errors
+        $files = self::scanDirectoryFilesDesc(self::$migrations);
         
         // run migration methods of included file
         $errorMessage   = [];
