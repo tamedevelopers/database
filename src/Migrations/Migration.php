@@ -57,11 +57,6 @@ class Migration{
         // scan migration folder to get all files
         $files = self::scanDirectoryFiles(self::$migrations);
 
-
-        dd(
-            $files
-        );
-
         $errorMessage = [];
         $errorstatus = Constant::STATUS_200;
 

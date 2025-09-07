@@ -173,25 +173,114 @@ trait MigrationTrait{
     private static function scanDirectoryFiles($directory)
     {
         // read file inside folders
-        $readDir = scandir($directory);
+        $files = scandir($directory);
 
-        unset($readDir[0]);
-        unset($readDir[1]);
+        unset($files[0]);
+        unset($files[1]);
 
         // change value to absolute path to file
-        array_walk($readDir, function(&$value, $index) use($directory) {
+        array_walk($files, function(&$value, $index) use($directory) {
             $value = rtrim($directory, '/') . "/{$value}";
         });
 
         // sort alphabetically (ensures ads comes before ads_data, users before users_address, etc.)
-        sort($readDir);
+        // sort($files);
 
-        dd(
-            $readDir
-        );
+        // self::orderMigrationsByFK($files)
         
-        return $readDir;
+        return self::sortParentFiles($files);
+        return $files;
     }
+
+    private static function sortParentFiles(array $files)
+    {
+        // Custom sort: parent tables before child tables
+        usort($files, function ($a, $b) {
+            $aName = basename($a);
+            $bName = basename($b);
+
+            // ensure "ads_table" comes before "ads_data_table"
+            if (preg_match('/create_(\w+)_data_table/', $aName, $am) &&
+                preg_match('/create_' . $am[1] . '_table/', $bName)) {
+                return 1; // b before a
+            }
+
+            if (preg_match('/create_(\w+)_data_table/', $bName, $bm) &&
+                preg_match('/create_' . $bm[1] . '_table/', $aName)) {
+                return -1; // a before b
+            }
+
+            return strcmp($aName, $bName); // fallback alphabetical
+        });
+
+        return $files;
+    }
+
+    // Very compact dependency-based ordering
+    private static function orderMigrationsByFK(array $files): array
+    {
+        $tableOf = [];
+        $deps = []; // table => set of referenced tables
+
+        $getFile = function(string $f): string {
+            return \Tamedevelopers\Support\Capsule\File::get($f) ?? '';
+        };
+
+        // 1) map file -> table and dependencies
+        foreach ($files as $f) {
+            $src = $getFile($f);
+            if (!preg_match("/Schema::create\\(['\"]([a-zA-Z0-9_]+)['\"]/i", $src, $m)) continue;
+            $table = $m[1];
+            $tableOf[$table] = $f;
+
+            preg_match_all("/->constrained\\(['\"]([a-zA-Z0-9_]+)['\"]/i", $src, $mm);
+            $refs = array_unique($mm[1] ?? []);
+            $deps[$table] = $refs;
+        }
+
+        // 2) Kahn's topological sort (by tables)
+        $inDeg = [];
+        foreach ($deps as $t => $rs) {
+            $inDeg[$t] ??= 0;
+            foreach ($rs as $r) {
+                // only count if referenced table is being created in this set
+                if (isset($deps[$r])) {
+                    $inDeg[$t] += 1;
+                }
+            }
+        }
+
+        $q = [];
+        foreach ($inDeg as $t => $d) if ($d === 0) $q[] = $t;
+
+        $ordered = [];
+        while ($q) {
+            $t = array_shift($q);
+            $ordered[] = $t;
+            foreach ($deps as $u => $rs) {
+                if (in_array($t, $rs, true)) {
+                    $inDeg[$u] -= 1;
+                    if ($inDeg[$u] === 0) $q[] = $u;
+                }
+            }
+        }
+
+        // Append any tables not captured (no FKs or parsing edge cases)
+        foreach (array_keys($tableOf) as $t) {
+            if (!in_array($t, $ordered, true)) $ordered[] = $t;
+        }
+
+        // Return files in dependency order
+        $out = [];
+        foreach ($ordered as $t) {
+            if (isset($tableOf[$t])) $out[] = $tableOf[$t];
+        }
+        // Preserve non-create migration files (if any)
+        foreach ($files as $f) if (!in_array($f, $out, true)) $out[] = $f;
+
+        return $out;
+    }
+
 
     /**
      * Create API Response
