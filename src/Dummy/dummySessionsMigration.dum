@@ -9,10 +9,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return mixed
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('{{TABLE}}', function (Blueprint $table) {
             $table->id();
@@ -29,16 +27,11 @@ return new class extends Migration
 
     /**
      * Drop database table
-     *
-     * @param bool $force 
-     * [optional] Default is false
-     * Force drop all tables or throw an error on Foreign keys
-     * 
-     * @return mixed
+     * @param bool $force
      */
-    public function drop($force = false)
+    public function drop($force = false): void
     {
-        return Schema::dropTable('{{TABLE}}', $force);
+        Schema::dropTable('{{TABLE}}', $force);
     }
 
 };

@@ -92,8 +92,10 @@ class Schema{
     {
         $blueprint = new Blueprint($tableName);
         $callback($blueprint);
+
         $result = $blueprint->handleBlueprint();
         self::$lastResult = $result;
+
         return $result;
     }
 
@@ -191,11 +193,17 @@ class Schema{
 
         // Handle query
         try{
-            // DROP TABLE IF EXISTS
+            
             if($force){
-                self::$pdo->exec("SET FOREIGN_KEY_CHECKS = 0; "); // Disable foreign key checks temporarily
-                self::$pdo->exec("DROP TABLE {$tableName} CASCADE;"); // Drop the table with CASCADE option
-                self::$pdo->exec("SET FOREIGN_KEY_CHECKS = 1;"); // Enable foreign key checks again
+                // Disable foreign key checks temporarily
+                self::$pdo->exec("SET FOREIGN_KEY_CHECKS = 0; "); 
+
+                if(self::$db->tableExists($tableName)){
+                    // Drop the table with CASCADE option
+                    self::$pdo->exec("DROP TABLE {$tableName} CASCADE;"); 
+                }
+                // Enable foreign key checks again
+                self::$pdo->exec("SET FOREIGN_KEY_CHECKS = 1;"); 
             } else{
                 self::$pdo->query( "DROP TABLE {$tableName};" )->execute();
             }
@@ -227,11 +235,11 @@ class Schema{
     {
         self::initSchemaDatabase();
 
-        // handle error
-        $handle = self::checkDBConnect();
-        if(is_array($handle)){
-            return $handle;
-        } 
+        $conn = self::checkDBConnect();
+        if($conn['status'] != Constant::STATUS_200){
+            self::$lastResult = $conn;
+            return $conn;
+        }
 
         // if empty
         if(empty($columnName)){

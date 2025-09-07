@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('{{TABLE}}', function (Blueprint $table) {
             {{BODY}}
@@ -20,10 +18,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function drop($force = false)
+    public function drop(): void
     {
         Schema::dropIfExists('{{TABLE}}');
     }
