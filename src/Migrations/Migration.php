@@ -20,32 +20,30 @@ class Migration{
     /**
      * constructor.
      */
-    public function __construct($connection = null)
+    public function __construct()
     {
         self::$error = Constant::STATUS_400;
     }
 
     /**
      * Create migration name
-     * @param string $table_name 
+     * @param string $table
      * @param string|null $type         
      * - [optional] <jobs, sessions> create schema with dummy Data
      * 
      * @return \Tamedevelopers\Support\Collections\Collection
      */
-    public static function create($table_name, $type = null)
+    public static function create($table, $type = null)
     {
         self::normalizeFolderStructure();
 
         self::initBaseDirectory();
 
-        return self::runMigrationCreateTable($table_name, $type);
+        return self::runMigrationCreateTable($table, $type);
     }
 
     /**
      * Staring our migration
-     * @param string $type 
-     * @param string $column 
      * 
      * @return \Tamedevelopers\Support\Collections\Collection
      */
@@ -94,10 +92,10 @@ class Migration{
     
     /**
      * Run the migrations.
-     *
-     * @return mixed
+     * @return null
      */
-    public function up(){
+    public function up()
+    {
         return null;
     }
     
@@ -125,14 +123,26 @@ class Migration{
         foreach($files as $file){
             $migration = include_once "{$file}";
 
-            // error
+            // call drop on the migration class; it may not return anything (void)
             $handle = $migration->drop($force);
 
-            // store all messages
-            $errorMessage[] = $handle['message'];
+            // normalize possible return types
+            if ($handle instanceof Collection) {
+                $handle = $handle->toArray();
+            }
+
+            // If migration didn't return a result, fallback to last Schema result
+            if (!is_array($handle)) {
+                $handle = Schema::getLastResult();
+            }
+
+            // store all messages, if available
+            if (is_array($handle) && isset($handle['message'])) {
+                $errorMessage[] = $handle['message'];
+            }
             
             // error occured stop code execution
-            if($handle['status'] != Constant::STATUS_200){
+            if (is_array($handle) && isset($handle['status']) && $handle['status'] != Constant::STATUS_200) {
                 $errorstatus = $handle['status'];
                 break;
             }
