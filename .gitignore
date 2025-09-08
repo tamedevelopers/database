@@ -9,7 +9,6 @@
 /.zencoder
 .env
 .htaccess
-.gitignore
 .user.ini
 composer.lock
 tame

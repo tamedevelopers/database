@@ -84,6 +84,9 @@ class Migration{
             }
         }
 
+        // If there are no files, we'll display a warning message.
+        self::noMigrationFound($files, $errorstatus, $errorMessage);
+
         return new Collection([
             'status'    => $errorstatus, 
             'message'   => implode("\n", $errorMessage)
@@ -148,10 +151,30 @@ class Migration{
             }
         }
 
+        // If there are no files, we'll display a warning message.
+        self::noMigrationFound($files, $errorstatus, $errorMessage);
+
         return new Collection([
             'status'    => $errorstatus, 
             'message'   => implode("\n", $errorMessage)
         ]);
+    }
+    
+    /**
+     * If migration folder is empty, we will show this message
+     *
+     * @param array $files
+     * @param  mixed $errorstatus
+     * @param  mixed $errorMessage
+     * @return void
+     */
+    protected static function noMigrationFound($files, &$errorstatus, &$errorMessage)
+    {
+        // empty folders, means no migrations found
+        if(empty($files)){
+            $errorstatus    = Constant::STATUS_400;
+            $errorMessage[] = "No migration found";
+        }
     }
 
 }
