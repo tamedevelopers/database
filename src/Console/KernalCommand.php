@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database\Console;
 
-
-use Tamedevelopers\Database\DB;
 use Tamedevelopers\Support\Capsule\Artisan;
 use Tamedevelopers\Database\Console\Commands\DBCommand;
 use Tamedevelopers\Database\Console\Commands\KeyCommand;
@@ -20,14 +18,12 @@ class KernalCommand implements CommandProviderInterface
     /** @inheritDoc */
     public function register(Artisan $artisan)  :void
     {
-        $conn = DB::connection();
-
         // Register built-in commands with class instances (enables subcommands and flags-as-methods)
-        $artisan->register('make', new MakeCommand($conn));
-        $artisan->register('scaffold', new ScaffoldCommand($conn), 'Generate default scaffolding');
-        $artisan->register('migrate', new MigrationCommand($conn), 'Run database migrations');
-        $artisan->register('key', new KeyCommand($conn), 'Set or manage the application key');
-        $artisan->register('db', new DBCommand($conn), 'Start a new database CLI session');
+        $artisan->register('make', new MakeCommand());
+        $artisan->register('scaffold', new ScaffoldCommand(), 'Generate default scaffolding');
+        $artisan->register('migrate', new MigrationCommand(), 'Run database migrations');
+        $artisan->register('key', new KeyCommand(), 'Set or manage the application key');
+        $artisan->register('db', new DBCommand(), 'Start a new database CLI session');
     }
 
 }
