@@ -5,7 +5,6 @@
 /storage
 /.idea
 /.vscode
-/.github
 /.zencoder
 .env
 .htaccess
