@@ -12,7 +12,8 @@ $migration = new Migration();
 
 
 dump( 
-    $migration::create('usersr')
+    'run migration',
+    // $migration::create('usersr')
 );
 
 ?>
