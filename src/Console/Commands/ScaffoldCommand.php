@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Tamedevelopers\Database\Console\Commands;
 
-use Tamedevelopers\Support\Env;
 use Tamedevelopers\Support\Tame;
 use Tamedevelopers\Database\AutoLoader;
-use Tamedevelopers\Database\DatabaseManager;
+use Tamedevelopers\Support\Capsule\Logger;
 use Tamedevelopers\Support\Capsule\CommandHelper;
 
 
@@ -21,6 +20,17 @@ class ScaffoldCommand extends CommandHelper
      */
     public function handle()
     {
+        Logger::helpHeader('<yellow>Usage:</yellow>');
+        Logger::writeln('  php tame scaffold:run --force');
+        Logger::writeln('');
+    }
+
+    /**
+     * App scalffolding
+     * Subcommand: php tame scaffold:run
+     */
+    public function run()
+    {
         // if app is running inside of a framework
         $frameworkChecker = (new Tame)->isAppFramework();
 
@@ -28,7 +38,7 @@ class ScaffoldCommand extends CommandHelper
         $force = $this->force();
 
         // Check for framework mode
-        if(!$frameworkChecker && !$force){
+        if($frameworkChecker && !$force){
             $this->warning("Sorry! This command can't be run in a framework.");
             return;
         }
