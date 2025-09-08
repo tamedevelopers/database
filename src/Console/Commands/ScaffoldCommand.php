@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database\Console\Commands;
 
 use Tamedevelopers\Support\Env;
+use Tamedevelopers\Support\Tame;
+use Tamedevelopers\Database\AutoLoader;
 use Tamedevelopers\Database\DatabaseManager;
 use Tamedevelopers\Support\Capsule\CommandHelper;
 
@@ -19,19 +21,31 @@ class ScaffoldCommand extends CommandHelper
      */
     public function handle()
     {
+        // if app is running inside of a framework
+        $frameworkChecker = (new Tame)->isAppFramework();
 
-        dd(
-            'scaffold command'
-        );
-        // Ensure env and logger are booted
-        Env::boot();
-        Env::loadOrFail();
+        // force scaffold command only on local environment
+        $force = $this->force();
 
-        // Example: ensure connection booted (if your manager requires it)
-        // Adjust to your initialization flow if different
-        $db = new DatabaseManager();
+        // Check for framework mode
+        if(!$frameworkChecker && !$force){
+            $this->warning("Sorry! This command can't be run in a framework.");
+            return;
+        }
+
+        // prompt for confirmation before proceeding
+        $confirm = $this->confirm('Proceed with Scalfolding the application?');
+
+        // ask once
+        if (!$confirm) {
+            $this->warning("Command aborted.");
+            return;
+        }
         
+        // scalffolding database manager
+        AutoLoader::start();
         
+        $this->info("App scalffolding Manager has been successfully runned!");
     }
 
 }

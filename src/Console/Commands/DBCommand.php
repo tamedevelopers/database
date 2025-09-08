@@ -159,8 +159,8 @@ class DBCommand extends CommandHelper
 
             // ask once
             if (!$confirm) {
-                $this->warning("Command aborted.\n");
-                return 0;
+                $this->warning("Command aborted.");
+                return;
             }
         }
         

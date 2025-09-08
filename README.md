@@ -190,7 +190,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 | By default you don't need to define any path again                                            |
 |                                                                                               |
 | Files you'll see after you reload browser:                                                    |
-| `.env` `.env.example` `.gitignore` `.htaccess` `.user.ini` `init.php` `tame[bash]`            |
+| `.env` `.env.example` `.gitignore` `.htaccess` `.user.ini` `init.php`                         |
 
 ```php
 use Tamedevelopers\Database\AutoLoader;

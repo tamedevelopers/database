@@ -24,11 +24,12 @@ class MigrationCommand extends CommandHelper
      */
     public function handle()
     {
-        echo "Usage examples:\n";
-        echo "  php tame migrate:fresh --seed --force\n";
-        echo "  php tame migrate:refresh --seed --force\n";
-        echo "  php tame migrate:status\n";
-        echo "  php tame migrate:reset\n";
+        Logger::helpHeader('<yellow>Usage:</yellow>');
+        Logger::writeln('  php tame migrate:fresh --seed --force');
+        Logger::writeln('  php tame migrate:refresh');
+        Logger::writeln('  php tame migrate:status');
+        Logger::writeln('  php tame migrate:reset');
+        Logger::writeln('');
     }
 
     /**
@@ -39,8 +40,6 @@ class MigrationCommand extends CommandHelper
     {
         $force = $this->option('force');
         $seed  = $this->option('seed');
-
-        
 
         if($force){
             Artisan::call('db:wipe --force --drop-types --drop-views --response=0');
@@ -96,7 +95,7 @@ class MigrationCommand extends CommandHelper
 
         if (!is_dir($migrationsDir)) {
             $this->warning("Migrations directory not found: {$migrationsDir}");
-            return 0;
+            return;
         }
 
         // Connect to DB and validate connection
@@ -111,7 +110,7 @@ class MigrationCommand extends CommandHelper
 
         if (empty($files)) {
             $this->info("No migration files found in: {$migrationsDir}");
-            return 0;
+            return;
         }
 
         // Build a single table output
@@ -139,7 +138,7 @@ class MigrationCommand extends CommandHelper
 
         if (empty($rows)) {
             $this->info("No detectable migration tables.");
-            return 0;
+            return;
         }
 
         // Compute column widths
@@ -168,7 +167,7 @@ class MigrationCommand extends CommandHelper
         }
         Logger::writeln($sep);
 
-        return 0;
+        return;
     }
 
 }

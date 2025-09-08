@@ -17,8 +17,9 @@ class KeyCommand extends CommandHelper
      */
     public function handle()
     {
-        echo "Usage:\n";
-        echo "  php tame key:generate\n\n";
+        Logger::helpHeader('<yellow>Usage:</yellow>');
+        Logger::writeln('  php tame key:generate');
+        Logger::writeln('');
     }
 
     /**
@@ -29,12 +30,11 @@ class KeyCommand extends CommandHelper
     {
         $key = Manager::regenerate();
         if ( !$key) {
-            Logger::error('Failed to generate the application key.');
-            return 0;
+            $this->error('Failed to generate the application key.');
+            return;
         }
 
-        Logger::success("Application key generated: {$key}\n");
-        return 1;
+        $this->success("Application key generated: {$key}");
     }
     
 }
