@@ -17,7 +17,14 @@ was pretty tough. So i decided to create a much more easier way of communicating
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Instantiate](#instantiate)
-* [Init.php File](#init.php-file)
+* [Init php](#init-php)
+* [Tame Cli](#tame-cli)
+    * [Tame Cli Scaffold](#tame-cli-scaffold)
+    * [Tame Cli DB](#tame-cli-db)
+    * [Tame Cli Migrate](#tame-cli-migrate)
+    * [Tame Cli Make](#tame-cli-make)
+    * [Tame Cli Key](#tame-cli-key)
+    * [Tame Artisan Call](#tame-artisan-call)
 * [BootLoader](#bootLoader)
 * [Database Connection](#database-connection)
 * [Database Disconnect](#database-disconnect)
@@ -196,24 +203,43 @@ require_once __DIR__ . '/vendor/autoload.php';
 use Tamedevelopers\Database\AutoLoader;
 
 AutoLoader::start();
-
 // then reload your browser to allow the system scalfold for you
 ```
 
-## Init.php File
+## init php
 - [optional] This will extends the `composer autoload` and other setup
     - If you used the package `Package scalfolding` this file will be 
     automatically generated, that you can include at the beginning of your project.
 
-|  Description                                                                                  | 
-|-----------------------------------------------------------------------------------------------|
-| Once application is started! You can choose to include the `init.php`                         | 
-| The file includes all configuration needed and as well extends the `vendor/autoload.php` path.|
 
+## Tame Cli
+- Custom support for CLI commands
+
+```bash
+php tame list
+```
+
+### tame-cli-scaffold
+- Scalffold the database files, instead of running `AutoLoader::start()` in browser.
+    - The `-f|--force` flag is needed if you're inside a framework or if on production server.
+    - This doesn't alter nor replace any files that exists and safe.
+
+```bash
+php tame scaffold:run --force
+```
+
+### tame-artisan-call
+- Using the CLI from within php, withing the CMD interface.
+
+```php
+use Tamedevelopers\Support\Capsule\Artisan;
+
+Artisan::call('db:wipe --force');
+```
 
 ## BootLoader
-- If you do not want to include or use the `init.php` file
-    - All you need do is call the bootloader, to start the database life-circle.
+- [optional] from `version ^6.0.3` If you do not want to include or use the `init.php` file
+    - You can as well call the bootloader, to start the database life-circle.
 
 ```php
 use Tamedevelopers\Database\Capsule\AppManager;
@@ -226,7 +252,7 @@ AppManager::bootLoader();
 - Take two param as `[$name|$options]`
     - Mandatory `$name` as string of connection name
     - [optional] `$options` and an array, if no connection data is found
-    - First navigate to [config/database.php] file and add connection configuration
+    - First navigate to [config/database.php] file and add connection configuration or use .env
 
 ```php
 DB::connection('connName', $options);

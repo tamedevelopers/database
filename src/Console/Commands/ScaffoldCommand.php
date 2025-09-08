@@ -26,7 +26,7 @@ class ScaffoldCommand extends CommandHelper
     }
 
     /**
-     * App scalffolding
+     * App scaffolding
      * Subcommand: php tame scaffold:run
      */
     public function run()
@@ -52,10 +52,10 @@ class ScaffoldCommand extends CommandHelper
             return;
         }
         
-        // scalffolding database manager
+        // scaffolding database manager
         AutoLoader::start();
         
-        $this->info("App scalffolding Manager has been successfully runned!");
+        $this->info("App scaffolding Manager has been successfully runned!");
     }
 
 }

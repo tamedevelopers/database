@@ -153,15 +153,13 @@ class DBCommand extends CommandHelper
 
         $this->forceChecker();
         
-        if(!$force){
-            // prompt for confirmation before proceeding
-            $confirm = $this->confirm('Proceed with db:wipe?');
+        // prompt for confirmation before proceeding
+        $confirm = $this->confirm('Proceed with db:wipe?');
 
-            // ask once
-            if (!$confirm) {
-                $this->warning("Command aborted.");
-                return;
-            }
+        // ask once
+        if (!$confirm) {
+            $this->warning("Command aborted.");
+            return;
         }
         
         $tables = $this->getTables();
