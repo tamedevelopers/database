@@ -40,22 +40,23 @@ class ScaffoldCommand extends CommandHelper
         // Check for framework mode
         if($frameworkChecker && !$force){
             $this->warning("Sorry! This command can't be run in a framework.");
-            return;
+            return 0;
         }
 
         // prompt for confirmation before proceeding
         $confirm = $this->confirm('Proceed with Scalfolding the application?');
 
         // ask once
-        if (!$confirm) {
+        if (!$confirm && $this->isConsole()) {
             $this->warning("Command aborted.");
-            return;
+            return 0;
         }
         
         // scaffolding database manager
         AutoLoader::start();
         
         $this->info("App scaffolding Manager has been successfully runned!");
+        return 1;
     }
 
 }

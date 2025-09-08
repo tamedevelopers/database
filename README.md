@@ -213,7 +213,7 @@ AutoLoader::start();
 
 
 ## Tame Cli
-- Custom support for CLI commands
+- Custom commands support for CLI
 
 ```bash
 php tame list
@@ -229,7 +229,7 @@ php tame scaffold:run --force
 ```
 
 ### tame-artisan-call
-- Using the CLI from within php, withing the CMD interface.
+- Using the CLI from within php, without the CMD interface.
 
 ```php
 use Tamedevelopers\Support\Capsule\Artisan;

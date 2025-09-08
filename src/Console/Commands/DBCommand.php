@@ -50,27 +50,31 @@ class DBCommand extends CommandHelper
         $path       = $this->option('path');
         $type       = $this->option('type');
 
-        $import = new DBSchemaExport(
+        $schema = new DBSchemaExport(
             path: !empty($path) ? base_path($path) : $path, 
             connection: $connection,
             type: $type,
         );
         
-        $this->checkConnection($import->conn);
+        $this->checkConnection($schema->conn);
+        $response = ['status' => Constant::STATUS_400, 'message' => ''];
 
-        $response = null;
-
-        $this->progressBar(function ($report) use ($import, &$response) {
-            $response = $import->run();
-            $report();
-        });
+        if ($this->isConsole()) {
+            $this->progressBar(function ($report) use ($schema, &$response) {
+                $response = $schema->run();
+                $report();
+            });
+        } else{
+            $response = $schema->run();
+        }
 
         if($response['status'] != Constant::STATUS_200){
             $this->error($response['message']);
-            return;
+            return 0;
         }
 
         $this->success($response['message']);
+        return 1;
     }
 
     /**
@@ -88,21 +92,24 @@ class DBCommand extends CommandHelper
         );
 
         $this->checkConnection($import->conn);
+        $response = ['status' => Constant::STATUS_400, 'message' => ''];
 
-        $response = null;
-
-        $this->progressBar(function ($report) use ($import, &$response) {
+        if ($this->isConsole()) {
+            $this->progressBar(function ($report) use ($import, &$response) {
+                $response = $import->run();
+                $report();
+            });
+        } else{
             $response = $import->run();
-
-            $report();
-        });
+        }
 
         if($response['status'] != Constant::STATUS_200){
             $this->error($response['message']);
-            return;
+            return 0;
         }
 
         $this->success($response['message']);
+        return 1;
     }
 
     /**
@@ -122,24 +129,27 @@ class DBCommand extends CommandHelper
         );
 
         $this->checkConnection($export->conn);
+        $response = ['status' => Constant::STATUS_400, 'message' => ''];
 
-        $response = null;
-
-        $this->progressBar(function ($report) use ($export, &$response) {
+        if ($this->isConsole()) {
+            $this->progressBar(function ($report) use ($export, &$response) {
+                $response = $export->run();
+                $report();
+            });
+        } else{
             $response = $export->run();
-
-            $report();
-        });
+        }
 
         if($response['status'] != Constant::STATUS_200){
             $this->error($response['message']);
-            return;
+            return 0;
         }
 
         // path
         $path = empty($response['path']) ? '' : "\n{$response['path']}";
 
         $this->success("{$response['message']}{$path}");
+        return 1;
     }
 
     /**
@@ -148,18 +158,18 @@ class DBCommand extends CommandHelper
      */
     public function wipe()
     {
-        $force = $this->option('force');
+        $force = $this->force();
         $response = $this->option('response');
 
         $this->forceChecker();
-        
+
         // prompt for confirmation before proceeding
         $confirm = $this->confirm('Proceed with db:wipe?');
 
         // ask once
-        if (!$confirm) {
+        if (!$confirm && $this->isConsole()) {
             $this->warning("Command aborted.");
-            return;
+            return 0;
         }
         
         $tables = $this->getTables();
@@ -170,7 +180,7 @@ class DBCommand extends CommandHelper
         $allItems = array_merge($views, $tables, $types);
         
         // only display response when needed
-        if($this->shouldResponseReturn($response)){
+        if($this->shouldResponseReturn($response) && $this->isConsole()){
             $this->progressBar(function ($report) use ($views, $tables, $types) {
                 $this->processWipeData($views, $tables, $types, $report);
             }, count($allItems));
@@ -179,6 +189,8 @@ class DBCommand extends CommandHelper
         } else{
             $this->processWipeData($views, $tables, $types);
         }
+
+        return 1;
     }
         
     /**

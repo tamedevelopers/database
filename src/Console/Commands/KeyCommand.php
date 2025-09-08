@@ -31,10 +31,11 @@ class KeyCommand extends CommandHelper
         $key = Manager::regenerate();
         if ( !$key) {
             $this->error('Failed to generate the application key.');
-            return;
+            return 0;
         }
 
         $this->success("Application key generated: {$key}");
+        return 1;
     }
     
 }

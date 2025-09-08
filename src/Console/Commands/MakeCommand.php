@@ -40,11 +40,20 @@ class MakeCommand extends CommandHelper
         }
 
         // if no table file name
-        if(empty($table)){
+        if(empty($table) && $this->isConsole()){
             $table = $this->ask("\nWhat should the migration be named?");
         }
+        
+        if(empty($table)){
+            return 0;
+        }
 
-        $table = $this->extractTableName($table);
+        // if create flag come, then we use it as table name
+        if(!empty($create)){
+            $table = $create;
+        } else{
+            $table = $this->extractTableName($table);
+        }
 
         $migration = new Migration();
 
@@ -52,10 +61,15 @@ class MakeCommand extends CommandHelper
 
         if($response['status'] != Constant::STATUS_200){
             $this->error($response['message']);
-            exit(0);
+            if($this->isConsole()){
+                exit(0);
+            } else{
+                return 0;
+            }
         }
 
         $this->info($response['message']);
+        return 1;
     }
 
 }

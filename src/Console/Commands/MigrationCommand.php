@@ -38,7 +38,7 @@ class MigrationCommand extends CommandHelper
      */
     public function fresh()
     {
-        $force = $this->option('force');
+        $force = $this->force();
         $seed  = $this->option('seed');
 
         if($force){
@@ -46,15 +46,19 @@ class MigrationCommand extends CommandHelper
         }
 
         $migration = new Migration();
-
         $response = $migration->run();
 
         if($response['status'] != Constant::STATUS_200){
             $this->error($response['message']);
-            exit(0);
+            if($this->isConsole()){
+                exit(0);
+            } else{
+                return 0;
+            }
         }
 
         $this->info($response['message']);
+        return 1;
     }
 
     /**
@@ -62,7 +66,7 @@ class MigrationCommand extends CommandHelper
      */
     public function refresh()
     {
-        Artisan::call('migrate:fresh --force --drop-types --drop-views');
+        return Artisan::call('migrate:fresh --force --drop-types --drop-views');
     }
 
     /**
@@ -79,10 +83,11 @@ class MigrationCommand extends CommandHelper
 
         if ($response['status'] != Constant::STATUS_200) {
             $this->error($response['message']);
-            return;
+            return 0;
         }
 
         $this->info($response['message']);
+        return 1;
     }
 
     /**
@@ -95,7 +100,7 @@ class MigrationCommand extends CommandHelper
 
         if (!is_dir($migrationsDir)) {
             $this->warning("Migrations directory not found: {$migrationsDir}");
-            return;
+            return 0;
         }
 
         // Connect to DB and validate connection
@@ -110,7 +115,7 @@ class MigrationCommand extends CommandHelper
 
         if (empty($files)) {
             $this->info("No migration files found in: {$migrationsDir}");
-            return;
+            return 0;
         }
 
         // Build a single table output
@@ -138,7 +143,7 @@ class MigrationCommand extends CommandHelper
 
         if (empty($rows)) {
             $this->info("No detectable migration tables.");
-            return;
+            return 0;
         }
 
         // Compute column widths
@@ -167,7 +172,7 @@ class MigrationCommand extends CommandHelper
         }
         Logger::writeln($sep);
 
-        return;
+        return 1;
     }
 
 }
