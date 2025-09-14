@@ -139,11 +139,6 @@ trait TableStructureTrait{
                 }
             }
 
-            dd(
-                'createQueryCollections',
-                $column
-            );
-
             // table query structure
             // exclude references
             if($column['type'] != 'foreign'){

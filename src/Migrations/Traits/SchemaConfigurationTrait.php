@@ -372,27 +372,24 @@ trait SchemaConfigurationTrait{
 
     /**
      * Create generix identifier name
-     * @param array $column
-     * @param string|null $name
      * 
+     * @param string|null $name
      * @return string
      */
-    protected function genericIdentifier($column, $name = null)
+    protected function genericIdentifier($name = null)
     {
-        dd(
-            $column,
-        );
-        
-        $column = $this->columns[count($this->columns)];
+        // Always reference the last added column in the collection
+        $lastIndex = array_key_last($this->columns);
+        $current = $this->columns[$lastIndex] ?? [];
         $unique = (new Exception)->getTrace()[1]['function'] ?? '__';
         
         // for foreign keys
-        if($column['type'] == 'foreign'){
-            $name = "{$this->tableName}_{$column['name']}_{$column['type']}";
+        if(($current['type'] ?? null) === 'foreign'){
+            $name = "{$this->tableName}_" . ($current['name'] ?? 'column') . "_" . ($current['type'] ?? 'foreign');
         } else{
             // create unique name
             if(empty($name)){
-                $name = "{$this->tableName}_{$column['name']}_{$unique}";
+                $name = "{$this->tableName}_" . ($current['name'] ?? 'column') . "_{$unique}";
             } else{
                 $name = "{$this->tableName}_{$name}";
             }

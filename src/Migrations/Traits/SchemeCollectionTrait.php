@@ -28,13 +28,14 @@ trait SchemaCollectionTrait{
      */
     public function primary()
     {
-        $name = $this->columns[0]['name'] ?? 'id';
-        $type = $this->columns[0]['type'] ?? 'integer';
+        $lastIndex = array_key_last($this->columns);
+        $name = $this->columns[$lastIndex]['name'] ?? 'id';
+        $type = $this->columns[$lastIndex]['type'] ?? 'integer';
 
-        // unset first element in columns array
+        // unset the element in columns
         // since we're trying to create an auto incrementing primary key
-        // for the first column in the schema collection.
-        unset($this->columns[0]);
+        // for the column in the schema collection.
+        unset($this->columns[$lastIndex]);
 
         return $this->addColumn($name, $type, [
             'primary'           => "PRIMARY", 
@@ -101,10 +102,9 @@ trait SchemaCollectionTrait{
      */
     public function references($columns, $indexName = null)
     {
-        $this->columns[count($this->columns)]['references'] = $columns;
-        $this->columns[count($this->columns)]['generix'] = $this->genericIdentifier(
-            $indexName ?? $columns
-        );
+        $lastIndex = array_key_last($this->columns);
+        $this->columns[$lastIndex]['references'] = $columns;
+        $this->columns[$lastIndex]['generix'] = $this->genericIdentifier($indexName);
 
         return $this;
     }
@@ -119,7 +119,8 @@ trait SchemaCollectionTrait{
      */
     public function on($table)
     {
-        $this->columns[count($this->columns)]['on'] = $table;
+        $lastIndex = array_key_last($this->columns);
+        $this->columns[$lastIndex]['on'] = $table;
         return $this;
     }
 
@@ -131,7 +132,8 @@ trait SchemaCollectionTrait{
      */
     public function onDelete($action)
     {
-        $this->columns[count($this->columns)]['onDelete'] = $action;
+        $lastIndex = array_key_last($this->columns);
+        $this->columns[$lastIndex]['onDelete'] = $action;
         return $this;
     }
 
@@ -143,7 +145,8 @@ trait SchemaCollectionTrait{
      */
     public function onUpdate($action)
     {
-        $this->columns[count($this->columns)]['onUpdate'] = $action;
+        $lastIndex = array_key_last($this->columns);
+        $this->columns[$lastIndex]['onUpdate'] = $action;
         return $this;
     }
 
@@ -154,7 +157,8 @@ trait SchemaCollectionTrait{
      */
     public function unsigned()
     {
-        $this->columns[count($this->columns)]['unsigned'] = true;
+        $lastIndex = array_key_last($this->columns);
+        $this->columns[$lastIndex]['unsigned'] = true;
         return $this;
     }
 
@@ -166,7 +170,8 @@ trait SchemaCollectionTrait{
      */
     public function default($value)
     {
-        $this->columns[count($this->columns)]['default'] = $value;
+        $lastIndex = array_key_last($this->columns);
+        $this->columns[$lastIndex]['default'] = $value;
         return $this;
     }
 
@@ -178,7 +183,8 @@ trait SchemaCollectionTrait{
      */
     public function nullable()
     {
-        $this->columns[count($this->columns)]['nullable'] = true;
+        $lastIndex = array_key_last($this->columns);
+        $this->columns[$lastIndex]['nullable'] = true;
 
         return $this;
     }
@@ -191,7 +197,8 @@ trait SchemaCollectionTrait{
      */
     public function index($name = null)
     {
-        $this->columns[count($this->columns)]['index'] = $this->genericIdentifier($name);
+        $lastIndex = array_key_last($this->columns);
+        $this->columns[$lastIndex]['index'] = $this->genericIdentifier($name);
 
         return $this;
     }
@@ -204,7 +211,8 @@ trait SchemaCollectionTrait{
      */
     public function unique($name = null)
     {
-        $this->columns[count($this->columns)]['unique'] = $this->genericIdentifier($name);
+        $lastIndex = array_key_last($this->columns);
+        $this->columns[$lastIndex]['unique'] = $this->genericIdentifier($name);
         
         return $this;
     }
