@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database\Traits;
 
 use PDO;
-use Tamedevelopers\Database\DB;
 use Tamedevelopers\Support\Str;
 use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
