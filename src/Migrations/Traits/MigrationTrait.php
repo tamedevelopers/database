@@ -83,7 +83,7 @@ trait MigrationTrait{
         };
 
         // dummy content
-        $dummyContent = Str::replace('{{TABLE}}', $table, File::get($dummyPath));
+        $dummyContent = Str::replace('{{ table }}', $table, File::get($dummyPath));
 
         // absolute path
         self::$storagePath = self::$migrations . $fileName;

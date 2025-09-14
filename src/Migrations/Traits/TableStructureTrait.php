@@ -139,6 +139,11 @@ trait TableStructureTrait{
                 }
             }
 
+            dd(
+                'createQueryCollections',
+                $column
+            );
+
             // table query structure
             // exclude references
             if($column['type'] != 'foreign'){
@@ -233,9 +238,14 @@ trait TableStructureTrait{
     {
         if(is_array($this->primaryKeyValue)){
             // check for auto increment
-            $autoIncrement = $this->primaryKeyValue['auto_increment'];
+            $increment = null;
+            $value = $this->primaryKeyValue;
+            $autoIncrement = $value['auto_increment'];
             if($autoIncrement){
-                $increment = " AUTO_INCREMENT, AUTO_INCREMENT=1";
+                // only add autoincrement if type is checked in array
+                if(in_array($value['type'], $this->unsignedTypes)){
+                    $increment = " AUTO_INCREMENT, AUTO_INCREMENT=1";
+                }
             }
 
             $this->addCollectionQuery(
@@ -244,7 +254,7 @@ trait TableStructureTrait{
                     -- AUTO_INCREMENT for table `{$this->tableName}`
                     --
                     ALTER TABLE `{$this->tableName}`
-                    MODIFY {$this->createColumnDefinition($this->primaryKeyValue)}{$increment};
+                    MODIFY {$this->createColumnDefinition($value)}{$increment};
                 "
             );
         }

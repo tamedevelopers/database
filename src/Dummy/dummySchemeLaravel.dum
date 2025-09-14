@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('{{TABLE}}', function (Blueprint $table) {
-            {{BODY}}
+        Schema::create('{{ table }}', function (Blueprint $table) {
+            {{ body }}
         });
     }
 
@@ -21,6 +21,6 @@ return new class extends Migration
      */
     public function drop(): void
     {
-        Schema::dropIfExists('{{TABLE}}');
+        Schema::dropIfExists('{{ table }}');
     }
 };

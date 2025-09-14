@@ -452,13 +452,13 @@ trait SchemaTrait{
     public function timestamps()
     {
         return $this->addColumn('created_at', 'timestamps', [
-                        'nullable'  => true,
-                        'index'     => $this->genericIdentifier('created_at_index')
-                    ])
-                    ->addColumn('updated_at', 'timestamps', [
-                        'nullable'  => true,
-                        'index'     => $this->genericIdentifier('updated_at_index')
-                    ]);
+            'nullable'  => true,
+            'index'     => $this->genericIdentifier('created_at_index')
+        ])
+        ->addColumn('updated_at', 'timestamps', [
+            'nullable'  => true,
+            'index'     => $this->genericIdentifier('updated_at_index')
+        ]);
     }
 
 }

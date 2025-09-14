@@ -5,42 +5,7 @@ declare(strict_types=1);
 namespace Tamedevelopers\Database\Migrations\Traits;
 
 trait SchemaCollectionTrait{
-
-    /**
-     * Creating column
-     * 
-     * @return $this
-     */
-    public function unsigned()
-    {
-        $this->columns[count($this->columns) - 1]['unsigned'] = true;
-        return $this;
-    }
-
-    /**
-     * Creating Default value
-     * @param string $value 
-     * 
-     * @return $this
-     */
-    public function default($value)
-    {
-        $this->columns[count($this->columns) - 1]['default'] = $value;
-        return $this;
-    }
-
-    /**
-     * Creating Nullable value
-     * @param string $value 
-     * 
-     * @return $this
-     */
-    public function nullable()
-    {
-        $this->columns[count($this->columns) - 1]['nullable'] = true;
-        return $this;
-    }
-
+    
     /**
      * Creating Indexs
      * @param string $name 
@@ -57,46 +22,24 @@ trait SchemaCollectionTrait{
     }
 
     /**
-     * Creating Indexs
-     * @param string $name 
-     * @param bool $autoIncrement \Default is true
-     * @param bool $unsigned \Default is true
+     * Creating Indexes
      * 
      * @return $this
      */
-    public function primary($name, ?bool $autoIncrement = true, ?bool $unsigned = true)
+    public function primary()
     {
-        return $this->addColumn($name, 'bigInteger', [
+        $name = $this->columns[0]['name'] ?? 'id';
+        $type = $this->columns[0]['type'] ?? 'integer';
+
+        // unset first element in columns array
+        // since we're trying to create an auto incrementing primary key
+        // for the first column in the schema collection.
+        unset($this->columns[0]);
+
+        return $this->addColumn($name, $type, [
             'primary'           => "PRIMARY", 
-            'unsigned'          => $unsigned, 
-            'auto_increment'    => $autoIncrement,
+            'auto_increment'    => true,
         ]);
-    }
-
-    /**
-     * Creating Indexs
-     * @param string|null $name 
-     * 
-     * @return $this
-     */
-    public function index($name = null)
-    {
-        $this->columns[count($this->columns) - 1]['index'] = $this->genericIdentifier($name);
-
-        return $this;
-    }
-
-    /**
-     * Creating Indexs
-     * @param string|null $name 
-     * 
-     * @return $this
-     */
-    public function unique($name = null)
-    {
-        $this->columns[count($this->columns) - 1]['unique'] = $this->genericIdentifier($name);
-        
-        return $this;
     }
 
     /**
@@ -158,8 +101,10 @@ trait SchemaCollectionTrait{
      */
     public function references($columns, $indexName = null)
     {
-        $this->columns[count($this->columns) - 1]['references'] = $columns;
-        $this->columns[count($this->columns) - 1]['generix'] = $this->genericIdentifier($indexName ?? $columns);
+        $this->columns[count($this->columns)]['references'] = $columns;
+        $this->columns[count($this->columns)]['generix'] = $this->genericIdentifier(
+            $indexName ?? $columns
+        );
 
         return $this;
     }
@@ -174,7 +119,7 @@ trait SchemaCollectionTrait{
      */
     public function on($table)
     {
-        $this->columns[count($this->columns) - 1]['on'] = $table;
+        $this->columns[count($this->columns)]['on'] = $table;
         return $this;
     }
 
@@ -186,7 +131,7 @@ trait SchemaCollectionTrait{
      */
     public function onDelete($action)
     {
-        $this->columns[count($this->columns) - 1]['onDelete'] = $action;
+        $this->columns[count($this->columns)]['onDelete'] = $action;
         return $this;
     }
 
@@ -198,7 +143,69 @@ trait SchemaCollectionTrait{
      */
     public function onUpdate($action)
     {
-        $this->columns[count($this->columns) - 1]['onUpdate'] = $action;
+        $this->columns[count($this->columns)]['onUpdate'] = $action;
+        return $this;
+    }
+
+    /**
+     * Creating column
+     * 
+     * @return $this
+     */
+    public function unsigned()
+    {
+        $this->columns[count($this->columns)]['unsigned'] = true;
+        return $this;
+    }
+
+    /**
+     * Creating Default value
+     * @param string $value 
+     * 
+     * @return $this
+     */
+    public function default($value)
+    {
+        $this->columns[count($this->columns)]['default'] = $value;
+        return $this;
+    }
+
+    /**
+     * Creating Nullable value
+     * @param string $value 
+     * 
+     * @return $this
+     */
+    public function nullable()
+    {
+        $this->columns[count($this->columns)]['nullable'] = true;
+
+        return $this;
+    }
+
+    /**
+     * Creating Indexs
+     * @param string|null $name 
+     * 
+     * @return $this
+     */
+    public function index($name = null)
+    {
+        $this->columns[count($this->columns)]['index'] = $this->genericIdentifier($name);
+
+        return $this;
+    }
+
+    /**
+     * Creating Indexs
+     * @param string|null $name 
+     * 
+     * @return $this
+     */
+    public function unique($name = null)
+    {
+        $this->columns[count($this->columns)]['unique'] = $this->genericIdentifier($name);
+        
         return $this;
     }
     

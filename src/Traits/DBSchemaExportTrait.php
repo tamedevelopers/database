@@ -156,7 +156,8 @@ trait DBSchemaExportTrait
             // Map type (pass index hint from singleIndexMap when available)
             $indexInfo = $singleIndexMap[$field] ?? (
                 $key === 'uni' ? ['kind' => 'uni', 'name' => null] : (
-                ($key === 'mul') ? ['kind' => 'mul', 'name' => null] : ['kind' => '', 'name' => null])
+                ($key === 'mul') ? ['kind' => 'mul', 'name' => null] : (
+                ($key === 'pri') ? ['kind' => 'pri', 'name' => null] : ['kind' => '', 'name' => null]))
             );
             $lines[] = $this->toBlueprintLine($field, $type, $null, $default, $extra, (string)$indexInfo['kind'], $indexInfo['name']);
         }
@@ -373,6 +374,11 @@ trait DBSchemaExportTrait
             } else {
                 $line .= "->default(" . $this->phpifyDefault($default, $baseType) . ")";
             }
+        }
+
+        // primary (non auto-increment) should be reflected inline
+        if ($key === 'pri' && !str_contains(Str::lower((string)$extra), 'auto_increment')) {
+            $line .= "->primary()";
         }
 
         // reflect single-column index inline (from map or Key)
@@ -755,13 +761,28 @@ trait DBSchemaExportTrait
             }
         }
 
-        // Build single-column index map for inline chaining
+        // Build single-column index map for inline chaining (exclude primary)
         $singleIndexMap = [];
+        $primaryCols = [];
         foreach ($indexes as $idx) {
-            if (($idx['type'] ?? '') === 'primary') { continue; }
+            if (($idx['type'] ?? '') === 'primary') {
+                $primaryCols = $idx['columns'] ?? [];
+                continue;
+            }
             if (isset($idx['columns']) && count($idx['columns']) === 1) {
                 $c = $idx['columns'][0];
                 $singleIndexMap[$c] = (($idx['type'] ?? '') === 'unique') ? 'uni' : 'mul';
+            }
+        }
+
+        // Detect single-column non-auto primary for inline ->primary(), or composite for table-level
+        $priSingleMap = [];
+        $compositePrimary = [];
+        if (!empty($primaryCols)) {
+            if (count($primaryCols) === 1 && !$primaryAuto) {
+                $priSingleMap[trim($primaryCols[0], " `")] = 'pri';
+            } elseif (count($primaryCols) > 1) {
+                $compositePrimary = array_map(fn($c) => trim($c, " `"), $primaryCols);
             }
         }
 
@@ -780,7 +801,7 @@ trait DBSchemaExportTrait
             if (in_array($field, ['created_at', 'updated_at'], true)) {
                 continue;
             }
-            $hint = $singleIndexMap[$field] ?? '';
+            $hint = $priSingleMap[$field] ?? ($singleIndexMap[$field] ?? '');
             $bodyLines[] = $this->toBlueprintLine($field, $type, (bool)$nullable, $default, (string)$extra, (string)$hint);
         }
 
@@ -795,9 +816,15 @@ trait DBSchemaExportTrait
             }
         }
 
-        // Indexes (single-column) already inlined; process only multi-column here
+        // Add table-level composite primary key if present
+        if (!empty($compositePrimary)) {
+            $colsList = "['" . implode("','", $compositePrimary) . "']";
+            $bodyLines[] = "\$table->primary({$colsList});";
+        }
+
+        // Indexes (single-column) already inlined; process only multi-column here (non-primary)
         foreach ($indexes as $idx) {
-            if ($idx['type'] === 'primary') { continue; }
+            if (($idx['type'] ?? '') === 'primary') { continue; }
             if (count($idx['columns']) <= 1) { continue; }
             $colsList = "['" . implode("','", $idx['columns']) . "']";
             if (($idx['type'] ?? '') === 'unique') {
@@ -850,7 +877,7 @@ trait DBSchemaExportTrait
         $templatePath = "{$realPath}/{$this->type}";
 
         $template = File::get($templatePath);
-        $php = Str::replace(['{{TABLE}}', '{{BODY}}'], [$table, $body], $template);
+        $php = Str::replace(['{{ table }}', '{{ body }}'], [$table, $body], $template);
 
         return $php;
     }

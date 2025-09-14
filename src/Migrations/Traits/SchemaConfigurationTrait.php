@@ -99,18 +99,18 @@ trait SchemaConfigurationTrait{
         ], $options);
         
         // create default string
-        $getType    = $this->getColumnType($options['type']);
+        $type       = $this->getColumnType($options['type']);
         $unsigned   = $this->getUnsigned($options['type']);
-        $columnDef  = "`{$options['name']}` {$getType}";
+        $columnDef  = "`{$options['name']}` {$type}";
         
         // Query for Type and Length 
         $columnDef .= $this->queryForType_and_Length($options);
 
         // add unsigned
-        $columnDef .= $this->queryForUnsigned($options, $getType, $unsigned);
+        $columnDef .= $this->queryForUnsigned($options, $type, $unsigned);
 
         // add collate
-        $columnDef .= $this->queryForCollate($getType);
+        $columnDef .= $this->queryForCollate($type);
 
         // add for nullable
         $columnDef .= $this->queryForNullable($options);
@@ -372,13 +372,18 @@ trait SchemaConfigurationTrait{
 
     /**
      * Create generix identifier name
+     * @param array $column
      * @param string|null $name
      * 
      * @return string
      */
-    protected function genericIdentifier($name = null)
+    protected function genericIdentifier($column, $name = null)
     {
-        $column = $this->columns[count($this->columns) - 1];
+        dd(
+            $column,
+        );
+        
+        $column = $this->columns[count($this->columns)];
         $unique = (new Exception)->getTrace()[1]['function'] ?? '__';
         
         // for foreign keys

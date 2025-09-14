@@ -41,6 +41,8 @@ class MigrationCommand extends CommandHelper
         $force = $this->force();
         $seed  = $this->option('seed');
 
+        $this->forceChecker();
+
         if($force){
             Artisan::call('db:wipe --force --drop-types --drop-views --response=0');
         }
@@ -66,7 +68,7 @@ class MigrationCommand extends CommandHelper
      */
     public function refresh()
     {
-        return Artisan::call('migrate:fresh --force --drop-types --drop-views');
+        return Artisan::call('migrate:fresh --force');
     }
 
     /**
