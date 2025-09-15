@@ -98,7 +98,7 @@ trait DBSchemaExportTrait
             $colName   = $ix->Column_name ?? $ix->column_name ?? null;
             $nonUnique = (int) ($ix->Non_unique ?? $ix->non_unique ?? 1);
             if (!$idxName || !$colName) { continue; }
-            if (Str::lower((string) $idxName) === 'primary') { continue; }
+            if (Str::lower($idxName) === 'primary') { continue; }
             if (!isset($byIndexName[$idxName])) {
                 $byIndexName[$idxName] = ['cols' => [], 'unique' => ($nonUnique === 0)];
             }
@@ -135,10 +135,10 @@ trait DBSchemaExportTrait
 
             $field  = $col?->Field ?? $col?->field;
             $type   = Str::lower($col?->Type ?? $col?->type);
-            $null   = Str::lower((string) $col?->Null ?? $col?->null) === 'yes';
+            $null   = Str::lower($col?->Null ?? $col?->null) === 'yes';
             // Key type should come from Key column not Null
-            $key    = Str::lower((string) ($col?->Key ?? $col?->key ?? ''));
-            $extra  = Str::lower((string) ($col?->Extra ?? $col?->extra ?? ''));
+            $key    = Str::lower(($col?->Key ?? $col?->key ?? ''));
+            $extra  = Str::lower(($col?->Extra ?? $col?->extra ?? ''));
             $default   = $col?->Default ?? $col?->default;
 
             // Skip the primary auto column since id() already added it
@@ -377,7 +377,7 @@ trait DBSchemaExportTrait
         }
 
         // primary (non auto-increment) should be reflected inline
-        if ($key === 'pri' && !str_contains(Str::lower((string)$extra), 'auto_increment')) {
+        if ($key === 'pri' && !str_contains(Str::lower($extra), 'auto_increment')) {
             $line .= "->primary()";
         }
 
@@ -426,7 +426,7 @@ trait DBSchemaExportTrait
             $col       = $idx->Column_name ?? $idx->column_name ?? null;
             $nonUnique = (int) ($idx->Non_unique ?? $idx->non_unique ?? 1);
             if (!$idxName || !$col) { continue; }
-            if (Str::lower((string) $idxName) === 'primary') { continue; }
+            if (Str::lower($idxName) === 'primary') { continue; }
             if (!isset($byIndexName[$idxName])) {
                 $byIndexName[$idxName] = ['cols' => [], 'unique' => ($nonUnique === 0)];
             }
@@ -451,12 +451,12 @@ trait DBSchemaExportTrait
     /** Detect if table has a single auto-increment primary key named 'id'. */
     protected function detectPrimaryAutoIncrement(array $columns): bool
     {
-        $pkCols = array_values(array_filter($columns, fn($c) => Str::lower((string)($c->Key ?? '')) === 'pri'));
+        $pkCols = array_values(array_filter($columns, fn($c) => Str::lower($c->Key ?? '') === 'pri'));
         if (count($pkCols) !== 1) {
             return false;
         }
         $pk = $pkCols[0];
-        $isAuto = str_contains(Str::lower((string)$pk->Extra), 'auto_increment');
+        $isAuto = str_contains(Str::lower($pk->Extra), 'auto_increment');
         return $isAuto && Str::lower($pk->Field) === 'id';
     }
 

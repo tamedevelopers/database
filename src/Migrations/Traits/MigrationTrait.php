@@ -19,6 +19,7 @@ trait MigrationTrait{
 
     private static $database;
     private static $migrations;
+    private static $factories;
     private static $seeders;
     private static $error;
     private static $message;
@@ -35,6 +36,7 @@ trait MigrationTrait{
         // collection of migration and seeders path
         self::$database     = Env::getServers('server') . "database/";
         self::$migrations   = self::$database . "migrations/";
+        self::$factories    = self::$database . "factories/";
         self::$seeders      = self::$database . "seeders/";
     }
 
@@ -130,21 +132,19 @@ trait MigrationTrait{
 
         // check if database folder not exist
         if(!File::isDirectory(self::$database)){
-            @File::makeDirectory(self::$database, 0777);
+            File::makeDirectory(self::$database, 0777);
+        }
 
-            // gitignore fle path
-            $gitignore = sprintf("%s.gitignore", self::$database);
+        // gitignore fle path
+        $gitignore = sprintf("%s.gitignore", self::$database);
 
-            // create file if not exist
-            if (!File::exists($gitignore) && !is_dir($gitignore)) {
-                // Write the contents to the new file
-                File::put($gitignore, preg_replace(
-                    '/^[ \t]+|[ \t]+$/m', '', 
-                    ".
-                    /database
-                    .env"
-                ));
-            }
+        // create file if not exist
+        if (!File::exists($gitignore)) {
+            File::put($gitignore, preg_replace(
+                '/^[ \t]+|[ \t]+$/m', '', 
+                ".env
+                *.sqlite*"
+            ));
         }
 
         // if migrations folder not found
@@ -155,6 +155,11 @@ trait MigrationTrait{
         // if seeders folder not found
         if(!File::isDirectory(self::$seeders)){
             File::makeDirectory(self::$seeders, 0777);
+        }
+
+        // if factories folder not found
+        if(!File::isDirectory(self::$factories)){
+            File::makeDirectory(self::$factories, 0777);
         }
 
         if(!File::isDirectory(self::$migrations)){

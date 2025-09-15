@@ -1,0 +1,16 @@
+<?php
+
+namespace Tamedevelopers\Database\Seeders;
+
+use Tamedevelopers\Database\Seeder;
+
+class {{ class }} extends Seeder
+{   
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        
+    }
+}

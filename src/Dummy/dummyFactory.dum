@@ -1,0 +1,20 @@
+<?php
+
+namespace Tamedevelopers\Database\Factories;
+
+use Tamedevelopers\Database\Factory;
+
+class {{ class }} extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition()
+    {
+        return [
+            
+        ];
+    }
+}
