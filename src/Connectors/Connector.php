@@ -30,6 +30,11 @@ class Connector extends DatabaseManager{
     private $connection;
 
     /**
+     * @var string|null
+     */
+    private $prefix;
+
+    /**
      * @var array|null
      */
     private $default;
@@ -227,6 +232,12 @@ class Connector extends DatabaseManager{
         // set connection
         $instance->connection = $this->dbConnection();
 
+        // update builder table prefix
+        // only when the prefix is not empty
+        if(!is_null($instance->prefix)){
+            $instance->connection['config']['prefix'] = $instance->prefix;
+        }
+
         // setup table name
         $builder->from = $table;
 
@@ -248,13 +259,25 @@ class Connector extends DatabaseManager{
     }
 
     /**
+     * Change the prefix of the currently selected database driver
+     * @param string $prefix
+     * @return void
+     */
+    public function changeTablePrefix($prefix)
+    {
+        $this->prefix = $prefix;
+    }
+
+    /**
      * Get the prefix of the currently selected database driver
      *
      * @return string|null 
      */
     public function getTablePrefix()
     {
-        return $this->getDataByMode('prefix');
+        return !is_null($this->prefix)
+                ? $this->prefix 
+                : $this->getDataByMode('prefix');
     }
 
     /**

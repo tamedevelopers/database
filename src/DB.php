@@ -53,7 +53,7 @@ use Tamedevelopers\Database\Traits\ExceptionTrait;
  * @method \Tamedevelopers\Database\Schema\Builder avg(Expression|string $column)
  * 
  * @method \Tamedevelopers\Database\Schema\Expression raw(mixed $value)
- * @method \Tamedevelopers\Database\Schema\Builder totalQueryDuration()
+ * @method \Tamedevelopers\Database\Schema\Builder runTime()
  * @method \Tamedevelopers\Database\Schema\Builder tableName()
  * @method \Tamedevelopers\Database\Schema\Builder query(string $query)
  * 
@@ -62,6 +62,7 @@ use Tamedevelopers\Database\Traits\ExceptionTrait;
  * @method \Tamedevelopers\Database\Connectors\Connector getConfig()
  * @method \Tamedevelopers\Database\Connectors\Connector getDatabaseName()
  * @method \Tamedevelopers\Database\Connectors\Connector getTablePrefix()
+ * @method \Tamedevelopers\Database\Connectors\Connector changeTablePrefix(string $prefix)
  * 
  * @see \Tamedevelopers\Database\Schema\Builder
  * @see \Tamedevelopers\Database\DatabaseManager

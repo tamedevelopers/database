@@ -6,6 +6,7 @@ namespace Tamedevelopers\Database\Traits;
 
 use PDO;
 use Tamedevelopers\Support\Str;
+use Tamedevelopers\Support\Zip;
 use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
 
@@ -268,9 +269,9 @@ trait DBExportTrait
         // save to the instance
         $this->fileStoragePath = $storageFilePath;
 
-        // Create a zip file if Tyep is not null
+        // Create a zip file if Type is not null
         if(!is_null($this->saveAsFileType)) {
-            TameZip()->zip($storagePath, $storageFilePath);
+            Zip::zip($storagePath, $storageFilePath);
         }
     }
 

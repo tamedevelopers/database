@@ -9,13 +9,10 @@ use Closure;
 use DateTime;
 use Exception;
 use DateTimeInterface;
-use Throwable;
 use Tamedevelopers\Support\Capsule\Forge;
 use Tamedevelopers\Database\Schema\Builder;
-use Tamedevelopers\Support\Capsule\Manager;
 use Tamedevelopers\Database\Schema\Expression;
 use Tamedevelopers\Database\Schema\JoinClause;
-use Tamedevelopers\Support\Capsule\DebugManager;
 use Tamedevelopers\Support\Collections\Collection;
 use Tamedevelopers\Database\Schema\BuilderCompiler;
 use Tamedevelopers\Database\Schema\Pagination\Paginator;
@@ -1385,10 +1382,10 @@ trait BuilderTrait{
         $this->groups   = null;
         $this->limit    = null;
         $this->offset   = null;
-        $this->runtime  = 0.00;
         if($table){
             $this->from = null;
-        }
+            $this->runTime();
+        } 
     }
 
     /**
@@ -1396,13 +1393,13 @@ trait BuilderTrait{
      * 
      * @return void
      */ 
-    protected function totalQueryDuration()
+    protected function runTime()
     {
         $start  = $this->connection->timer;
         $end    = new DateTime();
 
         // time difference
-        if(is_object($start)){
+        if(is_object($start) && $start instanceof DateTime){
             $diff = $start->diff($end);
             
             // runtime  

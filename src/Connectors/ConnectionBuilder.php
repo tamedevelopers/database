@@ -65,11 +65,11 @@ class ConnectionBuilder
     public function __construct($data = null, $name = null, $connection = null)
     {
         if($data){
-            $this->timer    = new DateTime();
-            $this->pdo      = $connection['pdo'] ?? $connection['message'];
-            $this->config   = array_merge($connection['config'], ['name' => $name]);
-            $this->database = $this->config['database'];
-            $this->tablePrefix = $this->getTablePrefixIfAllowed();
+            $this->timer        = new DateTime();
+            $this->pdo          = $connection['pdo'] ?? $connection['message'];
+            $this->config       = array_merge($connection['config'], ['name' => $name]);
+            $this->database     = $this->config['database'];
+            $this->tablePrefix  = $this->getTablePrefixIfAllowed();
         }
     }
 

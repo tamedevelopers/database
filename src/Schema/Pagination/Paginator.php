@@ -17,7 +17,7 @@ use Tamedevelopers\Database\Schema\Builder;
 use Tamedevelopers\Database\Schema\Pagination\PaginatorAsset;
 use Tamedevelopers\Database\Schema\Pagination\Yidas\PaginationLoader;
 use Tamedevelopers\Database\Schema\Pagination\Yidas\PaginationWidget;
-
+use Tamedevelopers\Support\Process\HttpRequest;
 
 class Paginator extends Builder{
     
@@ -322,7 +322,7 @@ class Paginator extends Builder{
      * 
      * @return $this
      */
-    protected function getPagination($totalCount, int|string $perPage = 15, Builder $query = null)
+    protected function getPagination($totalCount, int|string $perPage = 15, Builder $query)
     {
         try {
             // convert to int
@@ -350,8 +350,11 @@ class Paginator extends Builder{
             // and collect that from the var above\$perPage
             $this->pagination->setPerPage($perPage);
 
+            // get all request input - Both POST and GET
+            $input = HttpRequest::input();
+
             // auto setup pageParam
-            $pageParam = $_GET[$this->pageParam] ?? $this->pagination->page;
+            $pageParam = $input[$this->pageParam] ?? $this->pagination->page;
 
             // To avoi conflicts on multiple pagination
             // in same page. We autoset from $_GET request

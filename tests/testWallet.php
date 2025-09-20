@@ -7,7 +7,7 @@ include_once __DIR__ . "/Model/Wallet.php";
 
 // using model
 dd(
-    Wallet::count()
+    Wallet::count(),
 );
 
 

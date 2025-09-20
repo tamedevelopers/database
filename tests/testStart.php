@@ -23,5 +23,6 @@ AppManager::bootLoader();
 
 dd(
     'Working',
-    DB::table('wallet')->get()
+    DB::table('wallet')->first(),
+    DB::table('wallet')->get(),
 );

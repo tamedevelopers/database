@@ -125,7 +125,7 @@ class DBCommand extends CommandHelper
         $export = new DBExport(
             saveAsFileType: $as, 
             connection: $connection, 
-            retentionDays: (int) $days ?: 7
+            retentionDays: (int) $days ?: 5
         );
 
         $this->checkConnection($export->conn);

@@ -8,12 +8,12 @@ class PaginatorAsset
 
     /**
      * Pagination Default Texts
-     * @param string $mode
+     * @param string|null $mode
      * [optional] get array data
      *
      * @return array
      */
-    public static function texts(string $mode = null)
+    public static function texts($mode = null)
     {
         $data =  [
             'first'     => 'First',
@@ -34,12 +34,12 @@ class PaginatorAsset
 
     /**
      * Pagination Views Style
-     * @param string $mode
+     * @param string|null $mode
      * [optional] get array data
      * 
      * @return array|string
      */
-    public static function views(string $mode = null)
+    public static function views($mode = null)
     {
         $data = [
             'bootstrap' => 'bootstrap',

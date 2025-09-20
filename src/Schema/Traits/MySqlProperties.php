@@ -147,9 +147,9 @@ trait MySqlProperties{
     ];
 
     /**
-     * @var float|int
+     * @var int|null
      */
-    public $runtime = 0.00;
+    public $runtime;
 }
 
 

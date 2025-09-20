@@ -1442,7 +1442,12 @@ class Builder  {
         $this->setMethod(__FUNCTION__);
 
         // paginator data
-        $results =  $paginator->getPagination($totalCount, $perPage, $this);
+        $results = $paginator->getPagination($totalCount, $perPage, $this);
+
+
+        dd(
+            $results
+        );
         
         return new Collection($results['data'], $results['builder']);
     }
@@ -1727,7 +1732,7 @@ class Builder  {
     {
         dump($this->toSql(), $this->getBindings());
 
-        $this->totalQueryDuration();
+        $this->runTime();
 
         return $this;
     }
@@ -1735,11 +1740,11 @@ class Builder  {
     /**
      * Die and dump the current SQL and bindings.
      *
-     * @return never
+     * @return void
      */
     public function dd()
     {
-        $this->totalQueryDuration();
+        $this->runTime();
 
         dd($this->toSql(), $this->getBindings(), $this);
     }

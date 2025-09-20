@@ -7,7 +7,7 @@ include_once __DIR__ . "/../vendor/autoload.php";
 
 // 'woocommerce'
 // $export = new DBExport('zip', 'woocommerce');
-$export = new DBExport('zip');
+$export = new DBExport(null, 'zip');
 
 dd(
     $export->run(),

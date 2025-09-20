@@ -92,7 +92,7 @@ class DBExport
      * @param string|null $saveAsFileType Save the backup file as [zip|rar]
      * @param int $retentionDays Days to keep backups before deletion
      */
-    public function __construct($connection = null, $saveAsFileType = null, int $retentionDays = 7)
+    public function __construct($connection = null, $saveAsFileType = null, ?int $retentionDays = 5)
     {
         $saveAsFileType = Str::lower($saveAsFileType);
 
@@ -106,6 +106,10 @@ class DBExport
 
         $this->conn = DB::connection($connection);
         $this->db = $this->conn->dbConnection();
+
+        // since we're exporting from a live/database server
+        // we need to temporarily disable prefixing, by setting its value to empty string
+        $this->conn->changeTablePrefix('');
     }
 
     /**
@@ -129,8 +133,14 @@ class DBExport
         $filename   = "{$dbName}_backup_{$timestamp}.sql";
         $path       = "{$backupDir}/{$filename}";
 
+        // make required directory
         if (!File::isDirectory($backupDir)) {
             File::makeDirectory($backupDir, 0755, true);
+        }
+
+        // Cleanup old backups if expired
+        if ($this->retentionDays >= 0) {
+            $this->cleanupOldBackups($backupDir, $this->retentionDays);
         }
 
         $fh = fopen($path, 'w');
@@ -165,11 +175,6 @@ class DBExport
         
                     // Compress the backup using
                     $this->saveFileAs($path);
-        
-                    // Cleanup old backups if expired
-                    if ($this->retentionDays > 0) {
-                        $this->cleanupOldBackups($backupDir, $this->retentionDays);
-                    }
         
                     $this->error   = Constant::STATUS_200;
                     $this->message = "- Database has been exported successfully.";
