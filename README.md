@@ -77,6 +77,7 @@ was pretty tough. So i decided to create a much more easier way of communicating
     * [Pagination Showing](#pagination-showing)
     * [Pagination Showing Config](#pagination-showing-config)
     * [Pagination Foreach Numbers](#pagination-foreach-numbers)
+    * [Pagination Ajax Loading](#pagination-ajax-loading)
     * [Get Pagination](#get-pagination)
 * [Clause](#clause)
   * [query](#query)
@@ -788,6 +789,38 @@ $users = DB::table('users')->paginate(20);
 foreach($users as $user){
     echo $user->numbers();
 }
+```
+
+### Pagination Ajax Loading
+- When the view is either `loading|` \| `onloading`
+    - This can automatically fetched data without page load
+    - You need to give your DOM-element `data-pagination-content` and `data-pagination-append`
+
+```php
+$users = DB::table('users')->paginate(20);
+```
+
+```html
+<div data-pagination-content>
+    <div class="wallet-container" data-pagination-append>
+        <?php foreach($users as $user) {?>
+            <!-- Content to be loaded structure -->
+        <?php }?>
+    </div>
+</div>
+
+or
+
+<div data-pagination-content data-pagination-append>
+    <!-- Content to be loaded structure -->
+</div>
+
+<!-- pagination links -->
+<div>
+    <?= $users->links([
+        'no_content' => 'All users have been loaded.'
+    ]); ?>
+</div>
 ```
 
 ### Get Pagination
