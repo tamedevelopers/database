@@ -46,6 +46,7 @@ class PaginatorAsset
             'simple'    => 'simple',
             'cursor'    => 'cursor',
             'loading'   => 'loading',
+            'onloading' => 'onloading',
         ];
 
         return $data[$mode] ?? $data;
@@ -81,7 +82,7 @@ class PaginatorAsset
                 return self::getSimpleCss();
             } elseif($mode == self::views('bootstrap')){
                 return self::getBootstrapCss();
-            } elseif($mode == self::views('loading')){
+            } elseif($mode == self::views('loading') || $mode == self::views('onloading')){
                 return self::getLoadingCss();
             } else {
                 return self::getCursorCss();
@@ -91,7 +92,7 @@ class PaginatorAsset
                 return self::getSimpleCss();
             } elseif($mode == self::views('bootstrap')){
                 return self::getBootstrapCss();
-            } elseif($mode == self::views('loading')){
+            } elseif($mode == self::views('loading') || $mode == self::views('onloading')){
                 return self::getLoadingCss();
             } else {
                 return self::getCursorCss();

@@ -228,6 +228,8 @@ class Paginator extends Builder{
             $this->pagination_css = $this->asset->views('simple');
         } elseif($view == $this->asset->views('loading')){
             $this->pagination_css = $this->asset->views('loading');
+        } elseif($view == $this->asset->views('onloading')){
+            $this->pagination_css = $this->asset->views('onloading');
         } else{
             $this->pagination_css = $this->asset->views('cursor');
         }
