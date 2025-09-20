@@ -1,4 +1,4 @@
-<div class="load-more-container" style="text-align: center; margin: 20px 0;">
+<div class="load-more-container" data-pagination-scope style="text-align: center; margin: 20px 0;">
     <?php
         $page = $this->pagination->page;
         $totalPages = $this->pagination->pageCount;
@@ -7,10 +7,76 @@
         $nextUrl = $this->pagination->createUrl($nextPage);
     ?>
     <?php if (!$isLast): ?>
-        <button type="button" class="load-more-btn" data-page="<?php echo $nextPage; ?>" data-url="<?php echo $nextUrl; ?>" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        <a <?=$linkAttributes?> href="<?php echo $nextUrl; ?>" class="load-more-btn" data-page="<?php echo $nextPage; ?>" data-mode="append" data-target="[data-pagination-append]" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;">
             Load More
-        </button>
+        </a>
     <?php else: ?>
         <p>No more content to load.</p>
     <?php endif; ?>
 </div>
+<script>
+// Lightweight progressive AJAX for pagination (load-more friendly)
+(function(){
+  if(window.__TAME_PAGINATION_INITED__) return; // Guard against multiple inits
+  window.__TAME_PAGINATION_INITED__ = true;
+
+  function closestAnchor(el){
+    while(el && el !== document){
+      if(el.tagName === 'A') return el;
+      el = el.parentNode;
+    }
+    return null;
+  }
+
+  document.addEventListener('click', function(e){
+
+    e.preventDefault();
+
+    var a = closestAnchor(e.target);
+    if(!a) return;
+    if(a.getAttribute('data-pagination') !== 'ajax') return;
+
+    var href = a.getAttribute('href');
+    if(!href) return;
+
+    var mode = a.getAttribute('data-mode') || 'replace';
+    var targetSelector = a.getAttribute('data-target') || '[data-pagination-content]';
+    var scope = a.closest('[data-pagination-scope]');
+    var container = document.querySelector(targetSelector);
+
+    // Fallback when no container or scope found
+    if(!container || !scope){ window.location.href = href; return; }
+
+    a.setAttribute('aria-busy', 'true');
+
+    fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' }})
+      .then(function(res){ return res.text(); })
+      .then(function(html){
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, 'text/html');
+
+        var newContainer = doc.querySelector(targetSelector);
+        var newScope = doc.querySelector('[data-pagination-scope]');
+
+        if(!newContainer || !newScope){ window.location.href = href; return; }
+
+        if(mode === 'append'){
+          // Append children
+          while(newContainer.firstChild){
+            container.appendChild(newContainer.firstChild);
+          }
+        } else {
+          // Replace content
+          container.innerHTML = newContainer.innerHTML;
+        }
+
+        // Replace controls to keep next/prev in sync
+        scope.replaceWith(newScope);
+
+        try { window.history.pushState({}, '', href); } catch(_e) {}
+      })
+      .catch(function(){ window.location.href = href; })
+      .finally(function(){ a.removeAttribute('aria-busy'); });
+  });
+})();
+</script>

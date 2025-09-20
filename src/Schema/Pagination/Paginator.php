@@ -150,6 +150,8 @@ class Paginator extends Builder{
             'nextPageLabel'     => $settings['next'],
             'prevPageLabel'     => $settings['prev'],
             'buttonCount'       => $settings['buttons'],
+            // Enable AJAX by default with progressive enhancement
+            'linkAttributes'    => ['data-pagination' => 'ajax'],
         ]) . "{$getStyle}";
     }
 

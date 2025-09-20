@@ -1443,11 +1443,6 @@ class Builder  {
 
         // paginator data
         $results = $paginator->getPagination($totalCount, $perPage, $this);
-
-
-        // dd(
-        //     $results
-        // );
         
         return new Collection($results['data'], $results['builder']);
     }
