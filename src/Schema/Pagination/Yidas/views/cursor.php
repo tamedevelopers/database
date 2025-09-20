@@ -70,8 +70,19 @@
         var newContainer = doc.querySelector(targetSelector);
         var newScope = doc.querySelector('[data-pagination-scope]');
         if(!newContainer || !newScope){ window.location.href = href; return; }
+
         container.innerHTML = newContainer.innerHTML;
+
+        // Replace controls to keep next/prev in sync
         scope.replaceWith(newScope);
+
+        // Update "showing" summary if present on the page
+        var newShowing = doc.querySelector('[data-pagination-showing]');
+        var curShowing = document.querySelector('[data-pagination-showing]');
+        if(newShowing && curShowing){
+          curShowing.innerHTML = newShowing.innerHTML;
+        }
+
         try { window.history.pushState({}, '', href); } catch(_e) {}
       })
       .catch(function(){ window.location.href = href; })

@@ -205,7 +205,7 @@ class Paginator extends Builder{
         }
 
         // only display results when total count is more than 0
-        echo "<span class='{$settings['span']}' style='display: inline-block; text-align: center; padding: 0;'>
+        echo "<span data-pagination-showing class='{$settings['span']}' style='display: inline-block; text-align: center; padding: 0;'>
                 {$formatDisplayText} 
             </span>
         ";
