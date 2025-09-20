@@ -23,7 +23,7 @@
         data-page="<?=$nextPage?>"
         data-mode="append"
         data-target="[data-pagination-append]"
-        data-history="none"
+        data-history="none" 
         data-pagination="ajax"
         style="display:none;">Next</a>
     <?php endif; ?>
@@ -91,7 +91,7 @@
   function loadPage(a, container, scope){
     return new Promise(function(resolve, reject){
       let href = a.getAttribute('href');
-      let mode = a.getAttribute('data-mode') || 'replace';
+      let mode = a.getAttribute('data-mode') || 'replace'; 
 
       fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(res => res.text())

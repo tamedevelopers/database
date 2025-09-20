@@ -14,7 +14,13 @@
     ?>
     
     <?php if (!$isLast): ?>
-        <a <?=$linkAttributes?> href="<?php echo $nextUrl; ?>" class="load-more-btn" data-page="<?php echo $nextPage; ?>" data-mode="append" data-target="[data-pagination-append]" data-history="none" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;">
+        <a <?=$linkAttributes?> href="<?php echo $nextUrl; ?>" 
+          class="load-more-btn" 
+          data-page="<?php echo $nextPage; ?>" 
+          data-mode="append" 
+          data-target="[data-pagination-append]" 
+          data-history="none" 
+          style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;">
           <?=$this->loadMoreLabel?>
         </a>
     <?php else: ?>
@@ -45,7 +51,7 @@
     // Only prevent default if this is our AJAX pagination link
     e.preventDefault();
 
-    var mode = a.getAttribute('data-mode') || 'replace';
+    var mode = a.getAttribute('data-mode') || 'replace'; 
     var targetSelector = a.getAttribute('data-target') || '[data-pagination-content]';
     var scope = a.closest('[data-pagination-scope]');
     var container = document.querySelector(targetSelector);

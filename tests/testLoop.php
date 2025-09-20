@@ -9,14 +9,14 @@ $database = DB::connection();
 
 config_pagination([
     'allow' => true,
-    'view' => 'onloading' //bootstrap|loading|onloading|cursor| simple[default]
+    'view' => 'bootstrap' //bootstrap|loading|onloading|cursor| simple[default]
 ]);
 
 $wallets = $database->table('wallet')
                     ->where('amount', '>', 0)
                     ->join('user', 'user.user_id', '=', 'wallet.user_id')
                     ->latest('date')
-                    ->paginate(7);
+                    ->paginate(2);
 ?>
 
 

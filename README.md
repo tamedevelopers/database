@@ -792,7 +792,7 @@ foreach($users as $user){
 ```
 
 ### Pagination Ajax Loading
-- When the view is either `loading|` \| `onloading`
+- When the view is either `loading|` \| `onloading` \| `cursor` \| `bootstrap`
     - This can automatically fetched data without page load
     - You need to give your DOM-element `data-pagination-content` and `data-pagination-append`
 
