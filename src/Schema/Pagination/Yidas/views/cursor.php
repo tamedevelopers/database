@@ -18,7 +18,7 @@
       <?php if($isFirst):?>
           <span <?=$linkAttributes?>><?=$this->prevPageLabel?></span>
         <?php else: ?>
-          <a <?=$linkAttributes?> data-target="[data-pagination-content]" href="<?=$prevUrl?>"><?=$this->prevPageLabel?></a>
+          <a <?=$linkAttributes?> data-target="[data-pagination-content]" data-history="none" href="<?=$prevUrl?>"><?=$this->prevPageLabel?></a>
       <?php endif ?>
     
       <?php foreach ($this->_buttonStack as $key => $btnPage): ?>
@@ -28,7 +28,7 @@
       <?php if($isLast):?>
           <span <?=$linkAttributes?>><?=$this->nextPageLabel?></span>
         <?php else: ?>
-          <a <?=$linkAttributes?> data-target="[data-pagination-content]" href="<?=$nextUrl?>"><?=$this->nextPageLabel?></a>
+          <a <?=$linkAttributes?> data-target="[data-pagination-content]" data-history="none" href="<?=$nextUrl?>"><?=$this->nextPageLabel?></a>
       <?php endif ?>
     </div>
   
@@ -56,6 +56,8 @@
     // Prevent default only for our ajax link
     e.preventDefault();
 
+    // Decide the history behavior from data-attributes
+    var historyMode = a.getAttribute('data-history') || 'push'; // 'push' | 'replace' | 'none'
     var targetSelector = a.getAttribute('data-target') || '[data-pagination-content]';
     var scope = a.closest('[data-pagination-scope]');
     var container = document.querySelector(targetSelector);
@@ -83,7 +85,11 @@
           curShowing.innerHTML = newShowing.innerHTML;
         }
 
-        try { window.history.pushState({}, '', href); } catch(_e) {}
+        // Manage history
+        try {
+          if(historyMode === 'push') window.history.pushState({}, '', a.getAttribute('href'));
+          else if(historyMode === 'replace') window.history.replaceState({}, '', a.getAttribute('href'));
+        } catch(_e) {}
       })
       .catch(function(){ window.location.href = href; })
       .finally(function(){ a.removeAttribute('aria-busy'); });

@@ -13,7 +13,7 @@
         $lastUrl = $this->pagination->createUrl($totalPages);
     ?>
     <?php if (!$isLast): ?>
-        <a <?=$linkAttributes?> href="<?php echo $nextUrl; ?>" class="load-more-btn" data-page="<?php echo $nextPage; ?>" data-mode="append" data-target="[data-pagination-append]" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;">
+        <a <?=$linkAttributes?> href="<?php echo $nextUrl; ?>" class="load-more-btn" data-page="<?php echo $nextPage; ?>" data-mode="append" data-target="[data-pagination-append]" data-history="none" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;">
             Load More
         </a>
     <?php else: ?>
@@ -54,7 +54,11 @@
 
     a.setAttribute('aria-busy', 'true');
 
-    fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' }})
+    // Decide the history behavior from data-attributes
+    var historyMode = a.getAttribute('data-history') || 'push'; // 'push' | 'replace' | 'none'
+    var fetchOptions = { headers: { 'X-Requested-With': 'XMLHttpRequest' } };
+
+    fetch(href, fetchOptions)
       .then(function(res){ return res.text(); })
       .then(function(html){
         var parser = new DOMParser();
@@ -85,9 +89,13 @@
           curShowing.innerHTML = newShowing.innerHTML;
         }
 
-        try { window.history.pushState({}, '', href); } catch(_e) {}
+        // Manage history
+        try {
+          if(historyMode === 'push') window.history.pushState({}, '', a.getAttribute('href'));
+          else if(historyMode === 'replace') window.history.replaceState({}, '', a.getAttribute('href'));
+        } catch(_e) {}
       })
-      .catch(function(){ window.location.href = href; })
+      .catch(function(){ window.location.href = a.getAttribute('href'); })
       .finally(function(){ a.removeAttribute('aria-busy'); });
   });
 })();
