@@ -1,5 +1,5 @@
 <?php
-  // Prepare variables in one scope (no JS added here)
+  // Prepare variables in one scope 
   $page = $this->pagination->page;
   $totalPages = $this->pagination->pageCount;
   $isFirst = $page <= 1;
