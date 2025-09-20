@@ -1,10 +1,16 @@
 <div class="load-more-container" data-pagination-scope style="text-align: center; margin: 20px 0;">
     <?php
+        // Prepare variables in one scope
         $page = $this->pagination->page;
         $totalPages = $this->pagination->pageCount;
+        $isFirst = $page <= 1;
         $isLast = $page >= $totalPages;
-        $nextPage = $page + 1;
+        $prevPage = max(1, $page - 1);
+        $nextPage = min($totalPages, $page + 1);
+        $firstUrl = $this->pagination->createUrl(1);
+        $prevUrl = $this->pagination->createUrl($prevPage);
         $nextUrl = $this->pagination->createUrl($nextPage);
+        $lastUrl = $this->pagination->createUrl($totalPages);
     ?>
     <?php if (!$isLast): ?>
         <a <?=$linkAttributes?> href="<?php echo $nextUrl; ?>" class="load-more-btn" data-page="<?php echo $nextPage; ?>" data-mode="append" data-target="[data-pagination-append]" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;">
@@ -17,8 +23,8 @@
 <script>
 // Lightweight progressive AJAX for pagination (load-more friendly)
 (function(){
-  if(window.__TAME_PAGINATION_INITED__) return; // Guard against multiple inits
-  window.__TAME_PAGINATION_INITED__ = true;
+  if(window.__TAME_PAGINATION_LOADING_INITED__) return; // Guard against multiple inits for loading view
+  window.__TAME_PAGINATION_LOADING_INITED__ = true;
 
   function closestAnchor(el){
     while(el && el !== document){
@@ -29,15 +35,14 @@
   }
 
   document.addEventListener('click', function(e){
-
-    e.preventDefault();
-
     var a = closestAnchor(e.target);
     if(!a) return;
     if(a.getAttribute('data-pagination') !== 'ajax') return;
-
     var href = a.getAttribute('href');
     if(!href) return;
+
+    // Only prevent default if this is our AJAX pagination link
+    e.preventDefault();
 
     var mode = a.getAttribute('data-mode') || 'replace';
     var targetSelector = a.getAttribute('data-target') || '[data-pagination-content]';

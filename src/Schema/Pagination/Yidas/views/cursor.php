@@ -1,11 +1,24 @@
 <div data-pagination-scope>
+  <?php
+    // Prepare variables in one scope
+    $page = $this->pagination->page;
+    $totalPages = $this->pagination->pageCount;
+    $isFirst = $page <= 1;
+    $isLast = $page >= $totalPages;
+    $prevPage = max(1, $page - 1);
+    $nextPage = min($totalPages, $page + 1);
+    $firstUrl = $this->pagination->createUrl(1);
+    $prevUrl = $this->pagination->createUrl($prevPage);
+    $nextUrl = $this->pagination->createUrl($nextPage);
+    $lastUrl = $this->pagination->createUrl($totalPages);
+  ?>
   <div class="pagination ">
   
     <div class="pagination-cursor">
       <?php if($isFirst):?>
           <span <?=$linkAttributes?>><?=$this->prevPageLabel?></span>
         <?php else: ?>
-          <a <?=$linkAttributes?> data-target="[data-pagination-content]" href="<?=$this->pagination->createUrl($page-1);?>"><?=$this->prevPageLabel?></a>
+          <a <?=$linkAttributes?> data-target="[data-pagination-content]" href="<?=$prevUrl?>"><?=$this->prevPageLabel?></a>
       <?php endif ?>
     
       <?php foreach ($this->_buttonStack as $key => $btnPage): ?>
@@ -15,7 +28,7 @@
       <?php if($isLast):?>
           <span <?=$linkAttributes?>><?=$this->nextPageLabel?></span>
         <?php else: ?>
-          <a <?=$linkAttributes?> data-target="[data-pagination-content]" href="<?=$this->pagination->createUrl($page+1);?>"><?=$this->nextPageLabel?></a>
+          <a <?=$linkAttributes?> data-target="[data-pagination-content]" href="<?=$nextUrl?>"><?=$this->nextPageLabel?></a>
       <?php endif ?>
     </div>
   
@@ -24,8 +37,8 @@
 <script>
 // Lightweight progressive AJAX for pagination (cursor view)
 (function(){
-  if(window.__TAME_PAGINATION_INITED__) return;
-  window.__TAME_PAGINATION_INITED__ = true;
+  if(window.__TAME_PAGINATION_CURSOR_INITED__) return; // Guard for cursor view only
+  window.__TAME_PAGINATION_CURSOR_INITED__ = true;
 
   function closestAnchor(el){
     while(el && el !== document){ if(el.tagName === 'A') return el; el = el.parentNode; }
@@ -36,8 +49,11 @@
     var a = closestAnchor(e.target);
     if(!a) return;
     if(a.getAttribute('data-pagination') !== 'ajax') return;
+
     var href = a.getAttribute('href');
     if(!href) return;
+
+    // Prevent default only for our ajax link
     e.preventDefault();
 
     var targetSelector = a.getAttribute('data-target') || '[data-pagination-content]';

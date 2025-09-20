@@ -1,3 +1,16 @@
+<?php
+  // Prepare variables in one scope (no JS added here)
+  $page = $this->pagination->page;
+  $totalPages = $this->pagination->pageCount;
+  $isFirst = $page <= 1;
+  $isLast = $page >= $totalPages;
+  $prevPage = max(1, $page - 1);
+  $nextPage = min($totalPages, $page + 1);
+  $firstUrl = $this->pagination->createUrl(1);
+  $prevUrl = $this->pagination->createUrl($prevPage);
+  $nextUrl = $this->pagination->createUrl($nextPage);
+  $lastUrl = $this->pagination->createUrl($totalPages);
+?>
 <nav aria-label="Page navigation example">
   <ul class="pagination <?php if($this->alignCenter):?>justify-content-center<?php endif?> <?=$this->ulCssClass?>">
     
@@ -6,7 +19,7 @@
         <?php if($isFirst):?>
           <span <?=$linkAttributes?> class="page-link"><?=$this->firstPageLabel?></span>
         <?php else: ?>
-          <a <?=$linkAttributes?> class="page-link" href="<?=$this->pagination->createUrl(1);?>"><?=$this->firstPageLabel?></a>
+          <a <?=$linkAttributes?> class="page-link" href="<?=$firstUrl?>"><?=$this->firstPageLabel?></a>
         <?php endif ?>
       </li>
     <?php endif ?>
@@ -15,7 +28,7 @@
         <?php if($isFirst):?>
           <span <?=$linkAttributes?> class="page-link"><?=$this->prevPageLabel?></span>
         <?php else: ?>
-          <a <?=$linkAttributes?> class="page-link" href="<?=$this->pagination->createUrl($page-1);?>"><?=$this->prevPageLabel?></a>
+          <a <?=$linkAttributes?> class="page-link" href="<?=$prevUrl?>"><?=$this->prevPageLabel?></a>
         <?php endif ?>
     </li>
 
@@ -29,7 +42,7 @@
       <?php if($isLast):?>
         <span <?=$linkAttributes?> class="page-link"><?=$this->nextPageLabel?></span>
       <?php else: ?>
-        <a <?=$linkAttributes?> class="page-link" href="<?=$this->pagination->createUrl($page+1);?>"><?=$this->nextPageLabel?></a>
+        <a <?=$linkAttributes?> class="page-link" href="<?=$nextUrl?>"><?=$this->nextPageLabel?></a>
       <?php endif ?>
     </li>
 
@@ -38,7 +51,7 @@
         <?php if($isLast):?>
           <span <?=$linkAttributes?> class="page-link"><?=$this->lastPageLabel?></span>
         <?php else: ?>
-          <a <?=$linkAttributes?> class="page-link" href="<?=$this->pagination->createUrl($this->pagination->pageCount);?>"><?=$this->lastPageLabel?></a>
+          <a <?=$linkAttributes?> class="page-link" href="<?=$lastUrl?>"><?=$this->lastPageLabel?></a>
         <?php endif ?>
       </li>
     <?php endif ?>

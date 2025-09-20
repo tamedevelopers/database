@@ -9,7 +9,7 @@ $database = DB::connection();
 
 config_pagination([
     'allow' => true,
-    'view' => 'loading' //bootstrap|loading|simple/cursor[default]
+    'view' => 'bootstrap' //bootstrap|loading|simple/cursor[default]
 ]);
 
 // dd(
