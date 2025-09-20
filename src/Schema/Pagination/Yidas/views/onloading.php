@@ -1,6 +1,5 @@
 <div class="onload-container" data-pagination-scope style="text-align: center; margin: 20px 0;">
   <?php
-    // Prepare variables
     $page = $this->pagination->page;
     $totalPages = $this->pagination->pageCount;
     $isLast = $page >= $totalPages;
@@ -17,78 +16,115 @@
   </div>
 
   <?php if(!$isLast): ?>
-    <a <?=$linkAttributes?> href="<?=$nextUrl?>" class="onload-trigger" data-page="<?=$nextPage?>" data-mode="append" data-target="[data-pagination-append]" data-history="push" style="display:none;">Next</a>
+    <a <?=$linkAttributes?>
+       href="<?=$nextUrl?>"
+       class="onload-trigger"
+       data-page="<?=$nextPage?>"
+       data-mode="append"
+       data-target="[data-pagination-append]"
+       data-history="none"
+       data-pagination="ajax"
+       style="display:none;">Next</a>
   <?php endif; ?>
 </div>
-<script>
-// Infinite scroll (onloading view)
-(function(){
-  if(window.__TAME_PAGINATION_ONLOADING_INITED__) return; // Guard against multiple inits
-  window.__TAME_PAGINATION_ONLOADING_INITED__ = true;
 
-  function closestAnchor(el){
-    while(el && el !== document){ if(el.tagName === 'A') return el; el = el.parentNode; }
-    return null;
-  }
+<script>
+(function(){
+  if(window.__TAME_PAGINATION_SCROLL_INITED__) return;
+  window.__TAME_PAGINATION_SCROLL_INITED__ = true;
 
   function setupInfinite(scope){
-    var link = scope.querySelector('.onload-trigger');
+    let link = scope.querySelector('.onload-trigger');
     if(!link) return;
 
-    var sentinel = document.createElement('div');
-    sentinel.setAttribute('data-onload-sentinel', '');
-    sentinel.style.cssText = 'height: 1px;';
+    const targetSelector = link.getAttribute('data-target') || '[data-pagination-content]';
+    const container = document.querySelector(targetSelector);
+    if(!container) return;
 
-    var targetSelector = link.getAttribute('data-target') || '[data-pagination-content]';
-    var container = document.querySelector(targetSelector);
-    if(!container){ return; }
+    // sentinel inside scope, not after container
+    let sentinel = document.createElement('div');
+    sentinel.setAttribute('data-onload-sentinel','');
+    sentinel.style.cssText = 'height:1px;';
+    scope.appendChild(sentinel);
 
-    // place sentinel after container to detect end of list
-    container.parentNode.insertBefore(sentinel, container.nextSibling);
+    let loading = false;
+    let loadedPages = new Set();
 
-    var loading = false;
-    var observer = new IntersectionObserver(function(entries){
+    let observer = new IntersectionObserver(function(entries){
       entries.forEach(function(entry){
         if(entry.isIntersecting && !loading){
+          let page = link.getAttribute('data-page');
+          if(loadedPages.has(page)) return;
+
           loading = true;
-          link.click(); // reuse existing click/AJAX logic
-          setTimeout(function(){ loading = false; }, 50);
+          loadedPages.add(page);
+
+          loadPage(link, container, scope).then(function(result){
+            scope = result.newScope;
+            link = scope.querySelector('.onload-trigger');
+            let stillHasNext = result.stillHasNext;
+
+            if(stillHasNext){
+              sentinel.remove();
+              sentinel = document.createElement('div');
+              sentinel.setAttribute('data-onload-sentinel','');
+              sentinel.style.cssText = 'height:1px;';
+              scope.appendChild(sentinel);
+              observer.observe(sentinel);
+              loading = false;
+            } else {
+              observer.disconnect();
+              sentinel.remove();
+            }
+          }).catch(function(){
+            window.location.href = link.getAttribute('href');
+          });
         }
       });
-    }, { rootMargin: '0px 0px 200px 0px' });
+    }, { threshold: 1.0 });
 
     observer.observe(sentinel);
+  }
 
-    // Cleanup if controls are replaced
-    scope.addEventListener('DOMNodeRemoved', function(ev){
-      if(ev.target === scope){ try{ observer.disconnect(); }catch(_e){} }
+  function loadPage(a, container, scope){
+    return new Promise(function(resolve, reject){
+      let href = a.getAttribute('href');
+      let mode = a.getAttribute('data-mode') || 'replace';
+
+      fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(res => res.text())
+        .then(html => {
+          let parser = new DOMParser();
+          let doc = parser.parseFromString(html, 'text/html');
+
+          let newContainer = doc.querySelector(a.getAttribute('data-target'));
+          let newScope = doc.querySelector('[data-pagination-scope]');
+          if(!newContainer || !newScope) return reject();
+
+          if(mode === 'append'){
+            while(newContainer.firstChild){
+              container.appendChild(newContainer.firstChild);
+            }
+          } else {
+            container.innerHTML = newContainer.innerHTML;
+          }
+
+          scope.replaceWith(newScope);
+
+          // update "showing"
+          let newShowing = doc.querySelector('[data-pagination-showing]');
+          let curShowing = document.querySelector('[data-pagination-showing]');
+          if(newShowing && curShowing){
+            curShowing.innerHTML = newShowing.innerHTML;
+          }
+
+          let nextLink = newScope.querySelector('.onload-trigger');
+          resolve({ newScope: newScope, stillHasNext: !!nextLink });
+        })
+        .catch(reject);
     });
   }
 
-  // Delegate click to reuse loading view behavior with history
-  document.addEventListener('click', function(e){
-    var a = closestAnchor(e.target);
-    if(!a) return;
-    if(a.classList.contains('onload-trigger')){
-      // Ensure it is treated as AJAX pagination
-      a.setAttribute('data-pagination', 'ajax');
-    }
-  });
-
-  // Initialize for current scope
-  document.querySelectorAll('[data-pagination-scope]').forEach(function(scope){
-    if(scope.closest('.onload-container')){ setupInfinite(scope); }
-  });
-
-  // After AJAX replacement, re-init when new scope appears
-  var mo = new MutationObserver(function(){
-    document.querySelectorAll('[data-pagination-scope]').forEach(function(scope){
-      if(scope.closest('.onload-container') && !scope.__onloadInited){
-        scope.__onloadInited = true;
-        setupInfinite(scope);
-      }
-    });
-  });
-  mo.observe(document.documentElement, { childList: true, subtree: true });
+  document.querySelectorAll('[data-pagination-scope]').forEach(setupInfinite);
 })();
 </script>

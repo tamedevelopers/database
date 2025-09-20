@@ -16,7 +16,7 @@ $wallets = $database->table('wallet')
                     ->where('amount', '>', 0)
                     ->join('user', 'user.user_id', '=', 'wallet.user_id')
                     ->latest('date')
-                    ->paginate(6);
+                    ->paginate(7);
 ?>
 
 
