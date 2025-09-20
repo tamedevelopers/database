@@ -7,6 +7,11 @@ include_once __DIR__ . "/../vendor/autoload.php";
 
 $database = DB::connection();
 
+config_pagination([
+    'allow' => true,
+    'view' => 'loading' //bootstrap|loading|simple/cursor[default]
+]);
+
 // dd(
 //     DB::table('wallet'),
 //     $database->table('country'),

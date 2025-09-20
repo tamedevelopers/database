@@ -695,7 +695,7 @@ $another->logout();  // clears in-memory and session
 | allow     | `true` \| `false`         | Default `false` Setting to true will allow the system use this settings across app|
 | class     | string                    | Css `selector` For pagination ul tag in the browser |
 | span      | string                    | Default `.page-span` Css `selector` For pagination Showing Span tags in the browser |
-| view      | `bootstrap` \| `simple` \| `cursor` | Default `simple` - For pagination design |
+| view      | `bootstrap` \| `cursor` \| `loading` | Default `simple` - For pagination design |
 | first     | string                    | Change the letter `First` |
 | last      | string                    | Change the letter `Last` |
 | next      | string                    | Change the letter `Next` |

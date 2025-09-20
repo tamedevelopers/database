@@ -45,6 +45,7 @@ class PaginatorAsset
             'bootstrap' => 'bootstrap',
             'simple'    => 'simple',
             'cursor'    => 'cursor',
+            'loading'   => 'loading',
         ];
 
         return $data[$mode] ?? $data;
@@ -80,15 +81,21 @@ class PaginatorAsset
                 return self::getSimpleCss();
             } elseif($mode == self::views('bootstrap')){
                 return self::getBootstrapCss();
-            } 
-            return self::getCursorCss();
+            } elseif($mode == self::views('loading')){
+                return self::getLoadingCss();
+            } else {
+                return self::getCursorCss();
+            }
         } elseif(STYLE_EXISTS != $mode){
             if($mode == self::views('simple')){
                 return self::getSimpleCss();
             } elseif($mode == self::views('bootstrap')){
                 return self::getBootstrapCss();
-            } 
-            return self::getCursorCss();
+            } elseif($mode == self::views('loading')){
+                return self::getLoadingCss();
+            } else {
+                return self::getCursorCss();
+            }
         }
     }
     
@@ -129,6 +136,18 @@ class PaginatorAsset
     }
 
     /**
+     * Return loading pagination css style
+     *
+     * @return string
+     */
+    public static function getLoadingCss()
+    {
+        return self::compressCss("<style>
+            .load-more-container{text-align: center;margin: 20px 0;}.load-more-btn{background-color: #1098ad;color: #fff;border: none;padding: 10px 20px;border-radius: 5px;cursor: pointer;font-weight: 600;}.load-more-btn:hover{background-color: #0e7a8a;}
+        </style>");
+    }
+
+    /**
      * Compresses CSS by removing comments, compressing spaces, and trimming the resulting string.
      *
      * @param string $s The CSS string to compress
@@ -157,3 +176,5 @@ class PaginatorAsset
         return trim($string);
     }
 }
+
+

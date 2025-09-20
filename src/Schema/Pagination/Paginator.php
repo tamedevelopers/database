@@ -112,7 +112,7 @@ class Paginator extends Builder{
                                                 : $this->asset->texts('view');
         }
 
-        // helps to use one simple settings for all pagination within applicaiton life circle
+        // helps to use one settings for all pagination within applicaiton life circle
         $this->use_global = $this->pagination_settings['allow'];
 
         return $this;
@@ -218,10 +218,14 @@ class Paginator extends Builder{
     private function paginationViews(?array $options = [])
     {
         // if bootstrap view
-        if(Str::lower($options['view']) == $this->asset->views('bootstrap')){
+        $view = Str::lower($options['view']);
+
+        if($view == $this->asset->views('bootstrap')){
             $this->pagination_css = $this->asset->views('bootstrap');
-        } elseif(Str::lower($options['view']) == $this->asset->views('simple')){
+        } elseif($view == $this->asset->views('simple')){
             $this->pagination_css = $this->asset->views('simple');
+        } elseif($view == $this->asset->views('loading')){
+            $this->pagination_css = $this->asset->views('loading');
         } else{
             $this->pagination_css = $this->asset->views('cursor');
         }

@@ -150,7 +150,7 @@ if (! function_exists('config_pagination')) {
      * - allow     | true\false         | Default `false` Setting to true will allow the system use this settings across app 
      * - class     | string             | Css `selector` For pagination ul tag in the browser 
      * - span      | string             | Css `selector` For pagination Showing Span tags in the browser 
-     * - view      | bootstrap\simple   | Default `simple` - For pagination design 
+     * - view      | bootstrap\cursor\loading   | Default `simple` - For pagination design 
      * - first     | string             | Change the letter of `First`
      * - last      | string             | Change the letter of `Last`
      * - next      | string             | Change the letter of `Next`

@@ -1445,9 +1445,9 @@ class Builder  {
         $results = $paginator->getPagination($totalCount, $perPage, $this);
 
 
-        dd(
-            $results
-        );
+        // dd(
+        //     $results
+        // );
         
         return new Collection($results['data'], $results['builder']);
     }

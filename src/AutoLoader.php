@@ -120,7 +120,7 @@ class AutoLoader
         $default['view'] = in_array($default['view'], $getViews)
                             ? $options['view'] 
                             : $text['view'];
-
+        
         /*
         |--------------------------------------------------------------------------
         | Adding Pagination Configuration into Constant
