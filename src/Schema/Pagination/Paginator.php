@@ -87,29 +87,20 @@ class Paginator extends Builder{
     public function configPagination(?array $options = [])
     {
         // trying to us global AutoLoader::configPagination data
-        if(defined('TAME_PAGI_CONFIG') && is_bool(TAME_PAGI_CONFIG['allow']) && TAME_PAGI_CONFIG['allow'] === true){
+        if(defined('TAME_PAGI_CONFIG') && TAME_PAGI_CONFIG['allow'] === true){
             $this->pagination_settings = TAME_PAGI_CONFIG;
         }else{
-            // create a default data
-            $this->pagination_settings = array_merge([
-                'allow'     => false,
-                'class'     => null,
-                'view'      => null,
-                'first'     => $this->asset->texts('first'),
-                'last'      => $this->asset->texts('last'),
-                'next'      => $this->asset->texts('next'),
-                'prev'      => $this->asset->texts('prev'),
-                'span'      => $this->asset->texts('span'),
-                'showing'   => $this->asset->texts('showing'),
-                'of'        => $this->asset->texts('of'),
-                'results'   => $this->asset->texts('results'),
-                'buttons'   => $this->asset->texts('buttons'),
-            ], $options);
+            // merge text options
+            $default = array_merge([ 
+                'allow' => false,
+                'class' => null,
+            ], $this->asset->texts());
 
-            // get actual view
-            $this->pagination_settings['view'] = in_array($this->pagination_settings['view'], $this->asset->views()) 
-                                                ? $options['view'] 
-                                                : $this->asset->texts('view');
+            // remerge view options
+            $default = array_merge($default, $options);
+
+            // attach data to property
+            $this->pagination_settings = $default;
         }
 
         // helps to use one settings for all pagination within applicaiton life circle
@@ -149,6 +140,8 @@ class Paginator extends Builder{
             'lastPageLabel'     => $settings['last'],
             'nextPageLabel'     => $settings['next'],
             'prevPageLabel'     => $settings['prev'],
+            'loadMoreLabel'     => $settings['load_more'],
+            'noContentLabel'    => $settings['no_content'],
             'buttonCount'       => $settings['buttons'],
             // Enable AJAX by default with progressive enhancement
             'linkAttributes'    => ['data-pagination' => 'ajax'],

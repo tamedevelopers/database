@@ -93,33 +93,23 @@ class AutoLoader
      */
     public static function configPagination(?array $options = [])
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Create default path and bg for errors
-        |--------------------------------------------------------------------------
-        */
-        $text       = PaginatorAsset::texts();
-        $getViews   = PaginatorAsset::views();
-        
-        $default = array_merge([
-            'allow'     => 'disallow',
-            'class'     => null,
-            'view'      => null,
-            'first'     => $text['first'],
-            'last'      => $text['last'],
-            'next'      => $text['next'],
-            'prev'      => $text['prev'],
-            'span'      => $text['span'],
-            'showing'   => $text['showing'],
-            'of'        => $text['of'],
-            'results'   => $text['results'],
-            'buttons'   => $text['buttons'],
-        ], $options);
+        // Create default path and bg for errors
+        $text     = PaginatorAsset::texts();
+        $getViews = PaginatorAsset::views();
 
-        // get actual view
-        $default['view'] = in_array($default['view'], $getViews)
-                            ? $options['view'] 
-                            : $text['view'];
+        // merge text options
+        $default = array_merge([ 
+            'allow' => 'disallow',
+            'class' => null,
+        ], $text);
+
+        // remerge view options
+        $default = array_merge($default, $options);
+
+        // replace with actual view if not found
+        if(!in_array($default['view'], $getViews)){
+            $default['view'] = $text['view'];
+        }
         
         /*
         |--------------------------------------------------------------------------

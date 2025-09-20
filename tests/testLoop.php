@@ -123,7 +123,9 @@ $wallets = $database->table('wallet')
 
     <!-- pagination links -->
     <div>
-        <?= $wallets->links(); ?>
+        <?= $wallets->links([
+            'no_content' => 'All Wallets has been loaded.'
+        ]); ?>
     </div>
 </body>
 </html>

@@ -12,12 +12,13 @@
         $nextUrl = $this->pagination->createUrl($nextPage);
         $lastUrl = $this->pagination->createUrl($totalPages);
     ?>
+    
     <?php if (!$isLast): ?>
         <a <?=$linkAttributes?> href="<?php echo $nextUrl; ?>" class="load-more-btn" data-page="<?php echo $nextPage; ?>" data-mode="append" data-target="[data-pagination-append]" data-history="none" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;">
-            Load More
+          <?=$this->loadMoreLabel?>
         </a>
     <?php else: ?>
-        <p>No more content to load.</p>
+        <p><?=$this->noContentLabel?></p>
     <?php endif; ?>
 </div>
 <script>

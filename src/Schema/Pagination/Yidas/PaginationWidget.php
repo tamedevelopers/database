@@ -69,6 +69,20 @@ class PaginationWidget
      * @var string
      */
     public $prevPageLabel = 'Prev';
+
+    /**
+     * The text label for the "load more" page button
+     *
+     * @var string
+     */
+    public $loadMoreLabel = 'Load More';
+
+    /**
+     * The text label for the "No more content to load." page button
+     *
+     * @var string
+     */
+    public $noContentLabel = 'No more content to load.';
     
     /**
      * The CSS class for the "first" page button

@@ -27,6 +27,8 @@ class PaginatorAsset
             'results'   => 'results',
             'view'      => 'simple',
             'buttons'   => 5,
+            'load_more' => 'Load More',
+            'no_content'=> 'No more content to load.',
         ];
 
         return $data[$mode] ?? $data;
@@ -87,7 +89,7 @@ class PaginatorAsset
             } else {
                 return self::getCursorCss();
             }
-        } elseif(STYLE_EXISTS != $mode){
+        } elseif(defined('STYLE_EXISTS') && STYLE_EXISTS != $mode){
             if($mode == self::views('simple')){
                 return self::getSimpleCss();
             } elseif($mode == self::views('bootstrap')){

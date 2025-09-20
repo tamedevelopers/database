@@ -695,7 +695,7 @@ $another->logout();  // clears in-memory and session
 | allow     | `true` \| `false`         | Default `false` Setting to true will allow the system use this settings across app|
 | class     | string                    | Css `selector` For pagination ul tag in the browser |
 | span      | string                    | Default `.page-span` Css `selector` For pagination Showing Span tags in the browser |
-| view      | `bootstrap` \| `cursor` \| `loading` | Default `simple` - For pagination design |
+| view      | `bootstrap` \| `cursor` \| `loading` \| `onloading` | Default `simple` - For pagination design |
 | first     | string                    | Change the letter `First` |
 | last      | string                    | Change the letter `Last` |
 | next      | string                    | Change the letter `Next` |
@@ -704,7 +704,6 @@ $another->logout();  // clears in-memory and session
 | of        | string                    | Change the letter `of`      |
 | results   | string                    | Change the letter `results` |
 | buttons   | int                       | Numbers of pagination links to generate. Default is 5 and limit is 20 |
-
 
 ### Global Configuration 
 - 1 Setup global pagination on ENV autostart `most preferred` method
@@ -741,8 +740,7 @@ $users->links();
 <details><summary>Read more...</summary>
 
 - You can directly configure pagination links
-    - Note: If `configPagination()` `allow` is set to `true`
-    - It'll override every other settings
+    - It'll override the global settings
 
 ```php
 $users->links([
@@ -750,6 +748,7 @@ $users->links([
     'last'  => 'Last Page',
     'prev'  => 'Previous Page',
     'next'  => 'Next Page',
+    'no_content'  => 'All videos has been loaded',
 ])
 ```
 </details>

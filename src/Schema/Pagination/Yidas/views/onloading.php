@@ -1,34 +1,36 @@
 <div class="onload-container" data-pagination-scope style="text-align: center; margin: 20px 0;">
-  <?php
-    $page = $this->pagination->page;
-    $totalPages = $this->pagination->pageCount;
-    $isLast = $page >= $totalPages;
-    $nextPage = min($totalPages, $page + 1);
-    $nextUrl = $this->pagination->createUrl($nextPage);
-  ?>
+    <?php
+      // Prepare variables in one scope
+      $page = $this->pagination->page;
+      $totalPages = $this->pagination->pageCount;
+      $isLast = $page >= $totalPages;
+      $nextPage = min($totalPages, $page + 1);
+      $nextUrl = $this->pagination->createUrl($nextPage);
+    ?>
 
-  <div class="onload-status" aria-live="polite" aria-atomic="true" style="margin:10px 0;">
+    <div class="onload-status" aria-live="polite" aria-atomic="true" style="margin:10px 0;">
+      <?php if(!$isLast): ?>
+        <span class="onload-text">...</span> <!-- Loading ... -->
+      <?php else: ?>
+        <span class="onload-text"><?=$this->noContentLabel?></span>
+      <?php endif; ?>
+    </div>
+
     <?php if(!$isLast): ?>
-      <span class="onload-text">Loading on scroll...</span>
-    <?php else: ?>
-      <span class="onload-text">No more content to load.</span>
+      <a <?=$linkAttributes?>
+        href="<?=$nextUrl?>"
+        class="onload-trigger"
+        data-page="<?=$nextPage?>"
+        data-mode="append"
+        data-target="[data-pagination-append]"
+        data-history="none"
+        data-pagination="ajax"
+        style="display:none;">Next</a>
     <?php endif; ?>
-  </div>
-
-  <?php if(!$isLast): ?>
-    <a <?=$linkAttributes?>
-       href="<?=$nextUrl?>"
-       class="onload-trigger"
-       data-page="<?=$nextPage?>"
-       data-mode="append"
-       data-target="[data-pagination-append]"
-       data-history="none"
-       data-pagination="ajax"
-       style="display:none;">Next</a>
-  <?php endif; ?>
 </div>
 
 <script>
+// Lightweight progressive AJAX for pagination (load-more friendly)
 (function(){
   if(window.__TAME_PAGINATION_SCROLL_INITED__) return;
   window.__TAME_PAGINATION_SCROLL_INITED__ = true;
