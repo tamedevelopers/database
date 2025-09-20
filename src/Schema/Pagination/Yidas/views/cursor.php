@@ -22,7 +22,7 @@
       <?php endif ?>
     
       <?php foreach ($this->_buttonStack as $key => $btnPage): ?>
-        <a <?=$linkAttributes?> data-target="[data-pagination-content]" class="<?php if(($page)==$btnPage):?>active<?php endif ?>" href="<?=$this->pagination->createUrl($btnPage);?>"><?=$btnPage?></a>
+        <a class="<?php if(($page)==$btnPage):?>active<?php endif ?>" href="javascript:void(0)"><?=$btnPage?></a>
       <?php endforeach ?>
       
       <?php if($isLast):?>
