@@ -12,8 +12,7 @@ class Constant{
     const STATUS_200  = 200;
     const COUNT       = 0;
     const ONE         = 1;
-
-
+    
     /**
      * Format Migration Table Name
      *
