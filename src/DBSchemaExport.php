@@ -109,8 +109,7 @@ class DBSchemaExport
      * @param array|null $onlyTables  List of tables to include (null = all)
      * @param array|null $exceptTables  List of tables to exclude
      * 
-     * @return \Tamedevelopers\Support\Collections\Collection  
-     * [status, path, message]
+     * @return \Tamedevelopers\Support\Collections\Collection|mixed {status, message, path}
      */
     public function run($onlyTables = null, $exceptTables = null)
     {

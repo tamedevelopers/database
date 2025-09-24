@@ -91,7 +91,7 @@ class DBImport{
      * Run the database import process.
      * @param string|null path
      * 
-     * @return object
+     * @return \Tamedevelopers\Support\Collections\Collection|mixed {status, message}
      * [status, message]
      */
     protected function import($path = null)

@@ -117,8 +117,7 @@ class DBExport
      *
      * @param string $backupDir Directory to store the backup
      * 
-     * @return \Tamedevelopers\Support\Collections\Collection
-     * [status, message, path]
+     * @return \Tamedevelopers\Support\Collections\Collection|mixed {status, message, path}
      * 
      * @throws \RuntimeException
      */
