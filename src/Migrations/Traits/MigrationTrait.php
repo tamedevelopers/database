@@ -78,7 +78,7 @@ trait MigrationTrait{
         $path = self::getDummyParts();
 
         // get directory
-        $dummyPath = match ($type) {
+        $dummyPath = match (true) {
             !empty($type) && in_array($type, ['job', 'jobs']) => $path['job'],
             !empty($type) && in_array($type, ['session', 'sessions']) => $path['session'],
             default => $path['default'],

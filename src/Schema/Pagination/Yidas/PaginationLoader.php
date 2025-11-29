@@ -272,7 +272,7 @@ class PaginationLoader
         // Parse the query string into an associative array
         parse_str($REQUEST_URI, $query_params);
 
-        // remove keys assisnged to pagination
+        // remove keys assinged to pagination
         foreach($query_params as $key => $param){
             if(in_array($key, array_keys($mainParams))){
                 unset($query_params[$key]);

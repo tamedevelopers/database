@@ -8,10 +8,11 @@ use PDO;
 use PDOException;
 use Tamedevelopers\Support\Str;
 use Tamedevelopers\Database\Constant;
+use Tamedevelopers\Support\Capsule\File;
 use Tamedevelopers\Database\Schema\Builder;
+use Tamedevelopers\Database\Schema\Traits\BuilderTrait;
 use Tamedevelopers\Database\Connectors\ConnectorInterface;
 use Tamedevelopers\Database\Connectors\Traits\ConnectorTrait;
-use Tamedevelopers\Database\Schema\Traits\BuilderTrait;
 
 class SQLiteConnector implements ConnectorInterface
 {
@@ -41,7 +42,11 @@ class SQLiteConnector implements ConnectorInterface
         try {
             // Expect database path in $config['database'] (file path or :memory:)
             $database = $config['database'] ?? ':memory:';
-            $dsn = "sqlite:" . $database;
+            $dsn = "sqlite:{$database}";
+
+            if(!Str::contains('.sqlite', $dsn)) {
+                $dsn = "sqlite:" . database_path("{$database}.sqlite");
+            }
 
             $pdo = new PDO($dsn, null, null, self::$options);
 
@@ -56,7 +61,7 @@ class SQLiteConnector implements ConnectorInterface
                 'pdo'       => null,
                 'config'    => $config,
                 'status'    => Constant::STATUS_400,
-                'message'   => $e->getMessage(),
+                'message'   => "{$e->getMessage()} [sqlite]",
             ];
         }
 

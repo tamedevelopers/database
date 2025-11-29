@@ -19,9 +19,9 @@ class MakeCommand extends CommandHelper
      */
     public function handle()
     {
-        Logger::helpHeader('<yellow>Usage:</yellow>');
-        Logger::writeln('  php tame make:migration admins');
-        Logger::writeln('  php tame make:migration create_users_table --create=users');
+        $this->handleHeader('make');
+        Logger::writeln('  make:migration admins');
+        Logger::writeln('  make:migration create_users_table --create=users');
         Logger::writeln('');
     }
 

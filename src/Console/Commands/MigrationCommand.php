@@ -24,17 +24,17 @@ class MigrationCommand extends CommandHelper
      */
     public function handle()
     {
-        Logger::helpHeader('<yellow>Usage:</yellow>');
-        Logger::writeln('  php tame migrate:fresh --seed --force');
-        Logger::writeln('  php tame migrate:refresh');
-        Logger::writeln('  php tame migrate:status');
-        Logger::writeln('  php tame migrate:reset');
+        $this->handleHeader('migrate');
+        Logger::writeln('  migrate:fresh --seed --force');
+        Logger::writeln('  migrate:refresh');
+        Logger::writeln('  migrate:status');
+        Logger::writeln('  migrate:reset');
         Logger::writeln('');
     }
 
     /**
      * Drop all tables and re-run all migrations
-     * Subcommand: php tame migrate:fresh
+     * Subcommand: migrate:fresh
      */
     public function fresh()
     {
@@ -50,7 +50,7 @@ class MigrationCommand extends CommandHelper
         $migration = new Migration();
         $response = $migration->run();
 
-        if($response['status'] != Constant::STATUS_200){
+        if(!$this->dbConnect($response)){
             $this->error($response['message']);
             if($this->isConsole()){
                 exit(0);
@@ -83,7 +83,7 @@ class MigrationCommand extends CommandHelper
         $migration = new Migration();
         $response = $migration->drop($force);
 
-        if ($response['status'] != Constant::STATUS_200) {
+        if (!$this->dbConnect($response)) {
             $this->error($response['message']);
             return 0;
         }
@@ -177,4 +177,11 @@ class MigrationCommand extends CommandHelper
         return 1;
     }
 
+    /** Check Database connection */
+    private function dbConnect($response): bool
+    {
+        $status = $response['status'] ?? null;
+
+        return $status == Constant::STATUS_200;
+    }
 }

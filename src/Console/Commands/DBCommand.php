@@ -22,18 +22,18 @@ class DBCommand extends CommandHelper
      */
     public function handle()
     {
-        Logger::writeln('<yellow>Usage:</yellow>');
-        Logger::writeln('  php tame db:seed');
-        Logger::writeln('  php tame db:wipe');
-        Logger::writeln('  php tame db:import --connection=woocommerce --path=tests/database/orm.sql');
-        Logger::writeln('  php tame db:export --connection=woocommerce --as=zip --days=5');
-        Logger::writeln('  php tame db:schema --connection= --path= --type=[orm|laravel]');
+        $this->handleHeader('db');
+        Logger::writeln('  db:seed');
+        Logger::writeln('  db:wipe');
+        Logger::writeln('  db:import --connection=woocommerce --path=tests/database/orm.sql');
+        Logger::writeln('  db:export --connection=woocommerce --as=zip --days=5');
+        Logger::writeln('  db:schema --connection= --path= --type=[orm|laravel]');
         Logger::writeln('');
     }
 
     /**
      * Seed the database with records
-     * Subcommand: php tame db:seed
+     * Subcommand: db:seed
      */
     public function seed()
     {
@@ -42,7 +42,7 @@ class DBCommand extends CommandHelper
 
     /**
      * Generate a migration Schema from a Database using [.sql]
-     * Subcommand: php tame db:seed
+     * Subcommand: db:seed
      */
     public function schema()
     {
@@ -79,7 +79,7 @@ class DBCommand extends CommandHelper
 
     /**
      * Import a Database [.sql] file into the database
-     * Subcommand: php tame db:seed
+     * Subcommand: db:seed
      */
     public function import()
     {
@@ -114,7 +114,7 @@ class DBCommand extends CommandHelper
 
     /**
      * Export a Database file into [.sql] and convert to <zip|rar>
-     * Subcommand: php tame db:export
+     * Subcommand: db:export
      */
     public function export()
     {
@@ -154,7 +154,7 @@ class DBCommand extends CommandHelper
 
     /**
      * Drop all tables, views, and types (--drop-types --drop-views)
-     * Subcommand: php tame db:wipe
+     * Subcommand: db:wipe
      */
     public function wipe()
     {

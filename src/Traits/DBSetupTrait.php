@@ -14,42 +14,6 @@ use Tamedevelopers\Database\Connectors\Connector;
 trait DBSetupTrait{
 
     /**
-     * Table name
-     * This is being used on all instance of one query
-     * 
-     * @param string $table
-     * 
-     * @return \Tamedevelopers\Database\Schema\Builder
-     */
-    public static function table($table)
-    {
-        return self::connector()->table($table);
-    }
-
-    /**
-     * Check if table exists
-     * 
-     * @param mixed $table
-     * 
-     * @return bool
-     */
-    public static function tableExists(...$table)
-    {
-        return self::connector()->table('')->tableExists($table);
-    }
-
-    /**
-     * Direct Query Expression
-     *
-     * @param string $query
-     * @return \Tamedevelopers\Database\Schema\Builder
-     */
-    public static function query(string $query)
-    {
-        return self::connector()->query($query);
-    }
-
-    /**
      * Set the table which the query is targeting.
      *
      * @param  string  $table
@@ -61,6 +25,51 @@ trait DBSetupTrait{
     {
         return self::table('')->from($table, $as);
     }
+
+    /**
+     * Table name
+     * This is being used on all instance of one query
+     * 
+     * @param string $table
+     * @return \Tamedevelopers\Database\Schema\Builder
+     */
+    public static function table($table)
+    {
+        return self::connector()->table($table);
+    }
+
+    /**
+     * Check if table exists
+     * 
+     * @param mixed $table
+     * @return bool
+     */
+    public static function tableExists(...$table)
+    {
+        return self::connector()->table('')->tableExists($table);
+    }
+
+    /**
+     * Alias for `tableExists` method
+     * 
+     * @param mixed $table
+     * @return bool
+     */
+    public static function hasTable(...$table)
+    {
+        return self::tableExists($table);
+    }
+
+    /**
+     * Direct Query Expression
+     *
+     * @param string $query
+     * @return \Tamedevelopers\Database\Schema\Builder
+     */
+    public static function query(string $query, $bindings = [])
+    {
+        return self::connector()->query($query);
+    }
     
     /**
      * Run a SELECT query and return all results.
@@ -68,7 +77,7 @@ trait DBSetupTrait{
      * @param string $query
      * @return \Tamedevelopers\Support\Collections\Collection
      */
-    public static function select(string $query)
+    public static function select(string $query, $bindings = [])
     {
         return self::query($query)->get();
     }
@@ -79,9 +88,21 @@ trait DBSetupTrait{
      * @param string $query
      * @return \Tamedevelopers\Support\Collections\Collection
      */
-    public static function selectOne(string $query)
+    public static function selectOne(string $query, $bindings = [])
     {
         return self::query($query)->first();
+    }
+
+    /**
+     * Add a Raw select expression to the query.
+     * 
+     * @param mixed $expression
+     * @param array $bindings - data to bind in the expression if found
+     * @return \Tamedevelopers\Database\Schema\Builder
+     */ 
+    public static function selectRaw(mixed $expression, $bindings = [])
+    {
+        return self::from('')->selectRaw($expression, $bindings);
     }
 
     /**

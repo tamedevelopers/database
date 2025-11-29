@@ -49,6 +49,13 @@ class Auth
     protected $table;
 
     /**
+     * Flag to proceed without password verification
+     *
+     * @var bool
+     */
+    protected $proceedWithoutPassword = false;
+
+    /**
      * Session key used to store authenticated user data.
      *
      * @var string
@@ -102,13 +109,18 @@ class Auth
         }
 
         // Normalize to array
-        $recordArray = is_array($record) ? $record : (method_exists($record, 'toArray') ? $record->toArray() : (array) $record);
+        $recordArray = is_array($record) ? $record 
+                    : (method_exists($record, 'toArray') 
+                    ? $record->toArray() : (array) $record);
 
         // Verify password against hashed password in database
         $plain = $credentials['password'] ?? null;
-        $hashed = $recordArray['password'] ?? null;
+        $hashed = $recordArray['password'] ?? null; 
 
-        if ($plain !== null && $hashed !== null && Hash::check($plain, $hashed)) {
+        // Check password values
+        $isPasswordNull = !is_null($plain) && !is_null($hashed);
+
+        if (($isPasswordNull && Hash::check($plain, $hashed)) || $this->proceedWithoutPassword) {
             // Set authenticated user internally ONLY (no session persistence)
             $this->user = $recordArray;
             return true;
@@ -160,6 +172,7 @@ class Auth
 
         // As a fallback, try to rehydrate from session lazily
         $this->hydrateFromSession();
+        
         return $this->user;
     }
 

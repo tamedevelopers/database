@@ -20,14 +20,14 @@ class ScaffoldCommand extends CommandHelper
      */
     public function handle()
     {
-        Logger::helpHeader('<yellow>Usage:</yellow>');
-        Logger::writeln('  php tame scaffold:run --force');
+        $this->handleHeader('scaffold');
+        Logger::writeln(' scaffold:run --force');
         Logger::writeln('');
     }
 
     /**
      * App scaffolding
-     * Subcommand: php tame scaffold:run
+     * Subcommand: scaffold:run
      */
     public function run()
     {

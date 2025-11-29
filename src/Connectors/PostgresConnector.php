@@ -61,7 +61,7 @@ class PostgresConnector implements ConnectorInterface
                 'pdo'       => null,
                 'config'    => $config,
                 'status'    => Constant::STATUS_400,
-                'message'   => $e->getMessage(),
+                'message'   => "{$e->getMessage()} [pgsql]",
             ];
         }
 

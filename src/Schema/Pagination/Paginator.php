@@ -317,13 +317,13 @@ class Paginator extends Builder{
 
     /**
      * Get Pagination data
+     * @param \Tamedevelopers\Database\Schema\Builder  $query
      * @param int $totalCount
      * @param int|string $perPage
-     * @param \Tamedevelopers\Database\Schema\Builder  $query
      * 
      * @return $this
      */
-    protected function getPagination($totalCount, int|string $perPage = 15, Builder $query)
+    protected function getPagination(Builder $query, $totalCount, int|string $perPage = 15)
     {
         try {
             // convert to int

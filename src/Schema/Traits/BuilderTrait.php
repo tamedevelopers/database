@@ -28,29 +28,24 @@ trait BuilderTrait{
 
     /**
      * Get Instance Table Name
-     * 
-     * @return string
      */
-    public function tableName()
+    public function tableName(): string
     {
         return "{$this->connection->tablePrefix}{$this->from}";
     }
 
     /**
      * Alias for tableName() method
-     * 
-     * @return string
      */
-    public function getTableName()
+    public function getTableName(): string
     {
         return $this->tableName();
     }
 
     /**
      * Set callback method
-     * @return void
      */
-    protected function setMethod($method = null)
+    protected function setMethod($method = null): void
     {
         $this->method = $method;
     }
@@ -98,20 +93,16 @@ trait BuilderTrait{
 
     /**
      * Get the current query value bindings in a flattened array.
-     *
-     * @return array
      */
-    protected function getBindings()
+    protected function getBindings(): array
     {
         return Forge::flattenValue($this->bindings);
     }
 
     /**
      * Get the raw array of bindings.
-     *
-     * @return array
      */
-    protected function getRawBindings()
+    protected function getRawBindings(): array
     {
         return $this->bindings;
     }
@@ -120,7 +111,6 @@ trait BuilderTrait{
      * Check if instance of Raw Expression Class
      *
      * @param mixed $value
-     * 
      * @return bool
      */
     protected function isExpression(mixed $value = null)
@@ -132,7 +122,6 @@ trait BuilderTrait{
      * Check if instance of Raw Expression Class
      *
      * @param mixed $value
-     * 
      * @return bool
      */
     protected function isExpressionContract(mixed $value = null)
@@ -144,7 +133,6 @@ trait BuilderTrait{
      * Check if instance of Collection class
      *
      * @param mixed $value
-     * 
      * @return bool
      */
     protected function isCollection(mixed $value = null)
@@ -156,7 +144,6 @@ trait BuilderTrait{
      * Check if instance of Closure class
      *
      * @param mixed $value
-     * 
      * @return bool
      */
     protected function isClosure(mixed $value = null)
@@ -168,7 +155,6 @@ trait BuilderTrait{
      * Check if instance of PDO class
      *
      * @param mixed $value
-     * 
      * @return bool
      */
     protected function isPDO(mixed $value = null)
@@ -213,7 +199,6 @@ trait BuilderTrait{
      * Add a new select column to the query.
      *
      * @param  array|mixed  $columns
-     * 
      * @param array $bindings
      * [optional] data to bind in the expression if found
      * 
@@ -283,7 +268,6 @@ trait BuilderTrait{
      * Add a select expression to the query.
      *
      * @param mixed $expression
-     * 
      * @param array $bindings
      * [optional] data to bind in the expression if found
      * 
@@ -541,10 +525,8 @@ trait BuilderTrait{
 
     /**
      * Clone the query.
-     *
-     * @return static
      */
-    protected function clone()
+    protected function clone(): static
     {
         return clone $this;
     }
@@ -554,7 +536,6 @@ trait BuilderTrait{
      * 
      * @param array $param
      * @param bool $indent
-     * 
      * @return array
      */ 
     protected function arrayWalkerTrim(?array $param = [], ?bool $indent = false)
@@ -757,7 +738,6 @@ trait BuilderTrait{
      * Build select columns to the query.
      *
      * @param mixed $columns
-     * 
      * @return string
      */
     protected function buildSelectColumns(mixed $columns = [])
@@ -773,10 +753,8 @@ trait BuilderTrait{
 
     /**
      * Get the format for database stored dates.
-     *
-     * @return string
      */
-    protected function getDateFormat()
+    protected function getDateFormat(): string
     {
         return 'Y-m-d H:i:s';
     }
@@ -820,10 +798,8 @@ trait BuilderTrait{
 
     /**
      * Invoke the "before query" modification callbacks.
-     *
-     * @return void
      */
-    protected function applyBeforeQueryCallbacks()
+    protected function applyBeforeQueryCallbacks(): void
     {
         foreach ($this->beforeQueryCallbacks as $callback) {
             $callback($this);
@@ -947,10 +923,8 @@ trait BuilderTrait{
 
     /**
      * Get last insert ID
-     *
-     * @return int
      */
-    protected function rowCount()
+    protected function rowCount(): int
     {
         return  $this->connection->statement 
                 ? $this->connection->statement->rowCount()
@@ -959,10 +933,8 @@ trait BuilderTrait{
 
     /**
      * Get last insert ID
-     *
-     * @return int
      */
-    protected function lastInsertId()
+    protected function lastInsertId(): int
     {
         return  $this->connection->pdo
                 ? $this->connection->pdo->lastInsertId()
@@ -1035,7 +1007,6 @@ trait BuilderTrait{
      *
      * @param  array  $values
      * @param  bool  $ignore
-     * 
      * @return int
      */
     protected function insertBuilder(array $values, $ignore = false)
@@ -1185,6 +1156,17 @@ trait BuilderTrait{
      */
     protected function updateBuilder(array $values, $ignore = false)
     {
+        $updatedAT = 'updated_at';
+
+        // check if timestamps is available in table
+        // if yes then add time stamps to columns
+        // with this helper, developers dont need to worry adding them
+        if(!isset($values[$updatedAT]) && $this->isTimeStampsReady){
+            $stampData = $this->timeStampData();
+
+            $values[$updatedAT] = $stampData[$updatedAT];
+        }
+
         $this->applyBeforeQueryCallbacks();
 
         $sql = $this->compile()->compileUpdate($this, $values);
@@ -1210,7 +1192,6 @@ trait BuilderTrait{
      *
      * @param  array|string  $columns
      * @param  bool  $close \By default we close queries 
-     * 
      * @return int
      */
     protected function countBuilder($columns = ['*'], $close = true)

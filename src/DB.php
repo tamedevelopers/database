@@ -52,6 +52,15 @@ use Tamedevelopers\Database\Traits\ExceptionTrait;
  * @method \Tamedevelopers\Database\Schema\Builder sum(Expression|string $column)
  * @method \Tamedevelopers\Database\Schema\Builder avg(Expression|string $column)
  * 
+ * @method int count()
+ * @method bool exists()
+ * @method int min(Expression|string $column)
+ * @method int max(Expression|string $column)
+ * @method int min(Expression|string $column)
+ * @method int sum(Expression|string $column)
+ * @method int avg(Expression|string $column)
+ * @method bool tableExists(mixed $table)
+ * 
  * @method \Tamedevelopers\Database\Schema\Expression raw(mixed $value)
  * @method \Tamedevelopers\Database\Schema\Builder runTime()
  * @method \Tamedevelopers\Database\Schema\Builder tableName()

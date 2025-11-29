@@ -17,8 +17,8 @@ class KeyCommand extends CommandHelper
      */
     public function handle()
     {
-        Logger::helpHeader('<yellow>Usage:</yellow>');
-        Logger::writeln('  php tame key:generate');
+        $this->handleHeader('key');
+        Logger::writeln('  key:generate');
         Logger::writeln('');
     }
 

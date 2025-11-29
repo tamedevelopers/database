@@ -108,11 +108,22 @@ class Connector extends DatabaseManager{
     }
 
     /**
+     * Set the table which the query is targeting.
+     *
+     * @param  string  $table
+     * @param  string|null  $as
+     * @return \Tamedevelopers\Database\Schema\Builder
+     */
+    public function from($table, $as = null)
+    {
+        return $this->table('')->from($table, $as);
+    }
+
+    /**
      * Table name
      * This is being used on all instance of one query
      * 
      * @param string $table
-     * 
      * @return \Tamedevelopers\Database\Schema\Builder
      */
     public function table(string $table)
@@ -126,7 +137,6 @@ class Connector extends DatabaseManager{
      * Check if table exists
      * 
      * @param mixed $table
-     * 
      * @return bool
      */
     public function tableExists(...$table)
@@ -135,36 +145,36 @@ class Connector extends DatabaseManager{
     }
 
     /**
-     * Direct Query Expression
+     * Alias for `tableExists` method
      * 
-     * @param string $query
-     * @return \Tamedevelopers\Database\Schema\Builder
-     */ 
-    public function query(string $query)
+     * @param mixed $table
+     * @return bool
+     */
+    public function hasTable(...$table)
     {
-        return $this->table('')->query($query);
+        return $this->tableExists($table);
     }
 
     /**
-     * Set the table which the query is targeting.
-     *
-     * @param  string  $table
-     * @param  string|null  $as
+     * Direct Query Expression
      * 
+     * @param string $query
+     * @param array $bindings - (optional) data to bind in query if found
      * @return \Tamedevelopers\Database\Schema\Builder
-     */
-    public function from($table, $as = null)
+     */ 
+    public function query(string $query, $bindings = [])
     {
-        return $this->table('')->from($table, $as);
+        return $this->table('')->query($query, $bindings);
     }
 
     /**
      * Run a SELECT query and return all results.
      *
      * @param string $query
+     * @param array $bindings - (optional) data to bind in select if found
      * @return \Tamedevelopers\Support\Collections\Collection
      */
-    public function select(string $query)
+    public function select(string $query, $bindings = [])
     {
         return $this->query($query)->get();
     }
@@ -173,11 +183,24 @@ class Connector extends DatabaseManager{
      * Run a SELECT query and return a single result.
      *
      * @param string $query
+     * @param array $bindings - (optional) data to bind in select if found
      * @return \Tamedevelopers\Support\Collections\Collection
      */
-    public function selectOne(string $query)
+    public function selectOne(string $query, $bindings = [])
     {
         return $this->query($query)->first();
+    }
+
+    /**
+     * Add a Raw select expression to the query.
+     * 
+     * @param mixed $expression
+     * @param array $bindings - data to bind in the expression if found
+     * @return \Tamedevelopers\Database\Schema\Builder
+     */ 
+    public function selectRaw(mixed $expression, $bindings = [])
+    {
+        return $this->from('')->selectRaw($expression, $bindings);
     }
 
     /**
@@ -203,8 +226,8 @@ class Connector extends DatabaseManager{
     
     /**
      * Build Table Instance
-     * @param string $table
      * 
+     * @param string $table
      * @return $this
      */
     private function buidTable($table = null)
@@ -260,6 +283,7 @@ class Connector extends DatabaseManager{
 
     /**
      * Change the prefix of the currently selected database driver
+     * 
      * @param string $prefix
      * @return void
      */
@@ -284,7 +308,6 @@ class Connector extends DatabaseManager{
      * Get Connection data
      * 
      * @param string|null $mode
-     * 
      * @return mixed
      */
     public function dbConnection($mode = null)
@@ -308,7 +331,6 @@ class Connector extends DatabaseManager{
      * Alias for dbConnection() method;
      * 
      * @param string|null $mode
-     * 
      * @return mixed
      */
     public function getConnection($mode = null)
@@ -352,7 +374,6 @@ class Connector extends DatabaseManager{
      * 
      * @param string|null $name
      * @param array|null $default
-     * 
      * @return array
      */
     private static function getConnectionFromDatabaseFile($name = null, $default = [])
@@ -378,8 +399,8 @@ class Connector extends DatabaseManager{
 
     /**
      * Set Database Connection
-     * @param string $connection
      * 
+     * @param string $connection
      * @return void
      */
     private function setConnection($connection = null)

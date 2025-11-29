@@ -34,6 +34,25 @@ class Builder  {
         ExpressionTrait;
     
 
+
+    /**
+     * Return a new clone of Builder 
+     * @return $this
+     */
+    public function clone()
+    {
+        return clone $this;
+    }
+
+    /**
+     * Alias of `clone` method
+     * @return $this
+     */
+    public function copy()
+    {
+        return $this->clone();
+    }
+
     /**
      * Set the table which the query is targeting.
      *
@@ -47,25 +66,11 @@ class Builder  {
 
         return $this;
     }
-
-    /**
-     * Direct Query Expression
-     * 
-     * @param string $query
-     * @return $this
-     */ 
-    public function query(string $query)
-    {
-        $this->query = $query;
-
-        return $this;
-    }
     
     /**
      * Execute the query strings
      *
      * @return int
-     * 
      * @throws \Exception
      */
     public function exec()
@@ -78,14 +83,27 @@ class Builder  {
     }
 
     /**
+     * Direct Query Expression
+     * 
+     * @param string $query
+     * @param array $bindings - (optional) data to bind in query if found
+     * @return $this
+     */ 
+    public function query(string $query, $bindings = [])
+    {
+        $this->query = $query;
+
+        return $this;
+    }
+
+    /**
      * Columns to be selected.
      * 
      * @param mixed $columns
-     * [array] or [string] if single selection
-     * 
+     * @param array $bindings - (optional) data to bind in select if found
      * @return $this
      */ 
-    public function select(mixed $columns = [])
+    public function select(mixed $columns = [], $bindings = [])
     {
         return $this->buildSelect(
             is_array($columns) ? $columns : func_get_args()
@@ -96,10 +114,7 @@ class Builder  {
      * Add a Raw select expression to the query.
      * 
      * @param mixed $expression
-     * 
-     * @param array $bindings
-     * [optional] data to bind in the expression if found
-     * 
+     * @param array $bindings - (optional) data to bind in the expression if found
      * @return $this
      */ 
     public function selectRaw(mixed $expression, $bindings = [])
@@ -111,9 +126,7 @@ class Builder  {
      * Add an "order by" clause to the query.
      * 
      * @param string $column
-     * 
-     * @param string|null $direction
-     * [optional] Default direction is `asc`
+     * @param string|null $direction (Default: 'asc')
      * 
      * @return $this
      * 
@@ -136,7 +149,6 @@ class Builder  {
      * Add an "order by desc" clause to the query.
      * 
      * @param string $column
-     * 
      * @return $this
      */ 
     public function orderByDesc($column)
@@ -148,7 +160,6 @@ class Builder  {
      * Add an "order by asc" clause to the query.
      * 
      * @param string $column
-     * 
      * @return $this
      */ 
     public function orderByAsc($column)
@@ -160,13 +171,11 @@ class Builder  {
      * Add a raw "order by" clause to the query.
      * 
      * @param string $sql
-     * 
      * @return $this
      */ 
     public function orderByRaw(string $sql)
     {
         $type = 'Raw';
-
         $this->orders[] = compact('type', 'sql');
 
         return $this;
@@ -175,9 +184,7 @@ class Builder  {
     /**
      * Add a "latest" clause to the query.
      * 
-     * @param string $column
-     * [optional] Default column name is `id`
-     *
+     * @param string $column (Default: 'id')
      * @return $this
      */
     public function latest(string $column = 'id')
@@ -190,9 +197,7 @@ class Builder  {
     /**
      * Add a "oldest" clause to the query.
      * 
-     * @param string $column
-     * [optional] Default column name is `id`
-     *
+     * @param string $column (Default: 'id')
      * @return $this
      */
     public function oldest(string $column = 'id')
@@ -345,7 +350,6 @@ class Builder  {
         return $this;
     }
 
-    
     /**
      * Add a "join where" clause to the query.
      *
@@ -1312,7 +1316,6 @@ class Builder  {
      * Check if table exists
      * 
      * @param mixed $table
-     * 
      * @return bool
      */
     public function tableExists(...$table)
@@ -1342,7 +1345,7 @@ class Builder  {
             }
 
             $pdo->query($sql)->execute();
-
+            
             $this->close();
             
             return true;
@@ -1352,11 +1355,20 @@ class Builder  {
     }
 
     /**
-     * Determine if any rows exist for the current query.
-     *
+     * Alias for `tableExists` method
+     * 
+     * @param mixed $table
      * @return bool
      */
-    public function exists()
+    public function hasTable(...$table)
+    {
+        return $this->tableExists($table);
+    }
+
+    /**
+     * Determine if any rows exist for the current query.
+     */
+    public function exists(): bool
     {
         $this->applyBeforeQueryCallbacks();
 
@@ -1377,20 +1389,16 @@ class Builder  {
 
     /**
      * Determine if no rows exist for the current query.
-     *
-     * @return bool
      */
-    public function doesntExist()
+    public function doesntExist(): bool
     {
         return ! $this->exists();
     }
 
     /**
      * Get the SQL representation of the query.
-     *
-     * @return string
      */
-    public function toSql()
+    public function toSql(): string
     {
         if(!empty($this->query)){
             return $this->query;
@@ -1421,12 +1429,10 @@ class Builder  {
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int|string $perPage
-     * - Supporting numeric string values, which will be internally converted to `int`
+     * @param  int|string $perPage      Supporting numeric string values, which will be 
+     * internally converted to `int`
      * 
-     * @param  string $pageParam
-     * [optional] parameter name on url
-     * 
+     * @param  string $pageParam        Parameter name on url
      * @return \Tamedevelopers\Support\Collections\Collection
      */
     public function paginate($perPage = 15, $pageParam = 'page')
@@ -1442,16 +1448,15 @@ class Builder  {
         $this->setMethod(__FUNCTION__);
 
         // paginator data
-        $results = $paginator->getPagination($totalCount, $perPage, $this);
+        $results = $paginator->getPagination($this, $totalCount, $perPage);
         
         return new Collection($results['data'], $results['builder']);
     }
 
     /**
      * Retrieve the "count" result of the query.
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->countBuilder();
     }
@@ -1459,9 +1464,7 @@ class Builder  {
     /**
      * Find data by given value
      * 
-     * @param int $value
-     * [default column name is `id`]
-     *
+     * @param int $value    (Default column name is `id`)
      * @return null|\Tamedevelopers\Support\Collections\Collection
      */
     public function find(int $value)
@@ -1587,10 +1590,8 @@ class Builder  {
 
     /**
      * Delete records from the database.
-     *
-     * @return int
      */
-    public function delete()
+    public function delete(): int
     {
         $this->applyBeforeQueryCallbacks();
 
@@ -1612,10 +1613,7 @@ class Builder  {
      * [performing where clause under the hood]
      *
      * @param mixed $value
-     *
-     * @param string $column
-     * [default column name is 'id']
-     * 
+     * @param string $column    (Default column name is 'id')
      * @return int
      */
     public function destroy($value, $column = 'id')
@@ -1734,10 +1732,8 @@ class Builder  {
 
     /**
      * Die and dump the current SQL and bindings.
-     *
-     * @return void
      */
-    public function dd()
+    public function dd(): void
     {
         $this->runTime();
 

@@ -15,6 +15,18 @@ trait AuthTrait
     // Internal helpers
     // --------------------
 
+    /**
+     * Set whether to skip password verification during login.
+     *
+     * @param bool $value
+     * @return $this
+     */
+    public function withoutPassword(bool $value = true)
+    {
+        $this->proceedWithoutPassword = $value;
+        return $this;
+    }
+
     /** Ensure session is started. */
     protected function ensureSessionStarted(): void
     {
@@ -188,8 +200,8 @@ trait AuthTrait
 
     /** Ensure password is present in the credentials array. */
     protected function assertPasswordPresent(array $credentials): void
-    {
-        if (!isset($credentials['password'])) {
+    {   
+        if (!isset($credentials['password']) && !$this->proceedWithoutPassword) {
             try {
                 throw new \RuntimeException("Password field ['password'] is required in credentials.");
             } catch (\Throwable $th) {
