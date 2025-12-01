@@ -34,7 +34,6 @@ class MigrationCommand extends CommandHelper
 
     /**
      * Drop all tables and re-run all migrations
-     * Subcommand: migrate:fresh
      */
     public function fresh()
     {

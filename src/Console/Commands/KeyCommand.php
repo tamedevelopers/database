@@ -24,7 +24,6 @@ class KeyCommand extends CommandHelper
 
     /**
      * Generate and display a new application key
-     * Subcommand: php tame key:generate
      */
     public function generate()
     {

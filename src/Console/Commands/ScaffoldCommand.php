@@ -27,7 +27,6 @@ class ScaffoldCommand extends CommandHelper
 
     /**
      * App scaffolding
-     * Subcommand: scaffold:run
      */
     public function run()
     {

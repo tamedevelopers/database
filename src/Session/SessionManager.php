@@ -8,12 +8,15 @@ use PDO;
 use Redis;
 use SessionHandlerInterface;
 use Tamedevelopers\Database\DB;
+use Tamedevelopers\Support\Str;
+use Tamedevelopers\Support\Tame;
+use Tamedevelopers\Support\Time;
 use Tamedevelopers\Database\Constant;
 use Tamedevelopers\Support\Capsule\File;
 use Tamedevelopers\Database\Capsule\AppManager;
+use Tamedevelopers\Database\Session\SessionInterface;
 use Tamedevelopers\Database\Session\Handlers\RedisSessionHandler;
 use Tamedevelopers\Database\Session\Handlers\DatabaseSessionHandler;
-use Tamedevelopers\Database\Session\SessionInterface as BaseSessionInterface;
 
 /**
  * Configurable session manager supporting file, database, and redis drivers.
@@ -25,10 +28,10 @@ use Tamedevelopers\Database\Session\SessionInterface as BaseSessionInterface;
  * - For redis driver, install a phpredis-backed handler with TTL
  * - Provide a simple, framework-agnostic SessionInterface implementation
  */
-final class SessionManager implements BaseSessionInterface
+class SessionManager implements SessionInterface
 {
     /** @var array<string,mixed> Resolved session configuration */
-    private array $config;
+    protected array $config;
 
     /** @var \Tamedevelopers\Database\Connectors\Connector> Instance of Database Object*/
     private $conn;
@@ -41,15 +44,19 @@ final class SessionManager implements BaseSessionInterface
      *  - driver: file|database|redis (default: file)
      *  - lifetime: int seconds (optional, default from ini)
      *  - connection: Database connection name (for database driver)
-     *  - database: [dsn, username, password, options(array), table(string)]
      *  - redis: [host, port, timeout, auth, database, prefix, ttl]
      */
     public function __construct(array $config = [])
     {
+        // Run heavy boot only once
+        AppManager::bootLoader();
+
+        // Always merge config for each new Session instance
         $this->config = array_merge(config('session'), $config);
 
-        // Boot Capsule App Manager
-        AppManager::bootLoader();
+        // Always normalize values
+        $this->config['lifetime'] = Time::toSeconds($this->config['lifetime']);
+        $this->config['cookie']   = Str::camel($this->config['cookie']);
     }
 
     /** @inheritDoc */
@@ -61,19 +68,21 @@ final class SessionManager implements BaseSessionInterface
 
         $path       = $this->config['files'];
         $driver     = $this->config['driver'];
-        $lifetime   = (int) $this->config['lifetime'];
+        $lifetime   = $this->config['lifetime'];
         $name       = $this->config['cookie'];
 
         if (!File::isDirectory($path)) {
             File::makeDirectory($path, 0777, true);
         }
 
-        if ($lifetime) {
-            @ini_set('session.gc_maxlifetime', (string) $lifetime);
-        }
-
         if($name){
             session_name($name);
+        }
+
+        if ($lifetime) {
+            @ini_set('session.gc_maxlifetime', $lifetime);
+            ini_set('session.gc_probability', 1);
+            ini_set('session.gc_divisor', 100);
         }
 
         switch ($driver) {
@@ -84,7 +93,7 @@ final class SessionManager implements BaseSessionInterface
                 $this->configureRedisDriver($lifetime);
                 break;
             default:
-                $this->configureFileDriver($path);
+                $this->configureFileDriver($path, $lifetime);
                 break;
         }
 
@@ -92,7 +101,7 @@ final class SessionManager implements BaseSessionInterface
     }
 
     /** Configure file session driver */
-    private function configureFileDriver($path): void
+    private function configureFileDriver($path, $lifetime): void
     {
         if (!is_writable($path)) {
             throw new \RuntimeException("Session path not writable: {$path}");
@@ -100,10 +109,26 @@ final class SessionManager implements BaseSessionInterface
 
         ini_set('session.save_handler', 'files');
         ini_set('session.save_path', realpath($path));
+
+        // when setting the path that the cookie is valid for, 
+        // always remember to have that trailing '/' at the end.
+        // session_set_cookie_params(0, '/yourpath/'); - CORRECT
+        // session_set_cookie_params(0, '/yourpath'); - INCORRECT
+        $path = rtrim($this->config['path'], '/') . '/';
+
+        // Set secure session cookie parameters
+        session_set_cookie_params([
+            'lifetime' => $lifetime,  
+            'path' => $path,
+            'domain' => $this->config['domain'], 
+            'secure' => $this->config['secure'] ?: false, // Ensure HTTPS usage
+            'httponly' => $this->config['http_only'], // Prevent JavaScript access
+            'samesite' => $this->config['same_site']
+        ]);
     }
 
     /** Configure database session driver */
-    private function configureDatabaseDriver(?int $lifetime = null): void
+    private function configureDatabaseDriver($lifetime = null): void
     {
         if(empty($this->config['connection'])){
             $this->config['connection'] = config('database.default');
@@ -159,14 +184,6 @@ final class SessionManager implements BaseSessionInterface
     {
         return $this->config;
     }
-    
-    /** Check Database connection */
-    private function dbConnect(): bool
-    {
-        $status = $this->db['status'] ?? null;
-        
-        return $status == Constant::STATUS_200;
-    }
 
     /** @inheritDoc */
     public function id(): ?string
@@ -186,12 +203,22 @@ final class SessionManager implements BaseSessionInterface
     /** @inheritDoc */
     public function get(string $key, $default = null)
     {
-        return $_SESSION[$key] ?? $default;
+        $value = $_SESSION[$key] ?? $default;
+
+        if (!empty($this->config['encrypt']) && $this->config['encrypt'] == true) {
+            $value = $this->decryptValue($value);
+        }
+
+        return $value;
     }
 
     /** @inheritDoc */
     public function put(string $key, $value): void
     {
+        if (!empty($this->config['encrypt']) && $this->config['encrypt'] == true) {
+            $value = $this->encryptValue($value);
+        }
+
         $_SESSION[$key] = $value;
     }
 
@@ -210,7 +237,15 @@ final class SessionManager implements BaseSessionInterface
     /** @inheritDoc */
     public function all(): array
     {
-        return (array) ($_SESSION ?? []);
+        $data = (array) ($_SESSION ?? []);
+
+        if (!empty($this->config['encrypt']) && $this->config['encrypt'] == true) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->decryptValue($value);
+            }
+        }
+
+        return $data;
     }
 
     /** @inheritDoc */
@@ -226,4 +261,33 @@ final class SessionManager implements BaseSessionInterface
             @session_destroy();
         }
     }
+
+    /** Check Database connection */
+    private function dbConnect(): bool
+    {
+        $status = $this->db['status'] ?? null;
+        
+        return $status == Constant::STATUS_200;
+    }
+
+    /** Encrypt value using OpenSSL AES-256-CBC */
+    private function encryptValue($value): string
+    {
+        $value = serialize($value);
+
+        return Tame::encryptStr($value);
+    }
+
+    /** Decrypt session value */
+    private function decryptValue(?string $payload)
+    {
+        if (empty($payload)) {
+            return null;
+        }
+
+        $decrypted = Tame::decryptStr($payload);
+
+        return unserialize($decrypted);
+    }
+
 }

@@ -33,7 +33,6 @@ class DBCommand extends CommandHelper
 
     /**
      * Seed the database with records
-     * Subcommand: db:seed
      */
     public function seed()
     {
@@ -42,7 +41,6 @@ class DBCommand extends CommandHelper
 
     /**
      * Generate a migration Schema from a Database using [.sql]
-     * Subcommand: db:seed
      */
     public function schema()
     {
@@ -79,7 +77,6 @@ class DBCommand extends CommandHelper
 
     /**
      * Import a Database [.sql] file into the database
-     * Subcommand: db:seed
      */
     public function import()
     {
@@ -114,7 +111,6 @@ class DBCommand extends CommandHelper
 
     /**
      * Export a Database file into [.sql] and convert to <zip|rar>
-     * Subcommand: db:export
      */
     public function export()
     {
@@ -154,7 +150,6 @@ class DBCommand extends CommandHelper
 
     /**
      * Drop all tables, views, and types (--drop-types --drop-views)
-     * Subcommand: db:wipe
      */
     public function wipe()
     {

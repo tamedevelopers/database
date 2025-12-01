@@ -2,6 +2,7 @@
 
 use Tamedevelopers\Database\DB;
 use Tamedevelopers\Database\Auth;
+use Tamedevelopers\Database\Session;
 use Tamedevelopers\Database\DBExport;
 use Tamedevelopers\Database\DBImport;
 use Tamedevelopers\Database\AutoLoader;
@@ -137,6 +138,32 @@ if (! function_exists('schema')) {
     function schema()
     {
         return new Schema();
+    }
+}
+
+if (! function_exists('tsession')) {
+    /**
+     * Session Class
+     *
+     * @param array<string,mixed> $config
+     *  - driver: file|database|redis (default: file)
+     *  - lifetime: int seconds (optional, default from ini)
+     *  - connection: Database connection name (for database driver)
+     *  - redis: [host, port, timeout, auth, database, prefix, ttl]
+     * 
+     * @return \Tamedevelopers\Database\Session
+     */
+    function tsession(array $config = [])
+    {
+        static $instance = null;
+
+        if ($instance === null) {
+            $instance = new Session($config);
+
+            $instance->start();
+        }
+
+        return $instance;
     }
 }
 

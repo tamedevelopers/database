@@ -1,5 +1,6 @@
 <?php
 
+use Tamedevelopers\Database\Session;
 use Tamedevelopers\Database\Session\SessionManager;
 
 

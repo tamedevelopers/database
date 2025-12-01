@@ -1,12 +1,12 @@
 <?php
 
+use Tamedevelopers\Database\Session;
 use Tamedevelopers\Database\Session\SessionManager;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 
-config(['session.driver' => 'database']);
-
+// config(['session.driver' => 'database']);
 
 $session = new SessionManager([
     'lifetime' => 1800,
@@ -19,16 +19,9 @@ $session->put('db_key', 'db_value');
 // $session->destroy('db_key');
 
 dd(
-    $_SERVER['HTTP_USER_AGENT']
-);
-
-dd(
     $_SESSION,
-    $session->config(),
     $session->id(),
     $session->get('db_key'),
-
-    db('sqlite')->table('admins')
 );
 
 echo 'Session ID: ' . $session->id() . PHP_EOL;
