@@ -94,18 +94,6 @@ trait DBSetupTrait{
     }
 
     /**
-     * Add a Raw select expression to the query.
-     * 
-     * @param mixed $expression
-     * @param array $bindings - data to bind in the expression if found
-     * @return \Tamedevelopers\Database\Schema\Builder
-     */ 
-    public static function selectRaw(mixed $expression, $bindings = [])
-    {
-        return self::from('')->selectRaw($expression, $bindings);
-    }
-
-    /**
      * Get Connector instance
      * 
      * @return \Tamedevelopers\Database\Connectors\Connector

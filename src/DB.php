@@ -26,6 +26,7 @@ use Tamedevelopers\Database\Traits\ExceptionTrait;
  * @method static \Tamedevelopers\Database\DB table(string $table)
  * @method static \Tamedevelopers\Database\DB query(string $query)
  * @method static \Tamedevelopers\Database\DB select(string $query)
+ * @method static \Tamedevelopers\Database\DB selectRaw(mixed $expression, $bindings = [])
  * @method static \Tamedevelopers\Database\DB selectOne(string $query)
  * @method static \Tamedevelopers\Database\DB tableExists(mixed $table)
  * @method static \Tamedevelopers\Database\DB statement(string $query, array $bindings = [])
@@ -52,6 +53,10 @@ use Tamedevelopers\Database\Traits\ExceptionTrait;
  * @method \Tamedevelopers\Database\Schema\Builder sum(Expression|string $column)
  * @method \Tamedevelopers\Database\Schema\Builder avg(Expression|string $column)
  * 
+ * @method mixed first()
+ * @method mixed firstOrIgnore()
+ * @method mixed firstOrFail()
+ * @method mixed firstOrCreate(array $attributes = [], array $values = [])
  * @method mixed insert(array $values)
  * @method mixed insertOrIgnore(array $values)
  * @method int count()
