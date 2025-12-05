@@ -319,15 +319,15 @@ class Paginator extends Builder{
      * Get Pagination data
      * @param \Tamedevelopers\Database\Schema\Builder  $query
      * @param int $totalCount
-     * @param int|string $perPage
+     * @param int|string|null $perPage
      * 
      * @return $this
      */
-    protected function getPagination(Builder $query, $totalCount, int|string $perPage = 15)
+    protected function getPagination(Builder $query, $totalCount, $perPage = 15)
     {
         try {
             // convert to int
-            $perPage = (int) $perPage;
+            $perPage = (int) empty($perPage) ? 15 : $perPage;
 
             // reset headers
             $this->asset->headerControlNoCache();

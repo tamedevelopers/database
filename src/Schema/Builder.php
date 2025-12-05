@@ -1429,7 +1429,7 @@ class Builder  {
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int|string $perPage      Supporting numeric string values, which will be 
+     * @param  int|string|null $perPage      Supporting numeric string values, which will be 
      * internally converted to `int`
      * 
      * @param  string $pageParam        Parameter name on url
